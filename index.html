@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Scanner IMEI - Smart 9</title>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <title>Scanner IMEI</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -24,31 +24,43 @@
 </head>
 <body>
 
-    <h2>Scanner IMEI - Smart 9 (64GB + 4GB RAM)</h2>
+    <h2>Scanner IMEI - Smart 9 & Neo Titanium</h2>
 
     <div id="reader"></div>
     <div id="result">Scannez un IMEI...</div>
 
     <script>
         const imeiValides = [
-            "353067550782504",
-            "353067559894599"
+            "353067550782504", // Smart 9
+            "353067559894599", // Smart 9
+            "359007232383341", // Neo Titanium
+            "359007239283015"  // Neo Titanium
         ];
 
-        function onScanSuccess(decodedText, decodedResult) {
+        function verifierIMEI(code) {
             const resultDiv = document.getElementById("result");
 
-            if (imeiValides.includes(decodedText.trim())) {
+            if (!/^\d{15}$/.test(code)) {
+                resultDiv.style.color = "orange";
+                resultDiv.innerText = `Ignoré : "${code}" n’est pas un IMEI (15 chiffres attendus)`;
+                return;
+            }
+
+            if (imeiValides.includes(code)) {
                 resultDiv.style.color = "green";
-                resultDiv.innerText = `IMEI reconnu : ${decodedText}`;
+                resultDiv.innerText = `IMEI reconnu : ${code}`;
             } else {
                 resultDiv.style.color = "red";
-                resultDiv.innerText = `Erreur : IMEI non reconnu (${decodedText})`;
+                resultDiv.innerText = `Erreur : IMEI non reconnu (${code})`;
             }
         }
 
+        function onScanSuccess(decodedText, decodedResult) {
+            verifierIMEI(decodedText.trim());
+        }
+
         function onScanFailure(error) {
-            // On peut ignorer les erreurs temporaires de scan
+            // Échecs silencieux
         }
 
         const html5QrCode = new Html5Qrcode("reader");
