@@ -206,6 +206,8 @@
   margin-top: 0.2rem;
 }
 
+
+
   </style>
 </head>
 
@@ -273,27 +275,25 @@
 
   <main id="catalog" class="page">
     <!-- barre de recherche -->
-    <div style="display:flex; align-items:center; gap:0.75rem; padding:1rem;">
-      <div style="flex:1; position:relative;">
-        <input
-        type="search"
-        id="search-input"
-        placeholder="Search catalog"
-        aria-label="Search catalog"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="none"
-        spellcheck="false"
-          style="width:100%; padding:0.6rem 3rem 0.6rem 1rem;
-                 border-radius:1.5rem; border:1px solid #ddd;
-                 background:#f1f1f1; outline:none;">
-        <i class="bi bi-cart"
-           style="position:absolute; right:2.2rem; top:50%;
-                  transform:translateY(-50%); font-size:1.2rem;
-                  color:#666;"
-           aria-label="Cart"></i>
-      </div>
-    </div>
+    <header>
+        <div class="search-wrapper">
+          <i class="bi bi-search"></i>
+          <input
+            type="search"
+            id="search-input"
+            placeholder="Rechercher dans le catalogue"
+            aria-label="Recherche catalogue"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+          >
+          <div class="actions">
+            <i class="bi bi-cart"></i>
+          </div>
+        </div>
+      </header>
+    
 
       <!-- ===== Info cards (total livres + valeur) ===== -->
   <div class="info-cards">
