@@ -276,10 +276,14 @@
     <div style="display:flex; align-items:center; gap:0.75rem; padding:1rem;">
       <div style="flex:1; position:relative;">
         <input
-          type="text"
-          id="search-input"
-          placeholder="Search catalog"
-          aria-label="Search catalog"
+        type="search"
+        id="search-input"
+        placeholder="Search catalog"
+        aria-label="Search catalog"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck="false"
           style="width:100%; padding:0.6rem 3rem 0.6rem 1rem;
                  border-radius:1.5rem; border:1px solid #ddd;
                  background:#f1f1f1; outline:none;">
@@ -303,12 +307,6 @@
     </div>
   </div>
 
-  <!-- conteneur pour les résultats, déjà présent -->
-  <div id="catalog-results" style="padding:1rem;">
-    <!-- injectez ici votre liste de produits -->
-  </div>
-
-  
     <!-- conteneur pour les résultats -->
     <div id="catalog-results" style="padding:1rem;">
       <!-- injectez ici votre liste de produits -->
