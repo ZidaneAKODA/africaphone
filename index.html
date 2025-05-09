@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>eBay Mobile PWA</title>
+
   <!-- PWA manifest & theming -->
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0064d2">
@@ -12,347 +13,213 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="eBay Mobile">
   <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+
   <!-- Google Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-  <style>
-    :root {
-      --primary-text: #222;
-      --secondary-text: #555;
-      --border-radius-pill: 2rem;
-      --ebay-red:   #e53238;
-      --ebay-blue:  #0064d2;
-      --ebay-yellow:#f5af02;
-      --ebay-green: #86b817;
-      --accent:     #0064d2;
-    }
-    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-    html, body {
-      width:100%; height:100%;
-      font-family:'Roboto', sans-serif;
-      background:#fff; color:var(--primary-text);
+  <style>
+    :root{
+      --primary-text:#222;
+      --secondary-text:#555;
+      --border-radius-pill:2rem;
+      --ebay-red:#e53238;
+      --ebay-blue:#0064d2;
+      --ebay-yellow:#f5af02;
+      --ebay-green:#86b817;
+      --accent:#0064d2;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    html,body{
+      width:100%;height:100%;
+      font-family:'Roboto',sans-serif;
+      background:#fff;color:var(--primary-text);
       -webkit-font-smoothing:antialiased;
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
-      display:flex; flex-direction:column;
-      height: 100vh;
-      height: 100dvh;
+      display:flex;flex-direction:column;
+      height:100vh;height:100dvh;
     }
 
     /* PAGE MANAGEMENT */
-    .page        { display:none; }
-    .page.visible{ display:block; }
+    .page{display:none}
+    .page.visible{display:block}
 
     /* COMMON STYLES */
-    header { padding:1rem 1rem 0.5rem; }
-    .cart {
-      margin-left:auto;
-      font-size:1.6rem;
-      color:var(--primary-text);
+    header{padding:1rem 1rem 0.5rem}
+    .cart{margin-left:auto;font-size:1.6rem;color:var(--primary-text)}
+
+    .search-wrapper{
+      margin-top:0.75rem;position:relative
+    }
+    .search-wrapper input{
+      width:100%;padding:0.75rem 3.25rem 0.75rem 2.75rem;
+      border:none;border-radius:var(--border-radius-pill);
+      background:#f4f4f4;font-size:1rem;outline:none;cursor:pointer
+    }
+    .search-wrapper .bi-search{
+      position:absolute;left:1rem;top:50%;
+      transform:translateY(-50%);font-size:1.1rem;color:var(--secondary-text)
+    }
+    .search-wrapper .actions{
+      position:absolute;right:0.75rem;top:50%;
+      transform:translateY(-50%);display:flex;gap:0.5rem;
+      font-size:1.6rem;color:var(--secondary-text)
     }
 
-    .search-wrapper {
-      margin-top:0.75rem;
-      position:relative;
+    .signin-card{text-align:center;margin:0.5rem 0 1.2rem}
+    .signin-card p{
+      font-size:1.05rem;color:var(--secondary-text);
+      margin-bottom:1rem;line-height:1.4
     }
-    .search-wrapper input {
-      width:100%;
-      padding:0.75rem 3.25rem 0.75rem 2.75rem;
-      border:none;
-      border-radius:var(--border-radius-pill);
-      background:#f4f4f4;
-      font-size:1rem;
-      outline:none;
-      cursor:pointer;
-    }
-    .search-wrapper .bi-search {
-      position:absolute; left:1rem; top:50%;
-      transform:translateY(-50%);
-      font-size:1.1rem; color:var(--secondary-text);
-    }
-    .search-wrapper .actions {
-      position:absolute; right:0.75rem; top:50%;
-      transform:translateY(-50%);
-      display:flex; gap:0.5rem;
-      font-size:1.6rem; color:var(--secondary-text);
-    }
+    .signin-actions{display:flex;justify-content:center;gap:1rem}
 
-    .signin-card {
-      text-align:center;
-      margin:0.5rem 0 1.2rem;
+    .btn-outline{
+      flex:0 0 42%;padding:0.7rem 1rem;border:2px solid var(--accent);
+      border-radius:var(--border-radius-pill);background:#fff;
+      font-weight:500;color:var(--accent);font-size:1rem;
+      transition:all 0.2s ease;outline:none
     }
-    .signin-card p {
-      font-size:1.05rem;
-      color:var(--secondary-text);
-      margin-bottom:1rem;
-      line-height:1.4;
-    }
-    .signin-actions {
-      display:flex; justify-content:center; gap:1rem;
-    }
-    .btn-outline {
-      flex:0 0 42%;
-      padding:0.7rem 1rem;
-      border:2px solid var(--accent);
-      border-radius:var(--border-radius-pill);
-      background:#fff;
-      font-weight:500;
-      color:var(--accent);
-      font-size:1rem;
-      transition:all 0.2s ease;
-      outline:none;
-    }
-    .btn-outline:active {
-      background:var(--accent);
-      color:#fff;
-    }
+    .btn-outline:active{background:var(--accent);color:#fff}
 
-    .promo-block {
-      background:#f5f5f5;
-      padding:1.5rem 1rem;
-      margin-bottom:1.2rem;
+    .promo-block{
+      background:#f5f5f5;padding:1.5rem 1rem;margin-bottom:1.2rem
     }
-    .promo-block h2 {
-      font-size:1.6rem; margin-bottom:0.5rem;
+    .promo-block h2{font-size:1.6rem;margin-bottom:0.5rem}
+    .promo-block p{
+      color:var(--secondary-text);font-size:1rem;line-height:1.4;margin-bottom:1rem
     }
-    .promo-block p {
-      color:var(--secondary-text);
-      font-size:1rem; line-height:1.4;
-      margin-bottom:1rem;
+    .btn-primary{
+      padding:0.85rem 1.5rem;background:var(--accent);color:#fff;border:none;
+      border-radius:var(--border-radius-pill);font-size:1rem;font-weight:600;
+      box-shadow:0 4px 10px rgba(0,0,0,0.1);outline:none
     }
-    .btn-primary {
-      padding:0.85rem 1.5rem;
-      background:var(--accent);
-      color:#fff;
-      border:none;
-      border-radius:var(--border-radius-pill);
-      font-size:1rem; font-weight:600;
-      box-shadow:0 4px 10px rgba(0,0,0,0.1);
-      outline:none;
-    }
-    .btn-primary:active { background:#014fa5; }
+    .btn-primary:active{background:#014fa5}
 
-    .trending {
-      padding:0 1rem 5.5rem;
+    .trending{padding:0 1rem 5.5rem}
+    .trending h3{font-size:1.35rem;margin-bottom:0.75rem}
+    .trend-list{
+      display:flex;gap:1.25rem;overflow-x:auto;padding-bottom:0.5rem;
+      -ms-overflow-style:none;scrollbar-width:none
     }
-    .trending h3 {
-      font-size:1.35rem; margin-bottom:0.75rem;
+    .trend-list::-webkit-scrollbar{display:none}
+    .trend-item{
+      flex:0 0 auto;text-align:center;user-select:none;padding:0.5rem
     }
-    .trend-list {
-      display:flex; gap:1.25rem;
-      overflow-x:auto; padding-bottom:0.5rem;
-      -ms-overflow-style:none; scrollbar-width:none;
+    .trend-item img{
+      width:5.3rem;height:5.3rem;border-radius:50%;object-fit:cover;
+      box-shadow:0 2px 6px rgba(0,0,0,0.12)
     }
-    .trend-list::-webkit-scrollbar { display:none; }
-    .trend-item {
-      flex:0 0 auto;
-      text-align:center;
-      user-select:none;
-      padding:0.5rem;
+    .trend-item .product-name{display:block;margin-top:0.5rem;font-weight:500}
+    .trend-item .price{
+      display:block;margin:0.25rem 0 0.75rem;color:var(--ebay-red);font-weight:600
     }
-    .trend-item img {
-      width:5.3rem; height:5.3rem;
-      border-radius:50%; object-fit:cover;
-      box-shadow:0 2px 6px rgba(0,0,0,0.12);
-    }
-    .trend-item .product-name {
-      display:block;
-      margin-top:0.5rem;
-      font-weight:500;
-    }
-    .trend-item .price {
-      display:block;
-      margin:0.25rem 0 0.75rem;
-      color:var(--ebay-red);
-      font-weight:600;
-    }
-    .btn-add {
-      font-size:0.85rem;
-      padding:0.4rem 0.8rem;
-    }
+    .btn-add{font-size:0.85rem;padding:0.4rem 0.8rem}
 
     /* NAVIGATION BAR */
-    nav {
-      position:fixed; bottom:0; left:0;
-      width:100%; background:#fff;
-      border-top:1px solid #e0e0e0;
-      z-index:30;
+    nav{
+      position:fixed;bottom:0;left:0;width:100%;background:#fff;
+      border-top:1px solid #e0e0e0;z-index:30
     }
-    .nav-inner {
-      display:flex;
-      justify-content: space-evenly;
-      align-items:center;
-      padding:0.4rem 0;
+    .nav-inner{display:flex;justify-content:space-evenly;align-items:center;padding:0.4rem 0}
+    .nav-link{
+      flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      font-size:0.8rem;color:var(--secondary-text);outline:none;user-select:none;
+      position:relative;overflow:hidden;padding:0.6rem 0;border-radius:var(--border-radius-pill);
+      background:none;border:none;cursor:pointer;text-decoration:none
     }
-    .nav-link {
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      font-size:0.8rem;
-      color:var(--secondary-text);
-      outline:none;
-      user-select:none;
-      position:relative;
-      overflow:hidden;
-      padding:0.6rem 0;
-      border-radius:var(--border-radius-pill);
-      background:none;
-      border:none;
-      cursor:pointer;
-    }
-    .nav-link i { font-size:1.25rem; }
-    .nav-link.active {
-      color:var(--accent);
-      background:rgba(0,100,210,0.12);
-    }
+    .nav-link i{font-size:1.25rem}
+    .nav-link.active{color:var(--accent);background:rgba(0,100,210,0.12)}
 
     /* RIPPLE EFFECT */
-    .ripple {
-      position:absolute;
-      border-radius:50%;
-      transform:scale(0);
-      background:rgba(0,100,210,0.25);
-      animation:ripple 600ms linear;
-      pointer-events:none;
+    .ripple{
+      position:absolute;border-radius:50%;transform:scale(0);
+      background:rgba(0,100,210,0.25);animation:ripple 600ms linear;pointer-events:none
     }
-    @keyframes ripple {
-      to {
-        transform:scale(4);
-        opacity:0;
-      }
-    }
+    @keyframes ripple{to{transform:scale(4);opacity:0}}
 
-    /* CATALOG OVERLAY */
-    #catalog-page {
-      position:fixed;
-      inset:0;
-      z-index:20;
-      padding:1rem;
-      background:#fff;
-      display:flex;
-      flex-direction:column;
-      height:100vh;
-      opacity:0;
-      pointer-events:none;
-      transform:translateY(2%);
-      transition:opacity 0.3s ease, transform 0.3s ease;
+    /* CATALOG OVERLAY (devient id="catalog") */
+    #catalog{
+      position:fixed;inset:0;z-index:20;padding:1rem;background:#fff;
+      display:flex;flex-direction:column;height:100vh;
+      opacity:0;pointer-events:none;transform:translateY(2%);
+      transition:opacity 0.3s ease,transform 0.3s ease
     }
-    #catalog-page.visible {
-      opacity:1;
-      pointer-events:auto;
-      transform:translateY(0);
+    #catalog.visible{
+      opacity:1;pointer-events:auto;transform:translateY(0)
     }
 
     /* === Home page actions === */
-.home-actions {
-  display: flex;
-  justify-content: space-around;
-  gap: 1rem;
-  padding: 1rem;
-}
+    .home-actions{
+      display:flex;justify-content:space-around;gap:1rem;padding:1rem
+    }
+    .btn-action{
+      flex:1;display:flex;align-items:center;justify-content:center;gap:0.5rem;
+      padding:0.8rem 1rem;border:none;border-radius:var(--border-radius-pill);
+      font-size:1rem;font-weight:500;box-shadow:0 2px 6px rgba(0,0,0,0.12);
+      transition:transform 0.1s ease,box-shadow 0.1s ease;color:#fff;cursor:pointer
+    }
+    .btn-action:active{transform:translateY(1px);box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+    .btn-sell{background:var(--ebay-green)}
+    .btn-buy {background:var(--ebay-blue)}
 
-.btn-action {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.8rem 1rem;
-  border: none;
-  border-radius: var(--border-radius-pill);
-  font-size: 1rem;
-  font-weight: 500;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-  color: #fff;
-  cursor: pointer;
-}
-.btn-action:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-/* Bouton Vendre → vert eBay */
-.btn-sell {
-  background: var(--ebay-green);
-}
-/* Bouton Acheter → bleu eBay */
-.btn-buy {
-  background: var(--ebay-blue);
-}
-
-/* === Stock info card === */
-.stock-card {
-  background: var(--ebay-yellow);
-  border-radius: var(--border-radius-pill);
-  margin: 0 1rem 1.5rem;
-  padding: 0.75rem 1rem;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.stock-count {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--primary-text);
-}
-
-.stock-label {
-  font-size: 0.95rem;
-  color: var(--secondary-text);
-}
-
-
+    /* === Stock info card === */
+    .stock-card{
+      background:var(--ebay-yellow);border-radius:var(--border-radius-pill);
+      margin:0 1rem 1.5rem;padding:0.75rem 1rem;text-align:center;
+      box-shadow:0 2px 6px rgba(0,0,0,0.1)
+    }
+    .stock-count{font-size:1.8rem;font-weight:700;color:var(--primary-text)}
+    .stock-label{font-size:0.95rem;color:var(--secondary-text)}
   </style>
 </head>
+
 <body>
 
-    <!-- HOME PAGE -->
-<main id="home-page" class="page visible">
-    <header>
-      <h2 style="padding:1rem">Accueil</h2>
-    </header>
-  
+  <!-- HOME PAGE -->
+  <main id="home" class="page visible">
+    <header><h2 style="padding:1rem">Home</h2></header>
+
     <!-- Action buttons -->
     <div class="home-actions">
-      <button class="btn-action btn-sell" aria-label="Vendre">
-        <i class="bi bi-tag-fill"></i>
-        <span>Vendre</span>
+      <button class="btn-action btn-sell" data-hash="sell" aria-label="Sell">
+        <i class="bi bi-tag-fill"></i><span>Sell</span>
       </button>
-      <button class="btn-action btn-buy" aria-label="Acheter">
-        <i class="bi bi-cart-fill"></i>
-        <span>Acheter</span>
+      <button class="btn-action btn-buy" data-hash="catalog" aria-label="Buy">
+        <i class="bi bi-cart-fill"></i><span>Buy</span>
       </button>
     </div>
-  
+
     <!-- Stock info card -->
     <div class="stock-card">
       <div class="stock-count">1 234</div>
-      <div class="stock-label">Livres en stock</div>
+      <div class="stock-label">Books in stock</div>
     </div>
-  
-    <!-- Ici vous pourrez continuer avec vos sections promo, trending, etc. -->
   </main>
-  
 
-
+  <!-- SELL PAGE -->
+  <main id="sell" class="page">
+    <header><h2 style="padding:1rem">Vendre</h2></header>
+    <div class="search-wrapper" style="padding:0 1rem; margin-top:1rem;">
+      <i class="bi bi-search"></i>
+      <input type="text"
+             placeholder="Rechercher un produit à vendre"
+             aria-label="Recherche de l'article à vendre">
+    </div>
+    <!-- contenu additionnel -->
+  </main>
 
   <!-- MY ORDERS PAGE -->
-  <main id="orders-page" class="page">
-    <header>
-      <h2 style="padding:1rem">My Orders</h2>
-    </header>
+  <main id="orders" class="page">
+    <header><h2 style="padding:1rem">My Orders</h2></header>
     <p style="padding:0 1rem 6rem">Your recent orders will appear here…</p>
   </main>
 
   <!-- CART PAGE -->
-  <main id="cart-page" class="page visible">
-    <header>
-      <h2 style="padding:1rem">Cart</h2>
-    </header>
+  <main id="cart" class="page">
+    <header><h2 style="padding:1rem">Cart</h2></header>
     <div style="padding:0 1rem 6rem;">
       <p>Your cart is currently empty.</p>
       <button class="btn-primary" style="margin-top:1rem;">View recommendations</button>
@@ -360,10 +227,8 @@
   </main>
 
   <!-- ACCOUNT PAGE -->
-  <main id="account-page" class="page">
-    <header>
-      <h2 style="padding:1rem">My Account</h2>
-    </header>
+  <main id="account" class="page">
+    <header><h2 style="padding:1rem">My Account</h2></header>
     <div style="padding:0 1rem 6rem;">
       <p>Sign in to access your account and preferences.</p>
       <div class="signin-actions">
@@ -373,23 +238,29 @@
     </div>
   </main>
 
-  <!-- CATALOG OVERLAY -->
-  <section id="catalog-page">
+  <!-- CATALOG PAGE (overlay style) -->
+  <main id="catalog" class="page">
     <div style="display:flex; align-items:center; gap:0.75rem;">
       <div style="flex:1; position:relative;">
-        <input
-          type="text"
-          placeholder="Search catalog"
-          id="search-input"
-          aria-label="Search catalog"
-          style="width:100%;padding:0.6rem 3rem 0.6rem 1rem;border-radius:1.5rem;border:1px solid #ddd;background:#f1f1f1;outline:none;"
-        >
-        <i class="bi bi-cart" style="position:absolute; right:2.2rem; top:50%; transform:translateY(-50%); font-size:1.2rem; color:#666;" aria-label="Cart"></i>
+        <input type="text"
+               placeholder="Search catalog"
+               id="search-input"
+               aria-label="Search catalog"
+               style="width:100%;padding:0.6rem 3rem 0.6rem 1rem;border-radius:1.5rem;
+                      border:1px solid #ddd;background:#f1f1f1;outline:none;">
+        <i class="bi bi-cart"
+           style="position:absolute; right:2.2rem; top:50%; transform:translateY(-50%);
+                  font-size:1.2rem; color:#666;" aria-label="Cart"></i>
       </div>
     </div>
-    <div style="display:flex; justify-content:center; margin-top:1.2rem; gap:2rem; font-size:1rem; font-weight:500;">
-      <span id="tab-recent" onclick="toggleTab('recent')" style="color:#555; cursor:pointer;">Recent</span>
-      <span id="tab-saved" onclick="toggleTab('saved')" style="color:#0064d2; border-bottom:2px solid #0064d2; padding-bottom:0.25rem; cursor:pointer;">Saved</span>
+
+    <div style="display:flex; justify-content:center; margin-top:1.2rem; gap:2rem;
+                font-size:1rem; font-weight:500;">
+      <span id="tab-recent" onclick="toggleTab('recent')"
+            style="color:#555; cursor:pointer;">Recent</span>
+      <span id="tab-saved"  onclick="toggleTab('saved')"
+            style="color:#0064d2; border-bottom:2px solid #0064d2;
+                   padding-bottom:0.25rem; cursor:pointer;">Saved</span>
     </div>
 
     <div style="text-align:center; margin-top:4rem;">
@@ -401,42 +272,36 @@
       </p>
       <p><a href="#" style="color:#0064d2; font-weight:500; text-decoration:none;">Sign in to view</a></p>
     </div>
-  </section>
+  </main>
 
   <!-- NAVIGATION BAR -->
   <nav aria-label="Main navigation">
     <div class="nav-inner">
-      <button class="nav-link active" data-target="home-page" aria-label="Home">
+      <a href="#home"    data-hash="home"    class="nav-link active" aria-label="Home">
         <i class="bi bi-house"></i><span>Home</span>
-      </button>
-      <button class="nav-link" data-target="catalog-page" aria-label="Catalog">
+      </a>
+      <a href="#catalog" data-hash="catalog" class="nav-link" aria-label="Catalog">
         <i class="bi bi-search"></i><span>Catalog</span>
-      </button>
-      <button class="nav-link" data-target="cart-page" aria-label="Cart">
+      </a>
+      <a href="#cart"    data-hash="cart"    class="nav-link" aria-label="Cart">
         <i class="bi bi-cart"></i><span>Cart</span>
-      </button>
-      <button class="nav-link" data-target="account-page" aria-label="Account">
+      </a>
+      <a href="#account" data-hash="account" class="nav-link" aria-label="Account">
         <i class="bi bi-person"></i><span>Account</span>
-      </button>
+      </a>
     </div>
   </nav>
 
+  <!-- SCRIPTS -->
   <script>
-    /* PWA */
+    /* PWA registration */
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(e => console.error(e));
+      navigator.serviceWorker.register('/sw.js').catch(err => console.error(err));
     }
 
-    /* Catalog overlay */
-    const catalogPage = document.getElementById('catalog-page');
-    function openCatalog() {
-      catalogPage.classList.add('visible');
-    }
-    function closeCatalog() {
-      catalogPage.classList.remove('visible');
-    }
+    /* Tabs inside catalog */
     function toggleTab(tab) {
-      ['recent','saved'].forEach(t => {
+      ['recent', 'saved'].forEach(t => {
         const el = document.getElementById('tab-' + t);
         el.style.color = '#555';
         el.style.borderBottom = 'none';
@@ -446,46 +311,55 @@
       active.style.borderBottom = '2px solid #0064d2';
     }
 
-    /* Navigation + Ripple effect + Pages */
-    document.addEventListener('DOMContentLoaded', () => {
-      const navLinks = document.querySelectorAll('.nav-link');
-      const pages    = document.querySelectorAll('.page');
-      navLinks.forEach(link => {
-        link.addEventListener('click', function (e) {
-          const targetId = this.dataset.target;
-          // Ripple effect
-          const rect   = this.getBoundingClientRect();
-          const size   = Math.max(rect.width, rect.height);
-          const ripple = document.createElement('span');
-          ripple.className = 'ripple';
-          ripple.style.width  = ripple.style.height = size + 'px';
-          ripple.style.left   = (e.clientX - rect.left - size/2) + 'px';
-          ripple.style.top    = (e.clientY - rect.top  - size/2) + 'px';
-          const old = this.querySelector('.ripple');
-          if (old) old.remove();
-          this.appendChild(ripple);
+    /* Hash-router + ripple (l’onde ne s’applique qu’à la barre de navigation) */
+  (function () {
+    const pages = document.querySelectorAll('.page');
 
-          // Activate selected button
-          navLinks.forEach(btn => btn.classList.remove('active'));
-          this.classList.add('active');
-
-          // Show corresponding page
-          if (targetId === 'catalog-page') {
-            openCatalog();
-          } else {
-            closeCatalog();
-            pages.forEach(p => p.classList.remove('visible'));
-            document.getElementById(targetId).classList.add('visible');
-          }
-        });
+    function route() {
+      const key = location.hash.slice(1) || 'home';
+      let ok = false;
+      pages.forEach(p => {
+        const show = p.id === key;
+        p.classList.toggle('visible', show);
+        if (show) ok = true;
       });
+      if (!ok) {          // hash inconnu → retour home
+        location.hash = 'home';
+        return;
+      }
+      // Met à jour l’état « active » des liens
+      document.querySelectorAll('[data-hash]').forEach(el => {
+        el.classList.toggle('active', el.dataset.hash === key);
+      });
+    }
+
+    // Délégation : tout élément data-hash change le hash
+    document.body.addEventListener('click', e => {
+      const el = e.target.closest('[data-hash]');
+      if (!el) return;
+
+      /* ---------- Ripple UNIQUEMENT pour la barre de navigation ---------- */
+      if (el.classList.contains('nav-link')) {
+        const rect   = el.getBoundingClientRect();
+        const size   = Math.max(rect.width, rect.height);
+        const ripple = document.createElement('span');
+        ripple.className      = 'ripple';
+        ripple.style.width    =
+        ripple.style.height   = size + 'px';
+        ripple.style.left     = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top      = (e.clientY - rect.top  - size / 2) + 'px';
+        el.querySelector('.ripple')?.remove();   // supprime l’ancien éventuel
+        el.appendChild(ripple);
+      }
+      /* ------------------------------------------------------------------ */
+
+      if (el.tagName === 'A') e.preventDefault();
+      location.hash = el.dataset.hash;
     });
 
-    /* Cart (simulation) */
-    function addToCart(name, price) {
-      alert(name + ' added to cart for ' + price);
-    }
+    window.addEventListener('DOMContentLoaded', route);
+    window.addEventListener('hashchange', route);
+  })();
   </script>
-
 </body>
 </html>
