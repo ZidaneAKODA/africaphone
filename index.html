@@ -216,6 +216,23 @@
   color: var(--secondary-text);
   margin-top: 0.2rem;
 }
+.info-cards {
+  /* transition douce sur opacité et hauteur */
+  transition: opacity 0.3s ease, max-height 0.3s ease, margin-bottom 0.3s ease, padding 0.3s ease;
+  /* fixer une hauteur max suffisante pour le contenu */
+  max-height: 200px;        /* ajustez selon la hauteur de vos cards */
+  overflow: hidden;
+}
+
+.info-cards.fade-out {
+  opacity: 0;
+  max-height: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  pointer-events: none;     /* pour ne plus capter les clics */
+}
+
 
 /* Add this below your existing .info-card styles */
 
@@ -482,6 +499,30 @@ main#catalog {
     window.addEventListener('DOMContentLoaded', route);
     window.addEventListener('hashchange', route);
   })();
+
+  // Récupère les éléments
+const searchInput = document.getElementById('search-input');
+const infoCards   = document.querySelector('.info-cards');
+
+// Quand on focus (ou clique) dans la barre de recherche → fade-out
+searchInput.addEventListener('focus', () => {
+  infoCards.classList.add('fade-out');
+});
+
+// Si vous voulez les faire réapparaître au blur (et si le champ est vide)
+searchInput.addEventListener('blur', () => {
+  if (!searchInput.value.trim()) {
+    infoCards.classList.remove('fade-out');
+  }
+});
+
+// (Optionnel) si vous préférez déclencher aussi sur clic dans tout le wrapper
+const wrapper = document.querySelector('main#catalog .search-wrapper');
+wrapper.addEventListener('click', () => {
+  searchInput.focus();  // pour garantir le focus
+  infoCards.classList.add('fade-out');
+});
+
   </script>
 </body>
 </html>
