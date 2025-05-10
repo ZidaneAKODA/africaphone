@@ -44,8 +44,19 @@
     }
 
     /* PAGE MANAGEMENT */
-    .page{display:none}
-    .page.visible{display:block}
+    /* Nouveau code à copier-coller */
+.page {
+  display: none;           /* cachée par défaut */
+  flex: 1 1 auto;          /* grandit pour remplir l’espace */
+  width: 100%;             /* occupe toute la largeur */
+  overflow-y: auto;        /* scroll interne si besoin */
+}
+
+.page.visible {
+  display: flex;           /* devient un flex-container vertical */
+  flex-direction: column;
+}
+
 
     /* COMMON STYLES */
     header{padding:1rem 1rem 0.5rem}
@@ -243,6 +254,25 @@
 }
 
 
+/* Réduire l’espace au-dessus de la barre de recherche sur la page Catalog */
+main#catalog > header {
+  padding-top: 0.5rem; /* Avant : 1rem ; ajustez à votre goût */
+}
+
+/* (Optionnel) Si vous préférez bouger la barre elle-même */
+main#catalog .search-wrapper {
+  margin-top: -0.25rem; /* déplace la barre vers le haut */
+}
+
+/* 1) On force la carte à 100% de la largeur du conteneur */
+.books-list .book-card {
+  width: 100%;               /* pleine largeur */
+  box-sizing: border-box;    /* inclut le padding/les bordures */
+  margin: 0 auto;            /* centre au cas où tu fixes un max-width */
+}
+
+
+
   </style>
 </head>
 
@@ -343,7 +373,7 @@
   </div>
 
     <!-- conteneur pour les résultats -->
-    <div id="catalog-results" style="padding:1rem;">
+    <div id="catalog-results" >
         <div class="books-list">
             <div class="book-card">
               <h4 class="book-title">The Great Gatsby</h4>
