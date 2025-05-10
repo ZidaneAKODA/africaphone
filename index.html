@@ -296,6 +296,9 @@ main#catalog {
 }
 
 
+
+
+
   </style>
 </head>
 
@@ -323,16 +326,112 @@ main#catalog {
   </main>
 
   <!-- SELL PAGE -->
-  <main id="sell" class="page">
-    <header><h2 style="padding:1rem">Vendre</h2></header>
-    <div class="search-wrapper" style="padding:0 1rem; margin-top:1rem;">
+<main id="sell" class="page">
+  <!-- Styles spécifiques à la page SELL -->
+  <style>
+  /* === Styles spécifiques à la page SELL === */
+  #sell .sell-header {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  #sell .sell-header .btn-close {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--primary-text);
+    margin-right: 0.75rem;
+    cursor: pointer;
+    outline: none;
+  }
+
+  #sell .sell-header .search-wrapper {
+    flex: 1;
+    position: relative;
+    margin-top: 0; /* override du margin-top global */
+  }
+
+  #sell .sell-header .search-wrapper .bi-search {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    color: var(--secondary-text);
+  }
+
+  #sell .sell-header #search-input-sell {
+    width: 100%;
+    padding: 0.75rem 2.5rem;
+    border: none;
+    border-radius: var(--border-radius-pill);
+    font-size: 1rem;
+    outline: none;
+  }
+
+  #sell .sell-header .search-wrapper .actions {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 0.5rem;
+    font-size: 1.6rem;
+    color: var(--secondary-text);
+  }
+</style>
+
+
+  <!-- Barre de recherche (mise à jour) -->
+  <header class="sell-header">
+    <button class="btn-close" data-hash="home" aria-label="Quitter la page de vente">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <div class="search-wrapper">
       <i class="bi bi-search"></i>
-      <input type="text"
-             placeholder="Rechercher un produit à vendre"
-             aria-label="Recherche de l'article à vendre">
+      <input
+        type="search"
+        id="search-input-sell"
+        placeholder="Rechercher dans le catalogue"
+        aria-label="Recherche catalogue"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck="false"
+      >
+      <div class="actions">
+        <i class="bi bi-cart"></i>
+      </div>
     </div>
-    <!-- contenu additionnel -->
-  </main>
+  </header>
+
+  <!-- Liste des livres -->
+  <div id="catalog-results-sell">
+    <div class="books-list">
+      <div class="book-card">
+        <h4 class="book-title">The Great Gatsby</h4>
+        <p class="book-price">$10.99</p>
+        <p class="book-quantity">Quantity: 3</p>
+      </div>
+      <div class="book-card">
+        <h4 class="book-title">1984</h4>
+        <p class="book-price">$8.50</p>
+        <p class="book-quantity">Quantity: 5</p>
+      </div>
+      <!-- répétez autant de .book-card que nécessaire -->
+    </div>
+  </div>
+</main>
+
+
 
   <!-- MY ORDERS PAGE -->
   <main id="orders" class="page">
@@ -453,24 +552,39 @@ main#catalog {
     /* Hash-router + ripple (l’onde ne s’applique qu’à la barre de navigation) */
   (function () {
     const pages = document.querySelectorAll('.page');
+    const nav   = document.querySelector('nav');    // ← ajoutez cette ligne
 
     function route() {
-      const key = location.hash.slice(1) || 'home';
-      let ok = false;
-      pages.forEach(p => {
-        const show = p.id === key;
-        p.classList.toggle('visible', show);
-        if (show) ok = true;
-      });
-      if (!ok) {          // hash inconnu → retour home
-        location.hash = 'home';
-        return;
-      }
-      // Met à jour l’état « active » des liens
-      document.querySelectorAll('[data-hash]').forEach(el => {
-        el.classList.toggle('active', el.dataset.hash === key);
-      });
-    }
+  const key = location.hash.slice(1) || 'home';
+  let ok = false;
+
+  // 1) On affiche/caché chaque page
+  pages.forEach(p => {
+    const show = p.id === key;
+    p.classList.toggle('visible', show);
+    if (show) ok = true;
+  });
+
+  // 2) Si le hash est invalide, on retourne à home
+  if (!ok) {
+    location.hash = 'home';
+    return;
+  }
+
+  // 3) On met à jour le lien actif
+  document.querySelectorAll('[data-hash]').forEach(el => {
+    el.classList.toggle('active', el.dataset.hash === key);
+  });
+
+  // 4) On masque la nav pour #sell, et on la restaure ensuite
+  if (key === 'sell') {
+    nav.style.display = 'none';
+  } else {
+    // supprime l'affichage inline pour revenir au comportement CSS natif
+    nav.style.removeProperty('display');
+  }
+}
+
 
     // Délégation : tout élément data-hash change le hash
     document.body.addEventListener('click', e => {
@@ -500,27 +614,18 @@ main#catalog {
     window.addEventListener('hashchange', route);
   })();
 
-  // Récupère les éléments
+ // ----- Recherche catalogue : fade-out dès la frappe ----- //
+
 const searchInput = document.getElementById('search-input');
 const infoCards   = document.querySelector('.info-cards');
 
-// Quand on focus (ou clique) dans la barre de recherche → fade-out
-searchInput.addEventListener('focus', () => {
-  infoCards.classList.add('fade-out');
-});
-
-// Si vous voulez les faire réapparaître au blur (et si le champ est vide)
-searchInput.addEventListener('blur', () => {
-  if (!searchInput.value.trim()) {
+// À chaque saisie dans l'input
+searchInput.addEventListener('input', () => {
+  if (searchInput.value.trim() !== '') {
+    infoCards.classList.add('fade-out');
+  } else {
     infoCards.classList.remove('fade-out');
   }
-});
-
-// (Optionnel) si vous préférez déclencher aussi sur clic dans tout le wrapper
-const wrapper = document.querySelector('main#catalog .search-wrapper');
-wrapper.addEventListener('click', () => {
-  searchInput.focus();  // pour garantir le focus
-  infoCards.classList.add('fade-out');
 });
 
   </script>
