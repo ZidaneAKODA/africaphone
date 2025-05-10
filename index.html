@@ -206,6 +206,41 @@
   margin-top: 0.2rem;
 }
 
+/* Add this below your existing .info-card styles */
+
+.books-list {
+  display: flex;
+  flex-direction: column;      /* vertical stack */
+  gap: 1rem;                   /* space between cards */
+  padding: 1rem;               /* inner spacing */
+}
+
+.book-card {
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.book-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--primary-text);
+}
+
+.book-price {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ebay-red);
+  margin-bottom: 0.25rem;
+}
+
+.book-quantity {
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+}
 
 
   </style>
@@ -309,7 +344,19 @@
 
     <!-- conteneur pour les résultats -->
     <div id="catalog-results" style="padding:1rem;">
-      <!-- injectez ici votre liste de produits -->
+        <div class="books-list">
+            <div class="book-card">
+              <h4 class="book-title">The Great Gatsby</h4>
+              <p class="book-price">$10.99</p>
+              <p class="book-quantity">Quantity: 3</p>
+            </div>
+            <div class="book-card">
+              <h4 class="book-title">1984</h4>
+              <p class="book-price">$8.50</p>
+              <p class="book-quantity">Quantity: 5</p>
+            </div>
+            <!-- Repeat .book-card for each book -->
+          </div>          
     </div>
   </main>
   
