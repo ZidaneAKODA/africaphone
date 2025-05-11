@@ -461,6 +461,11 @@ main#catalog {
 #sell .book-card .btn-add-to-cart:active {
   background: #004080;
 }
+/* après vos styles existants, idéalement à la toute fin de votre feuille */
+main.page {
+  /* 56px = hauteur approximative de votre nav + 1rem de marge de confort */
+  padding-bottom: calc(56px + env(safe-area-inset-bottom));
+}
 
 
 </style>
@@ -530,37 +535,39 @@ main#catalog {
     </div>
   </main>
 
+ <!-- ACCOUNT PAGE -->
 <main id="account" class="page">
-  <!-- Styles spécifiques à la page ACCOUNT (fullscreen & safe-area pour Android) -->
+  <!-- Styles spécifiques à la page ACCOUNT -->
   <style>
-    /* Conteneur full-screen avec prise en compte des encoches */
-    main#account {
-      width: 100vw;
-      min-height: 100dvh;
-      box-sizing: border-box;
-      padding: env(safe-area-inset-top) 1rem env(safe-area-inset-bottom) 1rem;
-      display: flex;
-      flex-direction: column;
-      background: #fff;
-    }
+    /* cadre horizontal pour le profil */
+#account .profile-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem;            /* aligne à gauche dans le flow */
+  max-width: none;         /* pleine largeur possible */
+  box-shadow: none;        /* comme les autres cadres */
+}
 
-    /* Profil : full-width, pas de marge par défaut */
-    #account .profile-card {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 0.5rem;
-      padding: 1rem;
-      margin: 0;
-      width: 100%;
-      box-shadow: none;
-    }
+/* avatar à gauche, sans centrage */
+#account .profile-avatar {
+  flex: 0 0 auto;
+  margin: 0;
+}
 
-    /* Avatar */
+/* wrapper texte : colonne, aligné à gauche */
+#account .profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: left;
+}
+
     #account .profile-avatar {
-      flex: 0 0 auto;
       width: 64px;
       height: 64px;
       background: var(--ebay-blue);
@@ -568,18 +575,26 @@ main#catalog {
       font-weight: bold;
       font-size: 2rem;
       border-radius: 50%;
+      margin: 0 auto 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0;
     }
-
-    /* Informations profil */
-    #account .profile-info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      text-align: left;
+    #account h2 { 
+      padding: 1rem; 
+      font-size: 1.3rem; 
+      font-weight: 600; 
+    }
+    #account #display-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    #account #email,
+    #account #member-since {
+      font-size: 0.95rem;
+      color: var(--secondary-text);
+      margin-bottom: 0.5rem;
     }
 
     /* Titres de section */
@@ -591,14 +606,14 @@ main#catalog {
       color: var(--primary-text);
     }
 
-    /* Vos mises à jour en colonne */
+    /* Cartes de mises à jour */
     #account .updates-grid {
       display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.75rem;
       padding: 0 1rem;
     }
     #account .update-card {
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -607,27 +622,24 @@ main#catalog {
       border-radius: 0.5rem;
       padding: 1rem;
       cursor: pointer;
-      width: 100%;
-      margin: 0;
     }
     #account .update-card h4 {
-      margin: 0 0 0.25rem;
       font-size: 1rem;
+      margin: 0 0 0.25rem;
     }
     #account .update-card p {
-      margin: 0;
       font-size: 0.85rem;
       color: var(--secondary-text);
+      margin: 0;
     }
     #account .update-card i.bi-chevron-right {
       font-size: 1.2rem;
       color: var(--secondary-text);
     }
 
-    /* Menu interne full-width */
+    /* Liste de gestion interne */
     #account .menu-list {
       margin-top: 0.5rem;
-      padding: 0;
     }
     #account .menu-item {
       width: 100%;
@@ -639,9 +651,10 @@ main#catalog {
       border-bottom: 1px solid #eee;
       padding: 0.75rem 1rem;
       cursor: pointer;
-      margin: 0;
     }
-    #account .menu-item:last-child { border-bottom: none; }
+    #account .menu-item:last-child {
+      border-bottom: none;
+    }
     #account .menu-item .item-content {
       display: flex;
       align-items: center;
@@ -664,12 +677,10 @@ main#catalog {
       line-height: 1.2;
     }
 
-    /* Bouton déconnexion en bas */
+    /* Bouton de déconnexion */
     #account .btn-signout {
       width: calc(100% - 2rem);
-      margin: auto;
-      margin-top: auto;
-      margin-bottom: env(safe-area-inset-bottom);
+      margin: 1rem;
       padding: 0.75rem 1.2rem;
       font-size: 1rem;
       font-weight: 500;
@@ -677,85 +688,103 @@ main#catalog {
       border-radius: var(--border-radius-pill);
       background: #fff;
       color: var(--accent);
-      text-align: center;
       cursor: pointer;
+      text-align: center;
       transition: background 0.2s, color 0.2s;
     }
     #account .btn-signout:active {
       background: var(--accent);
       color: #fff;
     }
+
+    /* 1) autoriser le wrapping pour qu’un item puisse aller à la ligne suivante */
+#account .updates-grid {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* 2) forcer la 2ᵉ carte (Commandes récentes) à occuper 100 % de la largeur */
+#account .updates-grid .update-card:nth-child(2) {
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+
+
+
   </style>
 
   <!-- En-tête -->
   <header><h2>Mon compte</h2></header>
 
-  <!-- Carte profil -->
-  <div class="profile-card">
-    <div class="profile-avatar" id="avatar-letter">Z</div>
-    <div class="profile-info">
-      <div id="display-name">Utilisateur</div>
-      <div id="email">email@example.com</div>
-      <div id="member-since">Membre depuis: …</div>
-    </div>
+  <div>
+    <div class="profile-card">
+  <div class="profile-avatar" id="avatar-letter">Z</div>
+  <div class="profile-info">
+    <div id="display-name">Utilisateur</div>
+    <div id="email">email@example.com</div>
+    <div id="member-since">Membre depuis: …</div>
   </div>
+</div>
 
-  <!-- Vos mises à jour -->
-  <div class="section-title">Vos mises à jour</div>
-  <div class="updates-grid">
-    <div class="update-card" onclick="location.hash='stock-alerts'">
-      <div>
-        <h4>Alertes de stock</h4>
-        <p>Livres bientôt épuisés</p>
+
+    <!-- Vos mises à jour -->
+    <div class="section-title">Vos mises à jour</div>
+    <div class="updates-grid">
+      <div class="update-card" onclick="location.hash='stock-alerts'">
+        <div>
+          <h4>Alertes de stock</h4>
+          <p>Livres bientôt épuisés</p>
+        </div>
+        <i class="bi bi-chevron-right"></i>
       </div>
-      <i class="bi bi-chevron-right"></i>
+      <div class="update-card" onclick="location.hash='orders'">
+        <div>
+          <h4>Commandes récentes</h4>
+          <p>Voir vos dernières commandes</p>
+        </div>
+        <i class="bi bi-chevron-right"></i>
+      </div>
     </div>
-    <div class="update-card" onclick="location.hash='orders'">
-      <div>
-        <h4>Commandes récentes</h4>
-        <p>Voir vos dernières commandes</p>
-      </div>
-      <i class="bi bi-chevron-right"></i>
+
+    <!-- Gestion interne -->
+    <div class="section-title">Gestion</div>
+    <div class="menu-list">
+      <button class="menu-item" data-hash="inventory">
+        <div class="item-content">
+          <i class="bi bi-box-seam"></i>
+          <div>
+            <span>Inventaire</span>
+            <small>Gérer vos livres</small>
+          </div>
+        </div>
+        <i class="bi bi-chevron-right"></i>
+      </button>
+      <button class="menu-item" data-hash="suppliers">
+        <div class="item-content">
+          <i class="bi bi-people"></i>
+          <div>
+            <span>Fournisseurs</span>
+            <small>Liste des fournisseurs</small>
+          </div>
+        </div>
+        <i class="bi bi-chevron-right"></i>
+      </button>
+      <button class="menu-item" data-hash="reports">
+        <div class="item-content">
+          <i class="bi bi-bar-chart-line"></i>
+          <div>
+            <span>Rapports</span>
+            <small>Statistiques & analyses</small>
+          </div>
+        </div>
+        <i class="bi bi-chevron-right"></i>
+      </button>
     </div>
-  </div>
 
-  <!-- Gestion interne -->
-  <div class="section-title">Gestion</div>
-  <div class="menu-list">
-    <button class="menu-item" data-hash="inventory">
-      <div class="item-content">
-        <i class="bi bi-box-seam"></i>
-        <div>
-          <span>Inventaire</span>
-          <small>Gérer vos livres</small>
-        </div>
-      </div>
-      <i class="bi bi-chevron-right"></i>
-    </button>
-    <button class="menu-item" data-hash="suppliers">
-      <div class="item-content">
-        <i class="bi bi-people"></i>
-        <div>
-          <span>Fournisseurs</span>
-          <small>Liste des fournisseurs</small>
-        </div>
-      </div>
-      <i class="bi bi-chevron-right"></i>
-    </button>
-    <button class="menu-item" data-hash="reports">
-      <div class="item-content">
-        <i class="bi bi-bar-chart-line"></i>
-        <div>
-          <span>Rapports</span>
-          <small>Statistiques & analyses</small>
-        </div>
-      </div>
-      <i class="bi bi-chevron-right"></i>
-    </button>
+    <!-- Déconnexion -->
+    <button class="btn-signout" id="btn-signout">Déconnexion</button>
   </div>
-
-  <!-- Déconnexion -->
-  <button class="btn-signout" id="btn-signout">Déconnexion</button>
 
   <!-- Script de peuplement & sign out -->
   <script>
@@ -777,7 +806,6 @@ main#catalog {
     });
   </script>
 </main>
-
 
 
 
