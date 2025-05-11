@@ -530,19 +530,37 @@ main#catalog {
     </div>
   </main>
 
-  <!-- ACCOUNT PAGE -->
+ <!-- ACCOUNT PAGE -->
 <main id="account" class="page">
-  <!-- Style spécifique à la page ACCOUNT -->
+  <!-- Styles spécifiques à la page ACCOUNT -->
   <style>
-    #account .profile-card {
-      background: #fff;
-      padding: 1.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      text-align: center;
-      max-width: 400px;
-      margin: 2rem auto;
-    }
+    /* cadre horizontal pour le profil */
+#account .profile-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem;            /* aligne à gauche dans le flow */
+  max-width: none;         /* pleine largeur possible */
+  box-shadow: none;        /* comme les autres cadres */
+}
+
+/* avatar à gauche, sans centrage */
+#account .profile-avatar {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+/* wrapper texte : colonne, aligné à gauche */
+#account .profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: left;
+}
 
     #account .profile-avatar {
       width: 64px;
@@ -557,76 +575,217 @@ main#catalog {
       align-items: center;
       justify-content: center;
     }
-
-    #account h3 {
+    #account h2 { 
+      padding: 1rem; 
+      font-size: 1.3rem; 
+      font-weight: 600; 
+    }
+    #account #display-name {
       font-size: 1.3rem;
       font-weight: 600;
       margin-bottom: 0.25rem;
     }
-
-    #account p {
+    #account #email,
+    #account #member-since {
       font-size: 0.95rem;
       color: var(--secondary-text);
       margin-bottom: 0.5rem;
     }
 
-    #account .btn-outline {
-      margin-top: 1rem;
-      padding: 0.75rem 1.2rem;
-      font-size: 1rem;
-      border-radius: var(--border-radius-pill);
-      border: 2px solid var(--accent);
-      color: var(--accent);
-      background: #fff;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+    /* Titres de section */
+    #account .section-title {
+      padding: 0 1rem;
+      margin: 1.5rem 0 0.75rem;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--primary-text);
     }
 
-    #account .btn-outline:active {
+    /* Cartes de mises à jour */
+    #account .updates-grid {
+      display: flex;
+      gap: 0.75rem;
+      padding: 0 1rem;
+    }
+    #account .update-card {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      cursor: pointer;
+    }
+    #account .update-card h4 {
+      font-size: 1rem;
+      margin: 0 0 0.25rem;
+    }
+    #account .update-card p {
+      font-size: 0.85rem;
+      color: var(--secondary-text);
+      margin: 0;
+    }
+    #account .update-card i.bi-chevron-right {
+      font-size: 1.2rem;
+      color: var(--secondary-text);
+    }
+
+    /* Liste de gestion interne */
+    #account .menu-list {
+      margin-top: 0.5rem;
+    }
+    #account .menu-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border: none;
+      border-bottom: 1px solid #eee;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+    }
+    #account .menu-item:last-child {
+      border-bottom: none;
+    }
+    #account .menu-item .item-content {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    #account .menu-item .item-content i {
+      font-size: 1.4rem;
+      color: var(--accent);
+    }
+    #account .menu-item span {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--primary-text);
+    }
+    #account .menu-item small {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--secondary-text);
+      margin-top: 0.2rem;
+      line-height: 1.2;
+    }
+
+    /* Bouton de déconnexion */
+    #account .btn-signout {
+      width: calc(100% - 2rem);
+      margin: 1rem;
+      padding: 0.75rem 1.2rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border: 2px solid var(--accent);
+      border-radius: var(--border-radius-pill);
+      background: #fff;
+      color: var(--accent);
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.2s, color 0.2s;
+    }
+    #account .btn-signout:active {
       background: var(--accent);
       color: #fff;
     }
   </style>
 
-  <!-- Contenu de la page ACCOUNT -->
-  <header><h2 style="padding:1rem">My Account</h2></header>
-  <div style="padding:1rem 1rem 6rem;">
+  <!-- En-tête -->
+  <header><h2>Mon compte</h2></header>
+
+  <div>
     <div class="profile-card">
-      <div class="profile-avatar" id="avatar-letter">Z</div>
-      <h3 id="display-name">User Name</h3>
-      <p id="email">email@example.com</p>
-      <p id="member-since">Member since: ...</p>
-      <button class="btn-outline" id="btn-signout">Sign out</button>
+  <div class="profile-avatar" id="avatar-letter">Z</div>
+  <div class="profile-info">
+    <div id="display-name">Utilisateur</div>
+    <div id="email">email@example.com</div>
+    <div id="member-since">Membre depuis: …</div>
+  </div>
+</div>
+
+
+    <!-- Vos mises à jour -->
+    <div class="section-title">Vos mises à jour</div>
+    <div class="updates-grid">
+      <div class="update-card" onclick="location.hash='stock-alerts'">
+        <div>
+          <h4>Alertes de stock</h4>
+          <p>Livres bientôt épuisés</p>
+        </div>
+        <i class="bi bi-chevron-right"></i>
+      </div>
+      <div class="update-card" onclick="location.hash='orders'">
+        <div>
+          <h4>Commandes récentes</h4>
+          <p>Voir vos dernières commandes</p>
+        </div>
+        <i class="bi bi-chevron-right"></i>
+      </div>
     </div>
+
+    <!-- Gestion interne -->
+    <div class="section-title">Gestion</div>
+    <div class="menu-list">
+      <button class="menu-item" data-hash="inventory">
+        <div class="item-content">
+          <i class="bi bi-box-seam"></i>
+          <div>
+            <span>Inventaire</span>
+            <small>Gérer vos livres</small>
+          </div>
+        </div>
+        <i class="bi bi-chevron-right"></i>
+      </button>
+      <button class="menu-item" data-hash="suppliers">
+        <div class="item-content">
+          <i class="bi bi-people"></i>
+          <div>
+            <span>Fournisseurs</span>
+            <small>Liste des fournisseurs</small>
+          </div>
+        </div>
+        <i class="bi bi-chevron-right"></i>
+      </button>
+      <button class="menu-item" data-hash="reports">
+        <div class="item-content">
+          <i class="bi bi-bar-chart-line"></i>
+          <div>
+            <span>Rapports</span>
+            <small>Statistiques & analyses</small>
+          </div>
+        </div>
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Déconnexion -->
+    <button class="btn-signout" id="btn-signout">Déconnexion</button>
   </div>
 
-  <!-- Script JS spécifique à ACCOUNT -->
+  <!-- Script de peuplement & sign out -->
   <script>
     auth.onAuthStateChanged(user => {
       if (user) {
-        document.getElementById('display-name').textContent = user.displayName || "Anonymous";
+        const name = user.displayName || user.email.split('@')[0] || "Utilisateur";
+        document.getElementById('display-name').textContent = name;
         document.getElementById('email').textContent = user.email;
-
         const creationDate = new Date(user.metadata.creationTime);
         document.getElementById('member-since').textContent =
-          'Member since: ' + creationDate.toLocaleDateString(undefined, {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
+          'Membre depuis: ' + creationDate.toLocaleDateString(undefined, {
+            year: 'numeric', month: 'short', day: 'numeric'
           });
-
-        const firstLetter = (user.displayName || user.email || "Z")[0].toUpperCase();
-        document.getElementById('avatar-letter').textContent = firstLetter;
+        document.getElementById('avatar-letter').textContent = name[0].toUpperCase();
       }
     });
-
     document.getElementById('btn-signout').addEventListener('click', () => {
-      auth.signOut().then(() => {
-        window.location.href = 'login.html';
-      });
+      auth.signOut().then(() => window.location.href = 'login.html');
     });
   </script>
 </main>
+
 
 
   <main id="catalog" class="page">
