@@ -13,6 +13,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
 
+
+
 <!-- 2) Initialisation Firebase & Auth -->
 <script>
   // Ta config Firebase (même que dans index.html)
@@ -225,6 +227,7 @@
         <i class="bi bi-eye icon" id="toggle-signup"></i>
       </div>
 
+
       <div class="link" style="font-size:13px;line-height:1.4;">
         By signing up, you agree to our <a href="#">Privacy and Term</a>
       </div>
@@ -300,29 +303,35 @@ document.getElementById('btn-login').addEventListener('click', () => {
     });
 });
 
-// Sign up
-document.getElementById('btn-signup').addEventListener('click', () => {
-  const firstname = signupFirst.value.trim();
-  const lastname  = signupLast.value.trim();
-  const email     = signupEmail.value;
-  const password  = signupPw.value;
-  if (!firstname || !lastname) {
-    return alert("Veuillez indiquer votre nom et prénom.");
-  }
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(userCred => {
-      // On peut enregistrer le displayName
-      return userCred.user.updateProfile({
-        displayName: firstname + ' ' + lastname
-      });
-    })
-    .then(() => {
-      window.location.href = 'index.html';
-    })
-    .catch(err => {
-      alert("Erreur d’inscription : " + err.message);
-    });
-});
+// Récupère la fonction callable
+
+
+  document.getElementById('btn-signup').addEventListener('click', () => {
+    const firstname = signupFirst.value.trim();
+    const lastname  = signupLast.value.trim();
+    const email     = signupEmail.value;
+    const password  = signupPw.value;
+
+
+    if (!firstname || !lastname) {
+      return alert("Veuillez indiquer votre nom et prénom.");
+    }
+    
+
+    auth.createUserWithEmailAndPassword(email, password)
+  .then(async userCred => {
+    /* on ajoute le nom complet dans le profil */
+    await userCred.user.updateProfile({ displayName: firstname + ' ' + lastname });
+
+    /* ⬇️ NEW : on force le refresh pour récupérer la claim "pending" */
+    await auth.currentUser.getIdToken(true);
+
+    /* puis on redirige vers l’app principale */
+    window.location.href = 'index.html';
+  })
+  .catch(err => alert(err.message));
+
+  });
 </script>
 
 </body>
