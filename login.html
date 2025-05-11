@@ -1,806 +1,329 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>eBay Mobile PWA</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <!-- Bootstrap Icons CDN -->
+  <link 
+    rel="stylesheet" 
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+  >
 
-  <!-- PWA manifest & theming -->
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0064d2">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="eBay Mobile">
-  <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+  <!-- 1) Firebase (compat) SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
 
-  <!-- Google Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
- <!-- 1) Firebase (compat) SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
+<!-- 2) Initialisation Firebase & Auth -->
+<script>
+  // Ta config Firebase (même que dans index.html)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCvNZ5lhKdP_6W-eRle-7zCmFqejSfRuto",
+    authDomain: "shoptel-35c7e.firebaseapp.com",
+    projectId: "shoptel-35c7e",
+    storageBucket: "shoptel-35c7e.firebasestorage.app",
+    messagingSenderId: "541177101809",
+    appId: "1:541177101809:web:5ae3ea186f198558371850",
+    measurementId: "G-VH4MCV6Y6E"
+  };
 
-  <!-- 2) Initialisation Firebase & Auth -->
-  <script>
-    // Remplace par ta config
-    const firebaseConfig = {
-      apiKey: "AIzaSyCvNZ5lhKdP_6W-eRle-7zCmFqejSfRuto",
-      authDomain: "shoptel-35c7e.firebaseapp.com",
-      projectId: "shoptel-35c7e",
-      storageBucket: "shoptel-35c7e.firebasestorage.app",
-      messagingSenderId: "541177101809",
-      appId: "1:541177101809:web:5ae3ea186f198558371850",
-      measurementId: "G-VH4MCV6Y6E"
-    };
-
-  // 1) Initialise l’app et Auth UNE SEULE FOIS
+  // Initialise l’app et Auth
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
+  console.log("🔥 Firebase Auth initialisé :", auth);
+</script>
 
-  // 2) Dès que l’état d’auth est connu…
-  auth.onAuthStateChanged(user => {
-    if (!user) {
-      // pas d’utilisateur → on retourne au login
-      window.location.replace('login.html');
-      return;
-    }
-    // utilisateur ok → on peut afficher la page
-    document.body.classList.add('auth-ok');
-  });
-  </script>
-  
   <style>
-    body:not(.auth-ok) {
-  display: none;
+
+    .screen {
+  padding: 48px 24px 0; /* ← ajouter 48px de padding-top */
 }
 
-    :root{
-      --primary-text:#222;
-      --secondary-text:#555;
-      --border-radius-pill:2rem;
-      --ebay-red:#e53238;
-      --ebay-blue:#0064d2;
-      --ebay-yellow:#f5af02;
-      --ebay-green:#86b817;
-      --accent:#0064d2;
+    :root {
+      --primary: #1e90ff;
+      --bg: #f5f5f5;
+      --surface: #fff;
+      --text: #333;
+      --muted: #888;
+      --radius: 8px;
+      --transition: 0.3s ease;
     }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-    html,body{
-      width:100%;height:100%;
-      font-family:'Roboto',sans-serif;
-      background:#fff;color:var(--primary-text);
-      -webkit-font-smoothing:antialiased;
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-      display:flex;flex-direction:column;
-      height:100vh;height:100dvh;
+    * { box-sizing: border-box; margin:0; padding:0; }
+    html, body {
+      width:100%; height:100%;
+      overflow:hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
     }
-
-    /* PAGE MANAGEMENT */
-    /* Nouveau code à copier-coller */
-.page {
-  display: none;           /* cachée par défaut */
-  flex: 1 1 auto;          /* grandit pour remplir l’espace */
-  width: 100%;             /* occupe toute la largeur */
-  overflow-y: auto;        /* scroll interne si besoin */
-}
-
-.page.visible {
-  display: flex;           /* devient un flex-container vertical */
-  flex-direction: column;
-}
-
-
-    /* COMMON STYLES */
-    header{padding:1rem 1rem 0.5rem}
-    .cart{margin-left:auto;font-size:1.6rem;color:var(--primary-text)}
-
-    .search-wrapper{
-      margin-top:0.75rem;position:relative
+    /* container 2 écrans */
+    #app {
+      display: flex;
+      width:200%;
+      height:100%;
+      transition: transform var(--transition);
+      overscroll-behavior: none;
     }
-    .search-wrapper input{
-      width:100%;padding:0.75rem 3.25rem 0.75rem 2.75rem;
-      border:none;border-radius:var(--border-radius-pill);
-      background:#f4f4f4;font-size:1rem;outline:none;cursor:pointer
+    .screen {
+      width:100%;
+      padding: 0 24px;
+      background: var(--surface);
+      overflow-y: auto;
+      overscroll-behavior: none;
+      -ms-overflow-style: none; scrollbar-width: none;
+      display: flex; flex-direction: column; align-items: stretch;
     }
-    .search-wrapper .bi-search{
-      position:absolute;left:1rem;top:50%;
-      transform:translateY(-50%);font-size:1.1rem;color:var(--secondary-text)
+    .screen::-webkit-scrollbar { display: none; }
+    /* Logo */
+    .logo {
+      margin: 48px auto 32px;
+      text-align: center;
     }
-    .search-wrapper .actions{
-      position:absolute;right:0.75rem;top:50%;
-      transform:translateY(-50%);display:flex;gap:0.5rem;
-      font-size:1.6rem;color:var(--secondary-text)
+    .logo img { width:48px; height:48px; }
+    .logo h1 {
+      margin-top:8px;
+      font-size:24px;
+      font-weight:400;
+      color: var(--text);
     }
-
-    .signin-card{text-align:center;margin:0.5rem 0 1.2rem}
-    .signin-card p{
-      font-size:1.05rem;color:var(--secondary-text);
-      margin-bottom:1rem;line-height:1.4
+    /* Form */
+    .form-group {
+      position: relative;
+      margin-bottom: 20px;
     }
-    .signin-actions{display:flex;justify-content:center;gap:1rem}
-
-    .btn-outline{
-      flex:0 0 42%;padding:0.7rem 1rem;border:2px solid var(--accent);
-      border-radius:var(--border-radius-pill);background:#fff;
-      font-weight:500;color:var(--accent);font-size:1rem;
-      transition:all 0.2s ease;outline:none
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      color: var(--primary);
+      margin-bottom: 6px;
     }
-    .btn-outline:active{background:var(--accent);color:#fff}
-
-    .promo-block{
-      background:#f5f5f5;padding:1.5rem 1rem;margin-bottom:1.2rem
+    .form-group input {
+      width:100%;
+      padding:12px 40px 12px 12px;
+      font-size:16px;
+      border:1px solid #ccc;
+      border-radius: var(--radius);
+      transition: border-color var(--transition), box-shadow var(--transition);
     }
-    .promo-block h2{font-size:1.6rem;margin-bottom:0.5rem}
-    .promo-block p{
-      color:var(--secondary-text);font-size:1rem;line-height:1.4;margin-bottom:1rem
+    .form-group input:focus {
+      outline:none;
+      border-color: var(--primary);
+      box-shadow: 0 1px 0 var(--primary);
     }
-    .btn-primary{
-      padding:0.85rem 1.5rem;background:var(--accent);color:#fff;border:none;
-      border-radius:var(--border-radius-pill);font-size:1rem;font-weight:600;
-      box-shadow:0 4px 10px rgba(0,0,0,0.1);outline:none
+    /* Icons inside inputs */
+    .form-group .icon {
+      position:absolute;
+      top:50%; right:12px;
+      transform: translateY(-50%);
+      font-size:18px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color var(--transition);
     }
-    .btn-primary:active{background:#014fa5}
-
-    .trending{padding:0 1rem 5.5rem}
-    .trending h3{font-size:1.35rem;margin-bottom:0.75rem}
-    .trend-list{
-      display:flex;gap:1.25rem;overflow-x:auto;padding-bottom:0.5rem;
-      -ms-overflow-style:none;scrollbar-width:none
+    .form-group .icon:hover {
+      color: var(--primary);
     }
-    .trend-list::-webkit-scrollbar{display:none}
-    .trend-item{
-      flex:0 0 auto;text-align:center;user-select:none;padding:0.5rem
+    /* Buttons */
+    .btn {
+      display:block;
+      width:100%;
+      padding:14px;
+      margin-top:12px;
+      font-size:16px;
+      font-weight:500;
+      text-align:center;
+      background: var(--primary);
+      color:#fff;
+      border:none;
+      border-radius:30px;
+      cursor:pointer;
+      transition: transform 0.1s ease, background var(--transition);
+      user-select:none;
     }
-    .trend-item img{
-      width:5.3rem;height:5.3rem;border-radius:50%;object-fit:cover;
-      box-shadow:0 2px 6px rgba(0,0,0,0.12)
+    .btn:active {
+      transform: scale(0.97);
     }
-    .trend-item .product-name{display:block;margin-top:0.5rem;font-weight:500}
-    .trend-item .price{
-      display:block;margin:0.25rem 0 0.75rem;color:var(--ebay-red);font-weight:600
+    /* Links */
+    .link {
+      text-align:center;
+      margin-top:8px;
     }
-    .btn-add{font-size:0.85rem;padding:0.4rem 0.8rem}
-
-    /* NAVIGATION BAR */
-    nav{
-      position:fixed;bottom:0;left:0;width:100%;background:#fff;
-      border-top:1px solid #e0e0e0;z-index:30
+    .link a {
+      color: var(--primary);
+      font-size:14px;
+      text-decoration:none;
+      transition: opacity var(--transition);
     }
-    .nav-inner{display:flex;justify-content:space-evenly;align-items:center;padding:0.4rem 0}
-    .nav-link{
-      flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-      font-size:0.8rem;color:var(--secondary-text);outline:none;user-select:none;
-      position:relative;overflow:hidden;padding:0.6rem 0;border-radius:var(--border-radius-pill);
-      background:none;border:none;cursor:pointer;text-decoration:none
+    .link a:active {
+      opacity:0.6;
     }
-    .nav-link i{font-size:1.25rem}
-    .nav-link.active{color:var(--accent);background:rgba(0,100,210,0.12)}
-
-    /* RIPPLE EFFECT */
-    .ripple{
-      position:absolute;border-radius:50%;transform:scale(0);
-      background:rgba(0,100,210,0.25);animation:ripple 600ms linear;pointer-events:none
+    /* OR separator */
+    .or {
+      display:flex;
+      align-items:center;
+      text-align:center;
+      font-size:13px;
+      color:#aaa;
+      margin:24px 0;
     }
-    @keyframes ripple{to{transform:scale(4);opacity:0}}
-
-    /* CATALOG OVERLAY (devient id="catalog") */
-    #catalog{
-      position:fixed;inset:0;z-index:20;padding:1rem;background:#fff;
-      display:flex;flex-direction:column;height:100vh;
-      opacity:0;pointer-events:none;transform:translateY(2%);
-      transition:opacity 0.3s ease,transform 0.3s ease
+    .or::before, .or::after {
+      content:'';
+      flex:1;
+      height:1px;
+      background:#ddd;
     }
-    #catalog.visible{
-      opacity:1;pointer-events:auto;transform:translateY(0)
-    }
-
-    /* === Home page actions === */
-    .home-actions{
-      display:flex;justify-content:space-around;gap:1rem;padding:1rem
-    }
-    .btn-action{
-      flex:1;display:flex;align-items:center;justify-content:center;gap:0.5rem;
-      padding:0.8rem 1rem;border:none;border-radius:var(--border-radius-pill);
-      font-size:1rem;font-weight:500;box-shadow:0 2px 6px rgba(0,0,0,0.12);
-      transition:transform 0.1s ease,box-shadow 0.1s ease;color:#fff;cursor:pointer
-    }
-    .btn-action:active{transform:translateY(1px);box-shadow:0 1px 3px rgba(0,0,0,0.2)}
-    .btn-sell{background:var(--ebay-green)}
-    .btn-buy {background:var(--ebay-blue)}
-
-    /* === Stock info card === */
-    .stock-card{
-      background:var(--ebay-yellow);border-radius:var(--border-radius-pill);
-      margin:0 1rem 1.5rem;padding:0.75rem 1rem;text-align:center;
-      box-shadow:0 2px 6px rgba(0,0,0,0.1)
-    }
-    .stock-count{font-size:1.8rem;font-weight:700;color:var(--primary-text)}
-    .stock-label{font-size:0.95rem;color:var(--secondary-text)}
-
-    /* ---------- Info cards sans ombre, avec cadre ---------- */
-.info-cards {
-  display: flex;
-  gap: 0.5rem;                /* espace réduit */
-  padding: 0.5rem 1rem;       /* haut/bas + cotés */
-  margin-bottom: 0.5rem;      /* pour espacer du contenu suivant */
-  overflow-x: auto;           /* scroll si besoin */
-}
-
-.info-card {
-  flex: 1;
-  background: #fff;                     /* fond blanc pour bien contraster */
-  border: 1px solid #ddd;              /* cadre fin, gris clair */
-  border-radius: 0.5rem;               /* bords légèrement arrondis */
-  padding: 0.6rem;                      /* padding interne réduit */
-  text-align: center;
-  min-width: 0;                         /* empêche le dépassement */
-}
-
-.info-number {
-  font-size: 1.2rem;                    /* taille de police compacte */
-  font-weight: 600;
-  color: var(--ebay-blue);
-  line-height: 1.2;
-}
-
-.info-label {
-  font-size: 0.75rem;                   /* légende plus petite */
-  color: var(--secondary-text);
-  margin-top: 0.2rem;
-}
-.info-cards {
-  /* transition douce sur opacité et hauteur */
-  transition: opacity 0.3s ease, max-height 0.3s ease, margin-bottom 0.3s ease, padding 0.3s ease;
-  /* fixer une hauteur max suffisante pour le contenu */
-  max-height: 200px;        /* ajustez selon la hauteur de vos cards */
-  overflow: hidden;
-}
-
-.info-cards.fade-out {
-  opacity: 0;
-  max-height: 0;
-  margin-bottom: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  pointer-events: none;     /* pour ne plus capter les clics */
-}
-
-
-/* Add this below your existing .info-card styles */
-
-.books-list {
-  display: flex;
-  flex-direction: column;      /* vertical stack */
-  gap: 1rem;                   /* space between cards */
-  padding: 1rem;               /* inner spacing */
-}
-
-.book-card {
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-.book-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--primary-text);
-}
-
-.book-price {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--ebay-red);
-  margin-bottom: 0.25rem;
-}
-
-.book-quantity {
-  font-size: 0.9rem;
-  color: var(--secondary-text);
-}
-
-
-/* Réduire l’espace au-dessus de la barre de recherche sur la page Catalog */
-main#catalog > header {
-  padding-top: 0.5rem; /* Avant : 1rem ; ajustez à votre goût */
-}
-
-/* (Optionnel) Si vous préférez bouger la barre elle-même */
-main#catalog .search-wrapper {
-  margin-top: -0.25rem; /* déplace la barre vers le haut */
-}
-
-/* 1) On force la carte à 100% de la largeur du conteneur */
-.books-list .book-card {
-  width: 100%;               /* pleine largeur */
-  box-sizing: border-box;    /* inclut le padding/les bordures */
-  margin: 0 auto;            /* centre au cas où tu fixes un max-width */
-}
-
-/* dans ta feuille de styles, après les définitions existantes */
-
-main#catalog {
-  padding: 0;
-  margin: 0;
-}
-
-
-
-
-
+    .or::before { margin-right:8px; }
+    .or::after { margin-left:8px; }
   </style>
 </head>
-
 <body>
 
-  <!-- HOME PAGE -->
-  <main id="home" class="page visible">
-    <header><h2 style="padding:1rem">Home</h2></header>
-
-    <!-- Action buttons -->
-    <div class="home-actions">
-      <button class="btn-action btn-sell" data-hash="sell" aria-label="Sell">
-        <i class="bi bi-tag-fill"></i><span>Sell</span>
-      </button>
-      <button class="btn-action btn-buy" data-hash="catalog" aria-label="Buy">
-        <i class="bi bi-cart-fill"></i><span>Buy</span>
-      </button>
-    </div>
-
-    <!-- Stock info card -->
-    <div class="stock-card">
-      <div class="stock-count">1 234</div>
-      <div class="stock-label">Books in stock</div>
-    </div>
-  </main>
-
-  <!-- SELL PAGE -->
-<main id="sell" class="page">
-  <!-- Styles spécifiques à la page SELL -->
-  <style>
-/* === Styles spécifiques à la page SELL === */
-#sell .sell-header {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-#sell .sell-header .btn-close {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--primary-text);
-  margin-right: 0.75rem;
-  cursor: pointer;
-  outline: none;
-}
-
-#sell .sell-header .search-wrapper {
-  flex: 1;
-  position: relative;
-  margin-top: 0;
-}
-
-#sell .sell-header .search-wrapper .bi-search {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.1rem;
-  color: var(--secondary-text);
-}
-
-#sell .sell-header #search-input-sell {
-  width: 100%;
-  padding: 0.75rem 2.5rem;
-  border: none;
-  border-radius: var(--border-radius-pill);
-  font-size: 1rem;
-  outline: none;
-}
-
-#sell .sell-header .search-wrapper .actions {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  gap: 0.5rem;
-  font-size: 1.6rem;
-  color: var(--secondary-text);
-}
-
-/* === Styles pour les book-cards et le bouton d'ajout au panier === */
-#sell .book-card {
-  position: relative;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  margin-bottom: 1rem;
-}
-
-#sell .book-card .btn-add-to-cart {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  border: none;
-  border-radius: 50%;
-  background: var(--ebay-blue);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 1.4rem;
-  cursor: pointer;
-  box-shadow: none;
-  transition: background 0.2s ease;
-}
-
-#sell .book-card .btn-add-to-cart:hover {
-  background: #0052a3;
-}
-
-#sell .book-card .btn-add-to-cart:active {
-  background: #004080;
-}
-
-
-</style>
-
-
-  <!-- Barre de recherche (mise à jour) -->
-  <header class="sell-header">
-    <button class="btn-close" data-hash="home" aria-label="Quitter la page de vente">
-      <i class="bi bi-x-lg"></i>
-    </button>
-    <div class="search-wrapper">
-      <i class="bi bi-search"></i>
-      <input
-        type="search"
-        id="search-input-sell"
-        placeholder="Rechercher dans le catalogue"
-        aria-label="Recherche catalogue"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="none"
-        spellcheck="false"
-      >
-      <div class="actions">
-        <i class="bi bi-cart"></i>
+  <div id="app">
+    <!-- LOGIN -->
+    <div class="screen" id="login-screen">
+      
+      <div class="form-group">
+        <label for="login-user">Username</label>
+        <input type="text" id="login-user" placeholder="Enter your email or username">
       </div>
-    </div>
-  </header>
 
-  <!-- Liste des livres -->
-  <div id="catalog-results-sell">
-    <div class="books-list">
-     <div class="book-card">
-  <h4 class="book-title">The Great Gatsby</h4>
-  <p class="book-price">$10.99</p>
-  <p class="book-quantity">Quantity: 3</p>
-
-  <!-- Nouveau bouton d'ajout -->
-  <button class="btn-add-to-cart" aria-label="Ajouter au panier">
-    <i class="bi bi-cart-plus"></i>
-  </button>
-</div>
-
-      <div class="book-card">
-        <h4 class="book-title">1984</h4>
-        <p class="book-price">$8.50</p>
-        <p class="book-quantity">Quantity: 5</p>
+      <div class="form-group">
+        <label for="login-pw">Password</label>
+        <input type="password" id="login-pw" placeholder="Password">
+        <i class="bi bi-eye icon" id="toggle-login"></i>
       </div>
-      <!-- répétez autant de .book-card que nécessaire -->
+
+      <div class="link"><a href="#">Reset Password</a></div>
+      <button class="btn" id="btn-login">Sign in with email</button>
+
+      <div class="or">OR</div>
+      <div class="link"><a href="#" id="to-signup">Create an account</a></div>
     </div>
-  </div>
-</main>
 
+    <!-- SIGN UP -->
+    <div class="screen" id="signup-screen">
 
+      <div class="form-group">
+        <label for="signup-first">First Name</label>
+        <input type="text" id="signup-first" placeholder="First Name">
+        <i class="bi bi-x-circle icon" id="clear-first"></i>
+      </div>
 
-  <!-- MY ORDERS PAGE -->
-  <main id="orders" class="page">
-    <header><h2 style="padding:1rem">My Orders</h2></header>
-    <p style="padding:0 1rem 6rem">Your recent orders will appear here…</p>
-  </main>
+      <div class="form-group">
+        <label for="signup-last">Last Name</label>
+        <input type="text" id="signup-last" placeholder="Last Name">
+      </div>
 
-  <!-- CART PAGE -->
-  <main id="cart" class="page">
-    <header><h2 style="padding:1rem">Cart</h2></header>
-    <div style="padding:0 1rem 6rem;">
-      <p>Your cart is currently empty.</p>
-      <button class="btn-primary" style="margin-top:1rem;">View recommendations</button>
-    </div>
-  </main>
+      <div class="form-group">
+        <label for="signup-email">Email</label>
+        <input type="email" id="signup-email" placeholder="Email">
+      </div>
 
-  <!-- ACCOUNT PAGE -->
-<main id="account" class="page">
-  <!-- Style spécifique à la page ACCOUNT -->
-  <style>
-    #account .profile-card {
-      background: #fff;
-      padding: 1.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      text-align: center;
-      max-width: 400px;
-      margin: 2rem auto;
-    }
+      <div class="form-group">
+        <label for="signup-pw">Password</label>
+        <input type="password" id="signup-pw" placeholder="Password">
+        <i class="bi bi-eye icon" id="toggle-signup"></i>
+      </div>
 
-    #account .profile-avatar {
-      width: 64px;
-      height: 64px;
-      background: var(--ebay-blue);
-      color: #fff;
-      font-weight: bold;
-      font-size: 2rem;
-      border-radius: 50%;
-      margin: 0 auto 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+      <div class="link" style="font-size:13px;line-height:1.4;">
+        By signing up, you agree to our <a href="#">Privacy and Term</a>
+      </div>
+      <button class="btn" id="btn-signup">Create an account</button>
 
-    #account h3 {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-    }
-
-    #account p {
-      font-size: 0.95rem;
-      color: var(--secondary-text);
-      margin-bottom: 0.5rem;
-    }
-
-    #account .btn-outline {
-      margin-top: 1rem;
-      padding: 0.75rem 1.2rem;
-      font-size: 1rem;
-      border-radius: var(--border-radius-pill);
-      border: 2px solid var(--accent);
-      color: var(--accent);
-      background: #fff;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-    }
-
-    #account .btn-outline:active {
-      background: var(--accent);
-      color: #fff;
-    }
-  </style>
-
-  <!-- Contenu de la page ACCOUNT -->
-  <header><h2 style="padding:1rem">My Account</h2></header>
-  <div style="padding:1rem 1rem 6rem;">
-    <div class="profile-card">
-      <div class="profile-avatar" id="avatar-letter">Z</div>
-      <h3 id="display-name">User Name</h3>
-      <p id="email">email@example.com</p>
-      <p id="member-since">Member since: ...</p>
-      <button class="btn-outline" id="btn-signout">Sign out</button>
+      <div class="or">OR</div>
+      <div class="link"><a href="#" id="to-login">Login to your account</a></div>
     </div>
   </div>
 
-  <!-- Script JS spécifique à ACCOUNT -->
   <script>
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById('display-name').textContent = user.displayName || "Anonymous";
-        document.getElementById('email').textContent = user.email;
+    const app = document.getElementById('app');
+    const toSignup = () => app.style.transform = 'translateX(-50%)';
+    const toLogin  = () => app.style.transform = 'translateX(0)';
 
-        const creationDate = new Date(user.metadata.creationTime);
-        document.getElementById('member-since').textContent =
-          'Member since: ' + creationDate.toLocaleDateString(undefined, {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-          });
+    document.getElementById('to-signup').onclick = e => { e.preventDefault(); toSignup(); };
+    document.getElementById('to-login').onclick  = e => { e.preventDefault(); toLogin(); };
 
-        const firstLetter = (user.displayName || user.email || "Z")[0].toUpperCase();
-        document.getElementById('avatar-letter').textContent = firstLetter;
-      }
+    // Toggle password visibility
+    function bindToggle(btnId, inputId, iconVisible = 'bi-eye', iconHidden = 'bi-eye-slash') {
+      const btn = document.getElementById(btnId);
+      const inp = document.getElementById(inputId);
+      btn.addEventListener('click', () => {
+        if (inp.type === 'password') {
+          inp.type = 'text';
+          btn.classList.replace(iconVisible, iconHidden);
+        } else {
+          inp.type = 'password';
+          btn.classList.replace(iconHidden, iconVisible);
+        }
+      });
+    }
+    bindToggle('toggle-login','login-pw');
+    bindToggle('toggle-signup','signup-pw');
+
+    // Clear first name
+    document.getElementById('clear-first').addEventListener('click', () => {
+      document.getElementById('signup-first').value = '';
     });
 
-    document.getElementById('btn-signout').addEventListener('click', () => {
-      auth.signOut().then(() => {
-        window.location.href = 'login.html';
-      });
+    // Touch-swipe navigation
+    let startX = 0;
+    app.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+    app.addEventListener('touchend',   e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (diff > 50) toSignup();
+      if (diff < -50) toLogin();
     });
   </script>
-</main>
 
-
-  <main id="catalog" class="page">
-    <!-- barre de recherche -->
-    <header>
-        <div class="search-wrapper">
-          <i class="bi bi-search"></i>
-          <input
-            type="search"
-            id="search-input"
-            placeholder="Rechercher dans le catalogue"
-            aria-label="Recherche catalogue"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="none"
-            spellcheck="false"
-          >
-          <div class="actions">
-            <i class="bi bi-cart"></i>
-          </div>
-        </div>
-      </header>
-    
-
-      <!-- ===== Info cards (total livres + valeur) ===== -->
-  <div class="info-cards">
-    <div class="info-card">
-      <div class="info-number" id="total-books">1 234</div>
-      <div class="info-label">Total de livres</div>
-    </div>
-    <div class="info-card">
-      <div class="info-number" id="total-value">€12 345</div>
-      <div class="info-label">Valeur totale</div>
-    </div>
-  </div>
-
-    <!-- conteneur pour les résultats -->
-    <div id="catalog-results" >
-        <div class="books-list">
-            <div class="book-card">
-              <h4 class="book-title">The Great Gatsby</h4>
-              <p class="book-price">$10.99</p>
-              <p class="book-quantity">Quantity: 3</p>
-            </div>
-            <div class="book-card">
-              <h4 class="book-title">1984</h4>
-              <p class="book-price">$8.50</p>
-              <p class="book-quantity">Quantity: 5</p>
-            </div>
-            <!-- Repeat .book-card for each book -->
-          </div>          
-    </div>
-  </main>
-  
-  <!-- NAVIGATION BAR -->
-  <nav aria-label="Main navigation">
-    <div class="nav-inner">
-      <a href="#home"    data-hash="home"    class="nav-link active" aria-label="Home">
-        <i class="bi bi-house"></i><span>Home</span>
-      </a>
-      <a href="#catalog" data-hash="catalog" class="nav-link" aria-label="Catalog">
-        <i class="bi bi-search"></i><span>Catalog</span>
-      </a>
-      <a href="#cart"    data-hash="cart"    class="nav-link" aria-label="Cart">
-        <i class="bi bi-cart"></i><span>Cart</span>
-      </a>
-      <a href="#account" data-hash="account" class="nav-link" aria-label="Account">
-        <i class="bi bi-person"></i><span>Account</span>
-      </a>
-    </div>
-  </nav>
-
-  <!-- SCRIPTS -->
   <script>
-    /* PWA registration */
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(err => console.error(err));
-    }
+// Après bindToggle et swipe…
 
-    /* Tabs inside catalog */
-    function toggleTab(tab) {
-      ['recent', 'saved'].forEach(t => {
-        const el = document.getElementById('tab-' + t);
-        el.style.color = '#555';
-        el.style.borderBottom = 'none';
-      });
-      const active = document.getElementById('tab-' + tab);
-      active.style.color = '#0064d2';
-      active.style.borderBottom = '2px solid #0064d2';
-    }
+// Récupération des inputs
+const loginUser = document.getElementById('login-user');
+const loginPw   = document.getElementById('login-pw');
+const signupFirst = document.getElementById('signup-first');
+const signupLast  = document.getElementById('signup-last');
+const signupEmail = document.getElementById('signup-email');
+const signupPw    = document.getElementById('signup-pw');
 
-    /* Hash-router + ripple (l’onde ne s’applique qu’à la barre de navigation) */
-  (function () {
-    const pages = document.querySelectorAll('.page');
-    const nav   = document.querySelector('nav');    // ← ajoutez cette ligne
-
-    function route() {
-  const key = location.hash.slice(1) || 'home';
-  let ok = false;
-
-  // 1) On affiche/caché chaque page
-  pages.forEach(p => {
-    const show = p.id === key;
-    p.classList.toggle('visible', show);
-    if (show) ok = true;
-  });
-
-  // 2) Si le hash est invalide, on retourne à home
-  if (!ok) {
-    location.hash = 'home';
-    return;
-  }
-
-  // 3) On met à jour le lien actif
-  document.querySelectorAll('[data-hash]').forEach(el => {
-    el.classList.toggle('active', el.dataset.hash === key);
-  });
-
-  // 4) On masque la nav pour #sell, et on la restaure ensuite
-  if (key === 'sell') {
-    nav.style.display = 'none';
-  } else {
-    // supprime l'affichage inline pour revenir au comportement CSS natif
-    nav.style.removeProperty('display');
-  }
-}
-
-
-    // Délégation : tout élément data-hash change le hash
-    document.body.addEventListener('click', e => {
-      const el = e.target.closest('[data-hash]');
-      if (!el) return;
-
-      /* ---------- Ripple UNIQUEMENT pour la barre de navigation ---------- */
-      if (el.classList.contains('nav-link')) {
-        const rect   = el.getBoundingClientRect();
-        const size   = Math.max(rect.width, rect.height);
-        const ripple = document.createElement('span');
-        ripple.className      = 'ripple';
-        ripple.style.width    =
-        ripple.style.height   = size + 'px';
-        ripple.style.left     = (e.clientX - rect.left - size / 2) + 'px';
-        ripple.style.top      = (e.clientY - rect.top  - size / 2) + 'px';
-        el.querySelector('.ripple')?.remove();   // supprime l’ancien éventuel
-        el.appendChild(ripple);
-      }
-      /* ------------------------------------------------------------------ */
-
-      if (el.tagName === 'A') e.preventDefault();
-      location.hash = el.dataset.hash;
+// Sign in
+document.getElementById('btn-login').addEventListener('click', () => {
+  const email    = loginUser.value;
+  const password = loginPw.value;
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      // redirige vers index.html
+      window.location.href = 'index.html';
+    })
+    .catch(err => {
+      alert("Erreur de connexion : " + err.message);
     });
-
-    window.addEventListener('DOMContentLoaded', route);
-    window.addEventListener('hashchange', route);
-  })();
-
- // ----- Recherche catalogue : fade-out dès la frappe ----- //
-
-const searchInput = document.getElementById('search-input');
-const infoCards   = document.querySelector('.info-cards');
-
-// À chaque saisie dans l'input
-searchInput.addEventListener('input', () => {
-  if (searchInput.value.trim() !== '') {
-    infoCards.classList.add('fade-out');
-  } else {
-    infoCards.classList.remove('fade-out');
-  }
 });
 
-
-  </script>
-
-   
+// Sign up
+document.getElementById('btn-signup').addEventListener('click', () => {
+  const firstname = signupFirst.value.trim();
+  const lastname  = signupLast.value.trim();
+  const email     = signupEmail.value;
+  const password  = signupPw.value;
+  if (!firstname || !lastname) {
+    return alert("Veuillez indiquer votre nom et prénom.");
+  }
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(userCred => {
+      // On peut enregistrer le displayName
+      return userCred.user.updateProfile({
+        displayName: firstname + ' ' + lastname
+      });
+    })
+    .then(() => {
+      window.location.href = 'index.html';
+    })
+    .catch(err => {
+      alert("Erreur d’inscription : " + err.message);
+    });
+});
+</script>
 
 </body>
 </html>
