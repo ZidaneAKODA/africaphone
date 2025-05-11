@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <!-- Bootstrap Icons CDN -->
+  <link 
+    rel="stylesheet" 
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+  >
+
+  <!-- 1) Firebase (compat) SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
+
+<!-- 2) Initialisation Firebase & Auth -->
+<script>
+  // Ta config Firebase (même que dans index.html)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCvNZ5lhKdP_6W-eRle-7zCmFqejSfRuto",
+    authDomain: "shoptel-35c7e.firebaseapp.com",
+    projectId: "shoptel-35c7e",
+    storageBucket: "shoptel-35c7e.firebasestorage.app",
+    messagingSenderId: "541177101809",
+    appId: "1:541177101809:web:5ae3ea186f198558371850",
+    measurementId: "G-VH4MCV6Y6E"
+  };
+
+  // Initialise l’app et Auth
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  console.log("🔥 Firebase Auth initialisé :", auth);
+</script>
+
+  <style>
+    :root {
+      --primary: #1e90ff;
+      --bg: #f5f5f5;
+      --surface: #fff;
+      --text: #333;
+      --muted: #888;
+      --radius: 8px;
+      --transition: 0.3s ease;
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    html, body {
+      width:100%; height:100%;
+      overflow:hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* container 2 écrans */
+    #app {
+      display: flex;
+      width:200%;
+      height:100%;
+      transition: transform var(--transition);
+      overscroll-behavior: none;
+    }
+    .screen {
+      width:100%;
+      padding: 0 24px;
+      background: var(--surface);
+      overflow-y: auto;
+      overscroll-behavior: none;
+      -ms-overflow-style: none; scrollbar-width: none;
+      display: flex; flex-direction: column; align-items: stretch;
+    }
+    .screen::-webkit-scrollbar { display: none; }
+    /* Logo */
+    .logo {
+      margin: 48px auto 32px;
+      text-align: center;
+    }
+    .logo img { width:48px; height:48px; }
+    .logo h1 {
+      margin-top:8px;
+      font-size:24px;
+      font-weight:400;
+      color: var(--text);
+    }
+    /* Form */
+    .form-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+    .form-group input {
+      width:100%;
+      padding:12px 40px 12px 12px;
+      font-size:16px;
+      border:1px solid #ccc;
+      border-radius: var(--radius);
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .form-group input:focus {
+      outline:none;
+      border-color: var(--primary);
+      box-shadow: 0 1px 0 var(--primary);
+    }
+    /* Icons inside inputs */
+    .form-group .icon {
+      position:absolute;
+      top:50%; right:12px;
+      transform: translateY(-50%);
+      font-size:18px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color var(--transition);
+    }
+    .form-group .icon:hover {
+      color: var(--primary);
+    }
+    /* Buttons */
+    .btn {
+      display:block;
+      width:100%;
+      padding:14px;
+      margin-top:12px;
+      font-size:16px;
+      font-weight:500;
+      text-align:center;
+      background: var(--primary);
+      color:#fff;
+      border:none;
+      border-radius:30px;
+      cursor:pointer;
+      transition: transform 0.1s ease, background var(--transition);
+      user-select:none;
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+    /* Links */
+    .link {
+      text-align:center;
+      margin-top:8px;
+    }
+    .link a {
+      color: var(--primary);
+      font-size:14px;
+      text-decoration:none;
+      transition: opacity var(--transition);
+    }
+    .link a:active {
+      opacity:0.6;
+    }
+    /* OR separator */
+    .or {
+      display:flex;
+      align-items:center;
+      text-align:center;
+      font-size:13px;
+      color:#aaa;
+      margin:24px 0;
+    }
+    .or::before, .or::after {
+      content:'';
+      flex:1;
+      height:1px;
+      background:#ddd;
+    }
+    .or::before { margin-right:8px; }
+    .or::after { margin-left:8px; }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+    <!-- LOGIN -->
+    <div class="screen" id="login-screen">
+      
+      <div class="form-group">
+        <label for="login-user">Username</label>
+        <input type="text" id="login-user" placeholder="Enter your email or username">
+      </div>
+
+      <div class="form-group">
+        <label for="login-pw">Password</label>
+        <input type="password" id="login-pw" placeholder="Password">
+        <i class="bi bi-eye icon" id="toggle-login"></i>
+      </div>
+
+      <div class="link"><a href="#">Reset Password</a></div>
+      <button class="btn" id="btn-login">Sign in with email</button>
+
+      <div class="or">OR</div>
+      <div class="link"><a href="#" id="to-signup">Create an account</a></div>
+    </div>
+
+    <!-- SIGN UP -->
+    <div class="screen" id="signup-screen">
+
+      <div class="form-group">
+        <label for="signup-first">First Name</label>
+        <input type="text" id="signup-first" placeholder="First Name">
+        <i class="bi bi-x-circle icon" id="clear-first"></i>
+      </div>
+
+      <div class="form-group">
+        <label for="signup-last">Last Name</label>
+        <input type="text" id="signup-last" placeholder="Last Name">
+      </div>
+
+      <div class="form-group">
+        <label for="signup-email">Email</label>
+        <input type="email" id="signup-email" placeholder="Email">
+      </div>
+
+      <div class="form-group">
+        <label for="signup-pw">Password</label>
+        <input type="password" id="signup-pw" placeholder="Password">
+        <i class="bi bi-eye icon" id="toggle-signup"></i>
+      </div>
+
+      <div class="link" style="font-size:13px;line-height:1.4;">
+        By signing up, you agree to our <a href="#">Privacy and Term</a>
+      </div>
+      <button class="btn" id="btn-signup">Create an account</button>
+
+      <div class="or">OR</div>
+      <div class="link"><a href="#" id="to-login">Login to your account</a></div>
+    </div>
+  </div>
+
+  <script>
+    const app = document.getElementById('app');
+    const toSignup = () => app.style.transform = 'translateX(-50%)';
+    const toLogin  = () => app.style.transform = 'translateX(0)';
+
+    document.getElementById('to-signup').onclick = e => { e.preventDefault(); toSignup(); };
+    document.getElementById('to-login').onclick  = e => { e.preventDefault(); toLogin(); };
+
+    // Toggle password visibility
+    function bindToggle(btnId, inputId, iconVisible = 'bi-eye', iconHidden = 'bi-eye-slash') {
+      const btn = document.getElementById(btnId);
+      const inp = document.getElementById(inputId);
+      btn.addEventListener('click', () => {
+        if (inp.type === 'password') {
+          inp.type = 'text';
+          btn.classList.replace(iconVisible, iconHidden);
+        } else {
+          inp.type = 'password';
+          btn.classList.replace(iconHidden, iconVisible);
+        }
+      });
+    }
+    bindToggle('toggle-login','login-pw');
+    bindToggle('toggle-signup','signup-pw');
+
+    // Clear first name
+    document.getElementById('clear-first').addEventListener('click', () => {
+      document.getElementById('signup-first').value = '';
+    });
+
+    // Touch-swipe navigation
+    let startX = 0;
+    app.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+    app.addEventListener('touchend',   e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (diff > 50) toSignup();
+      if (diff < -50) toLogin();
+    });
+  </script>
+
+  <script>
+// Après bindToggle et swipe…
+
+// Récupération des inputs
+const loginUser = document.getElementById('login-user');
+const loginPw   = document.getElementById('login-pw');
+const signupFirst = document.getElementById('signup-first');
+const signupLast  = document.getElementById('signup-last');
+const signupEmail = document.getElementById('signup-email');
+const signupPw    = document.getElementById('signup-pw');
+
+// Sign in
+document.getElementById('btn-login').addEventListener('click', () => {
+  const email    = loginUser.value;
+  const password = loginPw.value;
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      // redirige vers index.html
+      window.location.href = 'index.html';
+    })
+    .catch(err => {
+      alert("Erreur de connexion : " + err.message);
+    });
+});
+
+// Sign up
+document.getElementById('btn-signup').addEventListener('click', () => {
+  const firstname = signupFirst.value.trim();
+  const lastname  = signupLast.value.trim();
+  const email     = signupEmail.value;
+  const password  = signupPw.value;
+  if (!firstname || !lastname) {
+    return alert("Veuillez indiquer votre nom et prénom.");
+  }
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(userCred => {
+      // On peut enregistrer le displayName
+      return userCred.user.updateProfile({
+        displayName: firstname + ' ' + lastname
+      });
+    })
+    .then(() => {
+      window.location.href = 'index.html';
+    })
+    .catch(err => {
+      alert("Erreur d’inscription : " + err.message);
+    });
+});
+</script>
+
+</body>
+</html>
