@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>eBay Mobile PWA</title>
+  <title>BookShop</title>
 
   <!-- PWA manifest & theming -->
   <link rel="manifest" href="/manifest.json">
@@ -22,6 +22,7 @@
  <!-- 1) Firebase (compat) SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-functions-compat.js"></script>
 
   <!-- 2) Initialisation Firebase & Auth -->
   <script>
@@ -30,7 +31,7 @@
       apiKey: "AIzaSyCvNZ5lhKdP_6W-eRle-7zCmFqejSfRuto",
       authDomain: "shoptel-35c7e.firebaseapp.com",
       projectId: "shoptel-35c7e",
-      storageBucket: "shoptel-35c7e.firebasestorage.app",
+      storageBucket: "shoptel-35c7e.appspot.com",
       messagingSenderId: "541177101809",
       appId: "1:541177101809:web:5ae3ea186f198558371850",
       measurementId: "G-VH4MCV6Y6E"
@@ -38,23 +39,43 @@
 
   // 1) Initialise l’app et Auth UNE SEULE FOIS
   firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+
 
   // 2) Dès que l’état d’auth est connu…
-  auth.onAuthStateChanged(user => {
-    if (!user) {
-      // pas d’utilisateur → on retourne au login
-      window.location.replace('login.html');
-      return;
-    }
-    // utilisateur ok → on peut afficher la page
-    document.body.classList.add('auth-ok');
-  });
+  
+const auth   = firebase.auth();
+  const fn     = firebase.functions();
+  
   </script>
   
+
   <style>
-    body:not(.auth-ok) {
-  display: none;
+   /* ——— Gestion de la visibilité des “pages” ——— */
+main.page {
+  display: none;           /* cachée par défaut */
+  flex: 1 1 auto;          /* occupe l’espace restant */
+  width: 100%;             /* toute la largeur */
+  overflow-y: auto;        /* scroll interne si besoin */
+  /* padding-bottom pour laisser la place à la nav en bas */
+  padding-bottom: calc(56px + env(safe-area-inset-bottom));
+}
+
+main.page.visible {
+  display: flex;           /* devient visible et flex */
+  flex-direction: column;
+}
+
+/* ——— Modal d’activation ——— */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;           /* cachée par défaut */
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.modal.show {
+  display: flex;           /* visible quand on ajoute “show” */
 }
 
     :root{
@@ -981,6 +1002,74 @@ searchInput.addEventListener('input', () => {
   </script>
 
    
+<!-- === MODAL D’ACTIVATION === -->
+<div id="activation-modal" class="modal">
+  <div class="modal-backdrop"></div>
 
+  <div class="modal-content">
+    <h3>Activation du compte</h3>
+    <p>Entrez votre code d’activation pour finaliser l’inscription.</p>
+
+    <div class="form-group">
+      <input type="text" id="activation-code" placeholder="Code d’activation">
+    </div>
+
+    <button id="btn-activate" class="btn-primary">Valider</button>
+  </div>
+</div>
+
+
+<style>
+/* Modal full-screen */
+.modal           { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:999; }
+.modal.show      { display:flex; }
+.modal-backdrop  { position:absolute; inset:0; background:rgba(0,0,0,.5); }
+.modal-content   { position:relative; z-index:1; width:90%; max-width:400px; background:#fff;
+                   border-radius:8px; padding:1.5rem; box-shadow:0 6px 30px rgba(0,0,0,.2); }
+.modal-content h3{ margin-bottom:.5rem; }
+.modal-content .form-group{ margin:1.25rem 0; }
+.modal-content input{ width:100%; padding:.75rem 1rem; font-size:1rem; border:1px solid #ccc; border-radius:6px; }
+</style>
+
+<script>/* ---------- Modal d’activation ---------- */
+
+  const verifyActivationCode = fn.httpsCallable('verifyActivationCode');
+
+  auth.onAuthStateChanged(async user => {
+    if (!user) {
+      return location.replace('login.html');
+    }
+
+    // 1) Force le rafraîchissement du token pour récupérer à jour les custom-claims
+    const idTokenResult = await user.getIdTokenResult(true);
+    console.log('Custom claims après refresh :', idTokenResult.claims);
+
+    // 2) Montre / cache le modal
+    if (idTokenResult.claims.role === 'pending') {
+      document.getElementById('activation-modal').classList.add('show');
+      // on n’ajoute pas encore auth-ok pour bloquer toute l’app
+    } else {
+      document.getElementById('activation-modal').classList.remove('show');
+      document.body.classList.add('auth-ok');
+    }
+  });
+
+  // Gestion du clic « Valider »
+  document.getElementById('btn-activate').addEventListener('click', async () => {
+    const code = document.getElementById('activation-code').value.trim();
+    if (!code) {
+      return alert('Veuillez entrer le code.');
+    }
+    try {
+      await verifyActivationCode({ code });
+      // 1) Rafraîchit de nouveau le token pour récupérer role: 'admin'
+      await auth.currentUser.getIdToken(true);
+      // 2) Recharger la page, le handler ci-dessus masquera le modal et affichera l’app
+      location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+</script>
 </body>
 </html>
