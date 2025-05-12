@@ -36,9 +36,7 @@
 
   <style>
 
-    .screen {
-  padding: 48px 24px 0; /* ← ajouter 48px de padding-top */
-}
+    
 
     :root {
       --primary: #1e90ff;
@@ -58,6 +56,7 @@
       color: var(--text);
       -webkit-tap-highlight-color: transparent;
     }
+
     /* container 2 écrans */
     #app {
       display: flex;
@@ -69,6 +68,7 @@
     .screen {
       width:100%;
       padding: 0 24px;
+      padding: 48px 24px 0;
       background: var(--surface);
       overflow-y: auto;
       overscroll-behavior: none;
@@ -176,6 +176,12 @@
     }
     .or::before { margin-right:8px; }
     .or::after { margin-left:8px; }
+
+    /* Hérité de .form-group .icon */
+.clear-icon {
+  display: none;      /* caché tant que le champ est vide */
+}
+
   </style>
 </head>
 <body>
@@ -208,7 +214,6 @@
       <div class="form-group">
         <label for="signup-first">First Name</label>
         <input type="text" id="signup-first" placeholder="First Name">
-        <i class="bi bi-x-circle icon" id="clear-first"></i>
       </div>
 
       <div class="form-group">
@@ -331,6 +336,30 @@ document.getElementById('btn-login').addEventListener('click', () => {
   })
   .catch(err => alert(err.message));
 
+  });
+
+  // À placer après le DOM prêt (ici en bas de page)
+  document.querySelectorAll('.form-group').forEach(group => {
+    const inp = group.querySelector('input');
+    if (!inp || inp.type === 'password') return;  // on zappe les password
+
+    // 1) création de l'icône
+    const clearIcn = document.createElement('i');
+    clearIcn.classList.add('bi','bi-x-circle','icon','clear-icon');
+    group.appendChild(clearIcn);
+
+    // 2) au clic sur la croix => vide + focus
+    clearIcn.addEventListener('click', () => {
+      inp.value = '';
+      inp.dispatchEvent(new Event('input'));  // pour rafraîchir l'affichage
+      inp.focus();
+    });
+
+    // 3) quand on tape => on affiche ou masque la croix
+    inp.addEventListener('input', () => {
+      if (inp.value.length > 0) clearIcn.style.display = 'block';
+      else clearIcn.style.display = 'none';
+    });
   });
 </script>
 
