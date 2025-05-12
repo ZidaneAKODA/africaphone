@@ -32,6 +32,27 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   console.log("🔥 Firebase Auth initialisé :", auth);
+
+  function withSpinner(buttonId, actionFn) {
+  const btn      = document.getElementById(buttonId);
+  const textSpan = btn.querySelector('.btn-text');
+  const spinner  = btn.querySelector('.loader');
+
+  // démarre le spinner
+  btn.disabled = true;
+  textSpan.style.visibility = 'hidden';
+  spinner.style.display = 'block';
+
+  return actionFn()
+    .catch(err => {
+      // en cas d'erreur : stop spinner et restaure
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      textSpan.style.visibility = 'visible';
+      throw err;
+    });
+}
+
 </script>
 
   <style>
@@ -127,24 +148,45 @@
     }
     /* Buttons */
     .btn {
-      display:block;
-      width:100%;
-      padding:14px;
-      margin-top:12px;
-      font-size:16px;
-      font-weight:500;
-      text-align:center;
-      background: var(--primary);
-      color:#fff;
-      border:none;
-      border-radius:30px;
-      cursor:pointer;
-      transition: transform 0.1s ease, background var(--transition);
-      user-select:none;
-    }
-    .btn:active {
-      transform: scale(0.97);
-    }
+  display:block;
+  width:100%;
+  padding:14px;
+  margin-top:12px;
+  font-size:16px;
+  font-weight:500;
+  text-align:center;
+  background: var(--primary);
+  color:#fff;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
+  transition: transform 0.1s ease, background var(--transition);
+  user-select:none;
+  position: relative;
+  overflow: hidden;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* SPINNER INLINE */
+.btn .loader {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.6);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
     /* Links */
     .link {
       text-align:center;
@@ -182,6 +224,32 @@
   display: none;      /* caché tant que le champ est vide */
 }
 
+/* messages d’erreur masqués par défaut */
+.input-error {
+  display: none;
+  color: #e74c3c;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* quand on veut l’afficher, on ajoute la classe .show */
+.input-error.show {
+  display: flex;
+  align-items: center;
+}
+
+/* icône d’erreur en 18px comme les autres */
+.input-error i {
+  margin-right: 6px;
+  font-size: 18px;
+  /* si jamais .icon met du absolute, on l’annule */
+  position: static;
+  cursor: default;
+  color: inherit;
+}
+
+
+
   </style>
 </head>
 <body>
@@ -190,19 +258,37 @@
     <!-- LOGIN -->
     <div class="screen" id="login-screen">
       
-      <div class="form-group">
-        <label for="login-user">Username</label>
-        <input type="text" id="login-user" placeholder="Enter your email or username">
-      </div>
+      <!-- === USERNAME === -->
+<div class="form-group">
+  <label for="login-user">Username</label>
+  <input type="text" id="login-user" placeholder="Enter your email or username">
+  <!-- Zone d’erreur spécifique à login-user -->
+  <div class="input-error" id="error-login-user">
+  <i class="bi bi-exclamation-circle-fill error-icon" aria-hidden="true"></i>
+  <span class="error-text"></span>
+</div>
 
-      <div class="form-group">
-        <label for="login-pw">Password</label>
-        <input type="password" id="login-pw" placeholder="Password">
-        <i class="bi bi-eye icon" id="toggle-login"></i>
-      </div>
+</div>
+
+<!-- === PASSWORD === -->
+<div class="form-group">
+  <label for="login-pw">Password</label>
+  <input type="password" id="login-pw" placeholder="Password">
+  <i class="bi bi-eye icon" id="toggle-login"></i>
+  <!-- Zone d’erreur spécifique à login-pw -->
+  <div class="input-error" id="error-login-pw" aria-live="assertive">
+    <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+    <span class="error-text"></span>
+  </div>
+</div>
+
 
       <div class="link"><a href="#">Reset Password</a></div>
-      <button class="btn" id="btn-login">Sign in with email</button>
+      <button class="btn" id="btn-login">
+  <span class="btn-text">Sign in with email</span>
+  <div class="loader"></div>
+</button>
+
 
       <div class="or">OR</div>
       <div class="link"><a href="#" id="to-signup">Create an account</a></div>
@@ -236,7 +322,11 @@
       <div class="link" style="font-size:13px;line-height:1.4;">
         By signing up, you agree to our <a href="#">Privacy and Term</a>
       </div>
-      <button class="btn" id="btn-signup">Create an account</button>
+      <button class="btn" id="btn-signup">
+  <span class="btn-text">Create an account</span>
+  <div class="loader"></div>
+</button>
+
 
       <div class="or">OR</div>
       <div class="link"><a href="#" id="to-login">Login to your account</a></div>
@@ -268,10 +358,6 @@
     bindToggle('toggle-login','login-pw');
     bindToggle('toggle-signup','signup-pw');
 
-    // Clear first name
-    document.getElementById('clear-first').addEventListener('click', () => {
-      document.getElementById('signup-first').value = '';
-    });
 
     // Touch-swipe navigation
     let startX = 0;
@@ -294,73 +380,99 @@ const signupLast  = document.getElementById('signup-last');
 const signupEmail = document.getElementById('signup-email');
 const signupPw    = document.getElementById('signup-pw');
 
+// — utilitaires pour chaque champ : —
+function showFieldError(fieldId, message) {
+  const errDiv = document.getElementById(`error-${fieldId}`);
+  errDiv.querySelector('.error-text').textContent = message;
+  errDiv.classList.add('show');
+}
+
+function clearFieldError(fieldId) {
+  const errDiv = document.getElementById(`error-${fieldId}`);
+  errDiv.classList.remove('show');
+  errDiv.querySelector('.error-text').textContent = '';
+}
+
+// Effacer l’erreur dès qu’on retape quelque chose
+[loginUser, loginPw].forEach(input => {
+  input.addEventListener('input', () => clearFieldError(input.id));
+});
+
 // Sign in
 document.getElementById('btn-login').addEventListener('click', () => {
-  const email    = loginUser.value;
-  const password = loginPw.value;
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      // redirige vers index.html
-      window.location.href = 'index.html';
-    })
-    .catch(err => {
-      alert("Erreur de connexion : " + err.message);
-    });
+  // 1) on efface d’éventuelles vieilles erreurs
+  clearFieldError('login-user');
+  clearFieldError('login-pw');
+
+  // 2) on récupère et valide
+  const email = loginUser.value.trim();
+  const pw    = loginPw.value;
+
+  if (!email) {
+    showFieldError('login-user', 'Veuillez entrer votre email.');
+    loginUser.focus(); return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showFieldError('login-user', 'Adresse email non valide.');
+    loginUser.focus(); return;
+  }
+  if (pw.length < 6) {
+    showFieldError('login-pw', 'Le mot de passe doit faire ≥ 6 caractères.');
+    loginPw.focus(); return;
+  }
+
+  // 3) on appelle Firebase
+  withSpinner('btn-login', () =>
+    auth.signInWithEmailAndPassword(email, pw)
+  )
+  .then(() => window.location.href = 'index.html')
+  .catch(err => {
+    // 4) on traite les codes d’erreur Firebase
+    switch (err.code) {
+      case 'auth/invalid-email':
+      case 'auth/user-not-found':
+        showFieldError('login-user', 'Email inconnu ou invalide.');
+        loginUser.focus();
+        break;
+      case 'auth/wrong-password':
+        showFieldError('login-pw', 'Mot de passe incorrect.');
+        loginPw.focus();
+        break;
+      case 'auth/user-disabled':
+        showFieldError('login-user', 'Ce compte a été désactivé.');
+        break;
+      default:
+        showFieldError('login-user', err.message);
+    }
+  });
 });
 
 // Récupère la fonction callable
 
 
-  document.getElementById('btn-signup').addEventListener('click', () => {
+  // SIGNUP
+document.getElementById('btn-signup').addEventListener('click', () => {
+  withSpinner('btn-signup', async () => {
     const firstname = signupFirst.value.trim();
     const lastname  = signupLast.value.trim();
-    const email     = signupEmail.value;
-    const password  = signupPw.value;
-
-
     if (!firstname || !lastname) {
-      return alert("Veuillez indiquer votre nom et prénom.");
+      alert("Veuillez indiquer votre nom et prénom.");
+      return Promise.reject();
     }
-    
-
-    auth.createUserWithEmailAndPassword(email, password)
-  .then(async userCred => {
-    /* on ajoute le nom complet dans le profil */
-    await userCred.user.updateProfile({ displayName: firstname + ' ' + lastname });
-
-    /* ⬇️ NEW : on force le refresh pour récupérer la claim "pending" */
+    const userCred = await auth.createUserWithEmailAndPassword(
+      signupEmail.value, signupPw.value
+    );
+    await userCred.user.updateProfile({
+      displayName: firstname + ' ' + lastname
+    });
     await auth.currentUser.getIdToken(true);
-
-    /* puis on redirige vers l’app principale */
     window.location.href = 'index.html';
   })
-  .catch(err => alert(err.message));
-
+  .catch(err => {
+    if (err && err.message) alert(err.message);
   });
-
-  // À placer après le DOM prêt (ici en bas de page)
-  document.querySelectorAll('.form-group').forEach(group => {
-    const inp = group.querySelector('input');
-    if (!inp || inp.type === 'password') return;  // on zappe les password
-
-    // 1) création de l'icône
-    const clearIcn = document.createElement('i');
-    clearIcn.classList.add('bi','bi-x-circle','icon','clear-icon');
-    group.appendChild(clearIcn);
-
-    // 2) au clic sur la croix => vide + focus
-    clearIcn.addEventListener('click', () => {
-      inp.value = '';
-      inp.dispatchEvent(new Event('input'));  // pour rafraîchir l'affichage
-      inp.focus();
-    });
-
-    // 3) quand on tape => on affiche ou masque la croix
-    inp.addEventListener('input', () => {
-      if (inp.value.length > 0) clearIcn.style.display = 'block';
-      else clearIcn.style.display = 'none';
-    });
-  });
+});
+  
 </script>
 
 </body>
