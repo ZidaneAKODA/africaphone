@@ -50,16 +50,29 @@
 const auth   = firebase.auth();
 const fn     = firebase.functions();
 
-auth.onAuthStateChanged(user => {
-      if (!user) {
-        // pas connecté → on recharge sur la page de login
-        // replace() pour ne pas garder index.html dans l’historique
-        return window.location.replace('login.html');
-      }
-      // connecté → on rend visible le contenu
-      document.body.style.visibility = 'visible';
-    });
-  
+// fonction callable pour vérifier le code
+const verifyActivationCode = fn.httpsCallable('verifyActivationCode');
+
+
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    // pas connecté
+    return window.location.replace('login.html');
+  }
+  // on refresh le token pour récupérer la claim “role”
+  const tokenResult = await user.getIdTokenResult(true);
+
+  // on rend d’abord le body visible (pour voir la page #activation ou les autres)
+  document.body.style.visibility = 'visible';
+
+  // si toujours en “pending”, on force la page d’activation
+  if (tokenResult.claims.role === 'pending') {
+    location.hash = 'activation';
+    return;     // on sort, on n’exécute pas le reste
+  }
+  // sinon, on laisse le router afficher la page demandée
+});
+
 
   </script>
   
@@ -80,18 +93,6 @@ main.page.visible {
   flex-direction: column;
 }
 
-/* ——— Modal d’activation ——— */
-.modal {
-  position: fixed;
-  inset: 0;
-  display: none;           /* cachée par défaut */
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-.modal.show {
-  display: flex;           /* visible quand on ajoute “show” */
-}
 
     :root{
       --primary-text:#222;
@@ -915,8 +916,107 @@ main.page {
     </div>
   </nav>
 
+  <main id="activation" class="page">
+    <style>
+/* --- Page Activation --- */
+main#activation.page {
+  display: none;           /* cachée par défaut, comme les autres pages */
+  padding: 0 1.5rem;
+  flex-direction: column;  /* comme les autres pages */
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+main#activation.visible {
+  display: flex;
+}
+
+.activation-container {
+  width: 100%;
+  max-width: 360px;   /* pour caler la largeur */
+}
+
+.activation-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  border-radius: 50%;
+  background: rgba(0, 200, 150, 0.15); /* couleur pastel */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.activation-icon i {
+  font-size: 2rem;
+  color: #00c896;     /* accent color */
+}
+
+main#activation h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+main#activation p {
+  color: var(--secondary-text);
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+}
+
+.activation-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  outline: none;
+}
+
+.activation-btn {
+  width: 100%;
+  padding: 0.85rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+</style>
+
+  <div class="activation-container">
+    <div class="activation-icon">
+      <i class="bi bi-box-arrow-in-right"></i>
+    </div>
+    <h3>Activation du compte</h3>
+    <p>Entrez votre code d’activation pour finaliser l’inscription.</p>
+    <input
+      type="text"
+      id="activation-code"
+      placeholder="Code d’activation"
+      class="activation-input"
+    >
+    <button id="btn-activate" class="btn-primary activation-btn">
+      Valider
+    </button>
+  </div>
+</main>
+
   <!-- SCRIPTS -->
   <script>
+
+    
+// gestion du clic “Valider”
+document.getElementById('btn-activate').addEventListener('click', async () => {
+  const code = document.getElementById('activation-code').value.trim();
+  if (!code) return alert('Veuillez entrer le code.');
+  try {
+    await verifyActivationCode({ code });
+    // on force un refresh du token et on recharge
+    await auth.currentUser.getIdToken(true);
+    location.reload();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
     /* PWA registration */
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(err => console.error(err));
@@ -934,42 +1034,36 @@ main.page {
       active.style.borderBottom = '2px solid #0064d2';
     }
 
-    /* Hash-router + ripple (l’onde ne s’applique qu’à la barre de navigation) */
-  (function () {
-    const pages = document.querySelectorAll('.page');
-    const nav   = document.querySelector('nav');    // ← ajoutez cette ligne
+;(function () {
+  const pages = document.querySelectorAll('.page');
+  const nav   = document.querySelector('nav');
 
-    function route() {
-  const key = location.hash.slice(1) || 'home';
-  let ok = false;
+  function route() {
+    // récupère la partie après le “#” ou “home” par défaut
+    const key = location.hash.slice(1) || 'home';
+    let found = false;
 
-  // 1) On affiche/caché chaque page
-  pages.forEach(p => {
-    const show = p.id === key;
-    p.classList.toggle('visible', show);
-    if (show) ok = true;
-  });
+    // pour chaque <main class="page"> on affiche/caché
+    pages.forEach(p => {
+      const show = p.id === key;
+      p.classList.toggle('visible', show);
+      if (show) found = true;
+    });
+    // si on n’a trouvé aucune page id=key → on retourne à home
+    if (!found) return location.hash = 'home';
 
-  // 2) Si le hash est invalide, on retourne à home
-  if (!ok) {
-    location.hash = 'home';
-    return;
+    // masque la nav pour #activation et #sell, la remet autrement
+    if (key === 'activation' || key === 'sell') {
+      nav.style.display = 'none';
+    } else {
+      nav.style.removeProperty('display');
+    }
+
+    // met à jour l’onglet actif (classe .active sur les [data-hash])
+    document.querySelectorAll('[data-hash]').forEach(el => {
+      el.classList.toggle('active', el.dataset.hash === key);
+    });
   }
-
-  // 3) On met à jour le lien actif
-  document.querySelectorAll('[data-hash]').forEach(el => {
-    el.classList.toggle('active', el.dataset.hash === key);
-  });
-
-  // 4) On masque la nav pour #sell, et on la restaure ensuite
-  if (key === 'sell') {
-    nav.style.display = 'none';
-  } else {
-    // supprime l'affichage inline pour revenir au comportement CSS natif
-    nav.style.removeProperty('display');
-  }
-}
-
 
     // Délégation : tout élément data-hash change le hash
     document.body.addEventListener('click', e => {
@@ -1016,75 +1110,7 @@ searchInput.addEventListener('input', () => {
 
   </script>
 
-   
-<!-- === MODAL D’ACTIVATION === -->
-<div id="activation-modal" class="modal">
-  <div class="modal-backdrop"></div>
-
-  <div class="modal-content">
-    <h3>Activation du compte</h3>
-    <p>Entrez votre code d’activation pour finaliser l’inscription.</p>
-
-    <div class="form-group">
-      <input type="text" id="activation-code" placeholder="Code d’activation">
-    </div>
-
-    <button id="btn-activate" class="btn-primary">Valider</button>
-  </div>
-</div>
 
 
-<style>
-/* Modal full-screen */
-.modal           { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:999; }
-.modal.show      { display:flex; }
-.modal-backdrop  { position:absolute; inset:0; background:rgba(0,0,0,.5); }
-.modal-content   { position:relative; z-index:1; width:90%; max-width:400px; background:#fff;
-                   border-radius:8px; padding:1.5rem; box-shadow:0 6px 30px rgba(0,0,0,.2); }
-.modal-content h3{ margin-bottom:.5rem; }
-.modal-content .form-group{ margin:1.25rem 0; }
-.modal-content input{ width:100%; padding:.75rem 1rem; font-size:1rem; border:1px solid #ccc; border-radius:6px; }
-</style>
-
-<script>/* ---------- Modal d’activation ---------- */
-
-  const verifyActivationCode = fn.httpsCallable('verifyActivationCode');
-
-  auth.onAuthStateChanged(async user => {
-    if (!user) {
-      return location.replace('login.html');
-    }
-
-    // 1) Force le rafraîchissement du token pour récupérer à jour les custom-claims
-    const idTokenResult = await user.getIdTokenResult(true);
-    console.log('Custom claims après refresh :', idTokenResult.claims);
-
-    // 2) Montre / cache le modal
-    if (idTokenResult.claims.role === 'pending') {
-      document.getElementById('activation-modal').classList.add('show');
-      // on n’ajoute pas encore auth-ok pour bloquer toute l’app
-    } else {
-      document.getElementById('activation-modal').classList.remove('show');
-      document.body.classList.add('auth-ok');
-    }
-  });
-
-  // Gestion du clic « Valider »
-  document.getElementById('btn-activate').addEventListener('click', async () => {
-    const code = document.getElementById('activation-code').value.trim();
-    if (!code) {
-      return alert('Veuillez entrer le code.');
-    }
-    try {
-      await verifyActivationCode({ code });
-      // 1) Rafraîchit de nouveau le token pour récupérer role: 'admin'
-      await auth.currentUser.getIdToken(true);
-      // 2) Recharger la page, le handler ci-dessus masquera le modal et affichera l’app
-      location.reload();
-    } catch (err) {
-      alert(err.message);
-    }
-  });
-</script>
 </body>
 </html>
