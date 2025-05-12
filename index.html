@@ -54,25 +54,50 @@ const fn     = firebase.functions();
 const verifyActivationCode = fn.httpsCallable('verifyActivationCode');
 
 
-auth.onAuthStateChanged(async user => {
-  if (!user) {
-    // pas connecté
-    return window.location.replace('login.html');
+ let activated = false;   // flag global
+
+  // 1) Auth state + claim
+  auth.onAuthStateChanged(async user => {
+    if (!user) {
+      return window.location.replace('login.html');
+    }
+    // force refresh pour récupérer la claim à jour
+    const tok = await user.getIdTokenResult(true);
+    activated = !!tok.claims.activated;
+
+    // une seule fois, si pas activé, forcer activation sans empiler
+    if (!activated) {
+      history.replaceState(null,'','#activation');
+    }
+    document.body.style.visibility = 'visible';
+    route();
+  });
+
+  // 2) Router with guard
+  function route() {
+    const key = location.hash.slice(1) || 'home';
+    if (!activated && key !== 'activation') {
+      // on reste sur activation
+      return history.replaceState(null,'','#activation');
+    }
+    document.querySelectorAll('.page').forEach(p => {
+      p.classList.toggle('visible', p.id === key);
+    });
+    // masquer ou afficher nav, mettre .active, etc. 
+    const nav = document.querySelector('nav');
+    if (key === 'activation' || key === 'sell') {
+      nav.style.display = 'none';
+    } else {
+      nav.style.removeProperty('display');
+    }
+    document.querySelectorAll('[data-hash]').forEach(el => {
+      el.classList.toggle('active', el.dataset.hash === key);
+    });
   }
-  // on refresh le token pour récupérer la claim “role”
-  const tokenResult = await user.getIdTokenResult(true);
 
-  // on rend d’abord le body visible (pour voir la page #activation ou les autres)
-  document.body.style.visibility = 'visible';
-
-  // si toujours en “pending”, on force la page d’activation
-  if (tokenResult.claims.role === 'pending') {
-    location.hash = 'activation';
-    return;     // on sort, on n’exécute pas le reste
-  }
-  // sinon, on laisse le router afficher la page demandée
-});
-
+  // 3) Réagir aux changements d’URL / back-button
+  window.addEventListener('hashchange', route);
+  window.addEventListener('popstate',   route);
 
   </script>
   
