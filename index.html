@@ -9,10 +9,10 @@
 
   <!-- PWA manifest & theming -->
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0064d2">
+  <meta name="theme-color" content="#FFFFFF">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="eBay Mobile">
+  <meta name="apple-mobile-web-app-title" content="">
   <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
 
    <style>
@@ -26,6 +26,7 @@
  <!-- 1) Firebase (compat) SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-functions-compat.js"></script>
 
   <!-- 2) Initialisation Firebase & Auth -->
@@ -49,6 +50,7 @@
   
 const auth   = firebase.auth();
 const fn     = firebase.functions();
+const db = firebase.firestore();
 
 // fonction callable pour vérifier le code
 const verifyActivationCode = fn.httpsCallable('verifyActivationCode');
@@ -872,56 +874,103 @@ main.page {
 
 
   <main id="catalog" class="page">
-    <!-- barre de recherche -->
-    <header>
-        <div class="search-wrapper">
-          <i class="bi bi-search"></i>
-          <input
-            type="search"
-            id="search-input"
-            placeholder="Rechercher dans le catalogue"
-            aria-label="Recherche catalogue"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="none"
-            spellcheck="false"
-          >
-          <div class="actions">
-            <i class="bi bi-cart"></i>
-          </div>
-        </div>
-      </header>
-    
+  <!-- barre de recherche … -->
+  <header>
+    <div class="search-wrapper">
+      <i class="bi bi-search"></i>
+      <input
+        type="search"
+        id="search-input"
+        placeholder="Rechercher dans le catalogue"
+        aria-label="Recherche catalogue"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck="false"
+      >
+      <div class="actions">
+        <i class="bi bi-cart"></i>
+      </div>
+    </div>
+  </header>
 
-      <!-- ===== Info cards (total livres + valeur) ===== -->
+  <!-- Info cards (total livres + valeur) -->
   <div class="info-cards">
     <div class="info-card">
-      <div class="info-number" id="total-books">1 234</div>
+      <div class="info-number" id="total-books">0</div>
       <div class="info-label">Total de livres</div>
     </div>
     <div class="info-card">
-      <div class="info-number" id="total-value">€12 345</div>
+      <div class="info-number" id="total-value">€0</div>
       <div class="info-label">Valeur totale</div>
     </div>
   </div>
 
-    <!-- conteneur pour les résultats -->
-    <div id="catalog-results" >
-        <div class="books-list">
-            <div class="book-card">
-              <h4 class="book-title">The Great Gatsby</h4>
-              <p class="book-price">$10.99</p>
-              <p class="book-quantity">Quantity: 3</p>
-            </div>
-            <div class="book-card">
-              <h4 class="book-title">1984</h4>
-              <p class="book-price">$8.50</p>
-              <p class="book-quantity">Quantity: 5</p>
-            </div>
-            <!-- Repeat .book-card for each book -->
-          </div>          
-    </div>
-  </main>
+  <!-- conteneur pour les résultats -->
+  <div id="catalog-results">
+    <div class="books-list"></div>
+  </div>
+
+  <!-- ⬇ Ici on encapsule tout le JS catalog ⬇ -->
+  <script>
+  (function() {
+    const booksList      = document.querySelector('#catalog-results .books-list');
+    const totalBooksEl   = document.getElementById('total-books');
+    const totalValueEl   = document.getElementById('total-value');
+    const searchInput    = document.getElementById('search-input');
+    const infoCards      = document.querySelector('.info-cards');
+
+    // Masquer les cards lors de la recherche
+    searchInput.addEventListener('input', () => {
+      if (searchInput.value.trim()) {
+        infoCards.classList.add('fade-out');
+      } else {
+        infoCards.classList.remove('fade-out');
+      }
+    });
+
+    // Auth + récupération des items
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        return window.location.replace('login.html');
+      }
+
+      const userCatalogRef = db
+        .collection('users')
+        .doc(user.uid)
+        .collection('catalog');
+
+      userCatalogRef.onSnapshot(snapshot => {
+        let count = 0;
+        let value = 0;
+        booksList.innerHTML = '';
+
+        snapshot.forEach(doc => {
+          const { title, price, quantity } = doc.data();
+          count += quantity;
+          value += price * quantity;
+
+          // création du book-card
+          const card = document.createElement('div');
+          card.className = 'book-card';
+          card.innerHTML = `
+            <h4 class="book-title">${title}</h4>
+            <p class="book-price">€${price.toFixed(2)}</p>
+            <p class="book-quantity">Quantité : ${quantity}</p>
+          `;
+          booksList.appendChild(card);
+        });
+
+        totalBooksEl.textContent = count.toLocaleString();
+        totalValueEl.textContent = '€' + value.toFixed(2);
+      }, err => {
+        console.error('Erreur Firestore catalog :', err);
+      });
+    });
+  })();
+  </script>
+</main>
+
   
   <!-- NAVIGATION BAR -->
   <nav aria-label="Main navigation">
