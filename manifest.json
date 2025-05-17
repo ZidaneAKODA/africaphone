@@ -1,14 +1,15 @@
 {
-  "name": "BookShop",
-  "short_name": "BookShop",
-  "start_url": "/index.html",
+  "name": "BookEase - Gestion ",
+  "short_name": "BookEase",
+  "start_url": "/africaphone/index.html",
   "display": "standalone",
-  "theme_color": "#0064d2",
   "background_color": "#ffffff",
+  "theme_color": "#006064",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
+      "src": "icons/logo-144x144.png",
+      "sizes": "144x144",
       "type": "image/png"
     }
   ]
