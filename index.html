@@ -417,6 +417,14 @@ main#catalog {
       <button class="btn-action btn-buy" data-hash="catalog" aria-label="Buy">
         <i class="bi bi-cart-fill"></i><span>Buy</span>
       </button>
+
+      <!-- Bouton PWA hidden par défaut -->
+<button id="btn-install" class="btn-primary"
+        style="display:none;margin:0 1rem 1rem 1rem;">
+  <i class="bi bi-download" style="margin-right:0.5rem;"></i>
+  Installer l’application
+</button>
+
     </div>
 
     <!-- Stock info card -->
@@ -774,6 +782,10 @@ main.page {
   max-width: 100%;
 }
 
+/* à la fin de ta feuille, juste pour le bouton */
+#btn-install {
+  width: calc(100% - 2rem);  /* même marge que les autres cartes */
+}
 
 
   </style>
@@ -1178,7 +1190,7 @@ searchInput.addEventListener('input', () => {
 
 
   </script>
-  
+
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -1201,6 +1213,40 @@ searchInput.addEventListener('input', () => {
         .catch(err => console.error('[App] Échec enregistrement SW :', err));
     });
   }
+</script>
+
+<script>
+/* === PWA install button === */
+let deferredPrompt = null;             // stocke l’évènement
+
+// 1) Le navigateur signale que l'app peut être installée
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();                  // on annule l’invite auto
+  deferredPrompt = e;                  // on garde l’objet
+  document.getElementById('btn-install').style.display = 'block';   // on révèle le bouton
+});
+
+// 2) Clique sur le bouton “Installer”
+document.getElementById('btn-install').addEventListener('click', async () => {
+  if (!deferredPrompt) return;         // sécurité
+  document.getElementById('btn-install').disabled = true;           // évite le spam
+
+  deferredPrompt.prompt();             // ouvre la modale native
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;               // on « consomme » l’évènement
+
+  // Si l’utilisateur a installé → on masque définitivement le bouton
+  // Sinon on le ré-affiche pour qu’il puisse réessayer plus tard
+  document.getElementById('btn-install').style.display =
+    (outcome === 'accepted') ? 'none' : 'block';
+  document.getElementById('btn-install').disabled = false;
+});
+
+// 3) Si l'app est finalement installée (via menu navigateur, etc.)
+window.addEventListener('appinstalled', () => {
+  console.log('[PWA] App installée 🎉');
+  document.getElementById('btn-install').style.display = 'none';
+});
 </script>
 
 
