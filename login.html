@@ -416,10 +416,11 @@ document.getElementById('btn-login').addEventListener('click', () => {
     showFieldError('login-user', 'Adresse email non valide.');
     loginUser.focus(); return;
   }
-  if (pw.length < 6) {
-    showFieldError('login-pw', 'Le mot de passe doit faire ≥ 6 caractères.');
-    loginPw.focus(); return;
-  }
+ if (!pw) {                       // juste vide ?
+  showFieldError('login-pw', 'Veuillez entrer votre mot de passe.');
+  loginPw.focus(); return;
+}
+
 
   // 3) on appelle Firebase
   withSpinner('btn-login', () =>
@@ -427,24 +428,36 @@ document.getElementById('btn-login').addEventListener('click', () => {
   )
   .then(() => window.location.href = 'index.html')
   .catch(err => {
-    // 4) on traite les codes d’erreur Firebase
-    switch (err.code) {
-      case 'auth/invalid-email':
-      case 'auth/user-not-found':
-        showFieldError('login-user', 'Email inconnu ou invalide.');
-        loginUser.focus();
-        break;
-      case 'auth/wrong-password':
-        showFieldError('login-pw', 'Mot de passe incorrect.');
-        loginPw.focus();
-        break;
-      case 'auth/user-disabled':
-        showFieldError('login-user', 'Ce compte a été désactivé.');
-        break;
-      default:
-        showFieldError('login-user', err.message);
-    }
-  });
+  // Pour le débogage, conservez tout de même la trace côté console
+  console.error('[auth] login error', err);
+
+  switch (err.code) {
+    case 'auth/invalid-email':
+      showFieldError('login-user', 'Adresse email non valide.');
+      loginUser.focus();
+      break;
+
+    case 'auth/user-disabled':
+      showFieldError('login-user', 'Ce compte a été désactivé.');
+      break;
+
+    /* Tous les cas "identifiants invalides" regroupés
+       — y compris le nouveau code  auth/invalid-login-credentials */
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+    case 'auth/invalid-login-credentials':
+      // On renvoie un message neutre pour ne pas donner d’indice
+      showFieldError('login-pw', 'Email ou mot de passe incorrect.');
+      loginPw.focus();
+      break;
+
+    default:
+      // Message passe-partout si c’est autre chose
+      showFieldError('login-user',
+        'Impossible de vous connecter pour le moment. Réessayez plus tard.');
+  }
+});
+
 });
 
 // Récupère la fonction callable
@@ -473,6 +486,29 @@ document.getElementById('btn-signup').addEventListener('click', () => {
   });
 });
   
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => {
+          console.log('[App] SW enregistré, scope :', reg.scope);
+
+          // Dès qu’on déploie une nouvelle version (CACHE_NAME incrémenté)…
+          reg.addEventListener('updatefound', () => {
+            const newSW = reg.installing;
+            newSW.addEventListener('statechange', () => {
+              // Quand le nouvel SW est prêt et qu’il y avait déjà un SW actif
+              if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('[App] Nouvelle version dispo → reload');
+                window.location.reload();
+              }
+            });
+          });
+        })
+        .catch(err => console.error('[App] Échec enregistrement SW :', err));
+    });
+  }
 </script>
 
 </body>
