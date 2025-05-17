@@ -1091,11 +1091,6 @@ document.getElementById('btn-activate').addEventListener('click', async () => {
   }
 });
 
-    /* PWA registration */
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(err => console.error(err));
-    }
-
     /* Tabs inside catalog */
     function toggleTab(tab) {
       ['recent', 'saved'].forEach(t => {
@@ -1183,7 +1178,30 @@ searchInput.addEventListener('input', () => {
 
 
   </script>
+  
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => {
+          console.log('[App] SW enregistré, scope :', reg.scope);
 
+          // Dès qu’on déploie une nouvelle version (CACHE_NAME incrémenté)…
+          reg.addEventListener('updatefound', () => {
+            const newSW = reg.installing;
+            newSW.addEventListener('statechange', () => {
+              // Quand le nouvel SW est prêt et qu’il y avait déjà un SW actif
+              if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('[App] Nouvelle version dispo → reload');
+                window.location.reload();
+              }
+            });
+          });
+        })
+        .catch(err => console.error('[App] Échec enregistrement SW :', err));
+    });
+  }
+</script>
 
 
 </body>
