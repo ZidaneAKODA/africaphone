@@ -1266,6 +1266,13 @@ document.getElementById('btn-activate').addEventListener('click', async () => {
         ripple.style.top      = (e.clientY - rect.top  - size / 2) + 'px';
         el.querySelector('.ripple')?.remove();   // supprime l’ancien éventuel
         el.appendChild(ripple);
+          // dès que l’anim est terminée, on le retire
+  ripple.addEventListener('animationend', () => {
+    ripple.remove();
+  });
+
+
+      
       }
       /* ------------------------------------------------------------------ */
 
