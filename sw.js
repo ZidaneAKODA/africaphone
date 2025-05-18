@@ -1,7 +1,7 @@
 // service-worker.js
 
 // ⚠️ Incrémentez ce nom à chaque déploiement !
-const CACHE_NAME = 'bookshop-cache-v8';
+const CACHE_NAME = 'bookshop-cache-v9';
 
 const urlsToCache = [
   '/index.html',
