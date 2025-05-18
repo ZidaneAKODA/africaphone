@@ -360,45 +360,31 @@ main#catalog {
 <body>
 
   <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Liste des attributs à bloquer
-  const attrs = {
-    autocomplete: 'off',
-    autocorrect:  'off',
-    autocapitalize: 'none',
-    spellcheck:   'false'
-  };
+  class AppInput extends HTMLElement {
+    constructor() {
+      super();
+      const shadow = this.attachShadow({ mode: 'open' });
+      const inp = document.createElement('input');
 
-  // Fonction qui applique les attributs
-  function disableInputs(el) {
-    Object.entries(attrs).forEach(([name, value]) => {
-      el.setAttribute(name, value);
-    });
+      // 1) Ajoute les attributs anti-autocomplete
+      inp.setAttribute('autocomplete', 'off');
+      inp.setAttribute('autocorrect',  'off');
+      inp.setAttribute('autocapitalize', 'none');
+      inp.setAttribute('spellcheck',    'false');
+
+      // 2) Reflète à la volée les attributs usuels passés sur <app-input>
+      ['type','placeholder','name','id','value','list'].forEach(name => {
+        if (this.hasAttribute(name)) {
+          inp.setAttribute(name, this.getAttribute(name));
+        }
+      });
+
+      // 3) Réinjecte dans le DOM
+      shadow.appendChild(inp);
+    }
   }
 
-  // 1) On traite tous les inputs déjà présents
-  document.querySelectorAll('input').forEach(disableInputs);
-
-  // 2) On observe les ajouts dans le DOM (pour les inputs créés dynamiquement)
-  const observer = new MutationObserver(mutations => {
-    for (const m of mutations) {
-      for (const node of m.addedNodes) {
-        if (node.nodeType !== 1) continue;             // on ne s’intéresse qu’aux éléments
-        if (node.tagName === 'INPUT') {
-          disableInputs(node);
-        }
-        // et à tout input qu’il contiendrait
-        node.querySelectorAll && node.querySelectorAll('input')
-            .forEach(disableInputs);
-      }
-    }
-  });
-
-  observer.observe(document.documentElement, {
-    childList: true,
-    subtree:   true
-  });
-});
+  customElements.define('app-input', AppInput);
 </script>
 
 
@@ -907,7 +893,11 @@ main.page {
              id="supplier-search"
              placeholder="Rechercher ou saisir un fournisseur"
              list="supplier-list"
-             autocomplete="off">
+             type="text"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false">
       <datalist id="supplier-list"></datalist>
     </div>
     <div class="wizard-nav">
