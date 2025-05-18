@@ -815,6 +815,33 @@ main.page {
       font-size: 0.9rem;
       z-index: 100;
     }
+    /* ————— Regrouper Qté & Prix unitaire sur la même ligne ————— */
+#new-supply .line-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Le champ “Livre” reste 100% */
+#new-supply .line-row .book-search {
+  flex: 1 1 100%;
+  box-sizing: border-box;
+}
+
+/* Qté et Prix unitaire côte‐à‐côte */
+#new-supply .line-row .line-qty,
+#new-supply .line-row .line-cost {
+  flex: 1 1 calc(50% - 0.25rem); /* deux colonnes égales */
+  min-width: 120px;             /* pour éviter que ce soit trop étroit */
+}
+
+/* Total et bouton Supprimer restent taille auto */
+#new-supply .line-row .line-total,
+#new-supply .line-row .remove-line {
+  flex: 0 0 auto;
+}
+
   </style>
 
   <!-- 2) Template HTML pour une ligne -->
