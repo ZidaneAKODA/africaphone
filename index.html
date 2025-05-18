@@ -679,263 +679,102 @@ main.page {
       });
   </script>
 </main>
+<!-- NOUVEL APPRO – 100 % MOBILE -->
 <main id="new-supply" class="page">
-
-  <!-- 1) Styles -->
+  <!-- ◉ STYLE -->
   <style>
     :root {
-      --primary: #212121;
-      --secondary: #616161;
-      --accent: #6200ee;
-      --surface: #ffffff;
-      --elevation: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-      --spacing: 1rem;
-      --radius: 0.5rem;
+      --primary:#212121; --secondary:#616161; --accent:#0064d2;
+      --surface:#ffffff; --radius:.5rem; --elevation:0 1px 4px rgba(0,0,0,.18);
     }
-    /* Conteneur global */
-    #new-supply {
-      display: none;
-      flex-direction: column;
-      height: 100vh;
-      background: var(--surface);
-      font-family: 'Roboto', sans-serif;
-      color: var(--primary);
-    }
-    #new-supply.visible { display: flex; }
+    #new-supply {display:none;flex-direction:column;height:100vh;background:var(--surface)}
+    #new-supply.visible{display:flex}
 
-    /* Étapes du wizard */
-    .step {
-      display: none;
-      flex: 1;
-      padding: var(--spacing);
-      overflow-y: auto;
-      padding-bottom: calc(56px + env(safe-area-inset-bottom));
-    }
-    .step.active {
-      display: flex;
-      flex-direction: column;
+    /* Étapes */
+    .step{display:none;flex:1;padding:1rem 1rem calc(56px + env(safe-area-inset-bottom))}
+    .step.active{display:flex;flex-direction:column}
+    h2{font-size:1.25rem;font-weight:500;margin-bottom:1rem}
+
+    /* Champs */
+    .form-group{margin-bottom:1rem}
+    label{font-size:.9rem;color:var(--secondary);margin-bottom:.25rem;display:block}
+    input[type=text],input[type=number],input[type=search]{
+      width:100%;padding:.8rem;border:1px solid #ddd;border-radius:var(--radius);
+      font-size:1rem;outline:none
     }
 
-    h2 {
-      font-size: 1.25rem;
-      font-weight: 500;
-      margin-bottom: var(--spacing);
-    }
+    /* Ligne article */
+    .line-row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-bottom:.6rem}
+    .book-search-wrap{position:relative;flex:1 1 100%}
+    .line-qty,.line-cost{flex:1 1 calc(50% - .3rem);min-width:110px}
+    .line-total{font-weight:600;margin-left:auto}
+    .remove-line{background:none;border:none;font-size:1.4rem;color:#e53935}
 
-    /* Inputs & labels */
-    .form-group {
-      margin-bottom: var(--spacing);
-    }
-    label {
-      display: block;
-      margin-bottom: 0.25rem;
-      font-size: 0.9rem;
-      color: var(--secondary);
-    }
-    input[list],
-    input[type="text"],
-    input[type="number"],
-    input[type="search"]
-     {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: var(--radius);
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
-      outline: none;
-    }
+    /* FAB “+ ligne” */
+    .fab{position:fixed;right:1rem;bottom:calc(70px + env(safe-area-inset-bottom));width:56px;height:56px;
+      border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:1.7rem;
+      display:flex;align-items:center;justify-content:center;box-shadow:var(--elevation);z-index:40}
 
-    /* Bouton flottant “+ ligne” */
-    .fab {
-      align-self: flex-end;
-      margin-bottom: var(--spacing);
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      box-shadow: var(--elevation);
-      cursor: pointer;
-    }
-    .fab:active { background: #5300cc; }
-
-    /* Template ligne */
-    .line-row {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr auto auto;
-      gap: 0.5rem;
-      align-items: center;
-      background: var(--surface);
-      box-shadow: var(--elevation);
-      border-radius: var(--radius);
-      padding: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-    .line-total {
-      font-weight: 600;
-      text-align: right;
-      color: var(--accent);
-    }
-    .remove-line {
-      background: none;
-      border: none;
-      font-size: 1.2rem;
-      color: #e53935;
-      cursor: pointer;
-    }
-
-    /* Navigation wizard */
-    .wizard-nav {
-  position: fixed;
-  left: 0;
-  bottom: env(safe-area-inset-bottom);   /* iOS safe-area */
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;                 /* même look que before */
-  background: var(--surface);            /* ou #fff */
-  box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
-  z-index: 100;
-}
-
-    .btn {
-      flex: 1;
-      padding: 0.75rem;
-      border-radius: var(--radius);
-      font-size: 1rem;
-      font-weight: 500;
-      border: none;
-      outline: none;
-    }
-    .btn + .btn { margin-left: 0.5rem; }
-    .btn.primary {
-      background: var(--accent);
-      color: #fff;
-    }
-    .btn.primary:disabled {
-      background: #ccc;
-      color: #666;
-    }
-    .btn.secondary {
-      background: #f5f5f5;
-      color: var(--primary);
-    }
-    .btn.secondary:disabled {
-      opacity: 0.6;
-    }
+    /* Nav wizard */
+    .wizard-nav{position:fixed;left:0;bottom:env(safe-area-inset-bottom);width:100%;
+      display:flex;gap:.6rem;padding:.7rem 1rem;background:var(--surface);box-shadow:0 -2px 8px rgba(0,0,0,.09)}
+    .btn{flex:1;padding:.8rem;font-size:1rem;font-weight:500;border:none;border-radius:var(--radius)}
+    .btn.primary{background:var(--accent);color:#fff}.btn.primary:disabled{background:#bfc8d7}
+    .btn.secondary{background:#f5f5f5}.btn.secondary:disabled{opacity:.6}
 
     /* Résumé */
-    .summary {
-      padding: var(--spacing);
-      background: var(--surface);
-      box-shadow: var(--elevation);
-      border-radius: var(--radius);
-      margin-bottom: var(--spacing);
-    }
-    .summary div {
-      font-size: 1rem;
-      margin-bottom: 0.25rem;
-    }
+    .summary{padding:1rem;background:#f9f9f9;border-radius:var(--radius);margin-bottom:1rem}
+    .summary div{margin-bottom:.3rem}
 
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.8);
-      color: #fff;
-      padding: 0.75rem 1.5rem;
-      border-radius: 4px;
-      font-size: 0.9rem;
-      z-index: 100;
-    }
-    /* ————— Regrouper Qté & Prix unitaire sur la même ligne ————— */
-#new-supply .line-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-/* Le champ “Livre” reste 100% */
-#new-supply .line-row .book-search {
-  flex: 1 1 100%;
-  box-sizing: border-box;
-}
-
-/* Qté et Prix unitaire côte‐à‐côte */
-#new-supply .line-row .line-qty,
-#new-supply .line-row .line-cost {
-  flex: 1 1 calc(50% - 0.25rem); /* deux colonnes égales */
-  min-width: 120px;             /* pour éviter que ce soit trop étroit */
-}
-
-/* Total et bouton Supprimer restent taille auto */
-#new-supply .line-row .line-total,
-#new-supply .line-row .remove-line {
-  flex: 0 0 auto;
-}
-
+    /* ► Bottom-sheet suggestions ◄ */
+    .sugg-sheet{position:fixed;left:0;right:0;bottom:0;max-height:45vh;overflow-y:auto;
+      background:#fff;border-top:1px solid #ddd;border-radius:12px 12px 0 0;
+      box-shadow:0 -4px 12px rgba(0,0,0,.15);list-style:none;margin:0;padding:.3rem 0;display:none;z-index:999}
+    .sugg-sheet li{padding:1rem 1.25rem;border-bottom:1px solid #eee;
+      display:flex;justify-content:space-between;font-size:1rem}
+    .sugg-sheet li:last-child{border-bottom:none}
+    .sugg-title{font-weight:500}.sugg-qty{font-size:.9rem;color:var(--secondary)}
   </style>
 
-  <!-- 2) Template HTML pour une ligne -->
+  <!-- ◉ TEMPLATE ligne -->
   <template id="tmpl-line">
     <div class="line-row" data-id="">
-      <input type="text" class="book-search" list="" placeholder="Livre">
-      <input type="number" class="line-qty" min="1" value="1">
+      <div class="book-search-wrap">
+        <input type="text" class="book-search" placeholder="Livre" autocomplete="off"
+               autocorrect="off" autocapitalize="none" spellcheck="false">
+      </div>
+      <input type="number" class="line-qty"  min="1" value="1">
       <input type="number" class="line-cost" step="0.01" value="0.00">
       <div class="line-total">€0.00</div>
       <button type="button" class="remove-line" aria-label="Supprimer">×</button>
     </div>
   </template>
 
-  <!-- 3) Étape 1 : Fournisseur -->
+  <!-- ◉ ÉTAPE 1 : Fournisseur -->
   <div class="step active" data-step="1">
     <h2>Fournisseur</h2>
     <div class="form-group">
       <label for="supplier-search">Nom du fournisseur</label>
-      <input type="search"
-             id="supplier-search"
-             placeholder="Rechercher ou saisir un fournisseur"
-             autocomplete="off"
-              autocorrect="off"
-              autocapitalize="none"
-              spellcheck="false"
-             >
-
+      <input id="supplier-search" type="search" placeholder="Rechercher ou saisir" autocomplete="off"
+             autocorrect="off" autocapitalize="none" spellcheck="false">
     </div>
     <div class="wizard-nav">
-      <button type="button" class="btn secondary" data-next disabled>
-        Suivant →
-      </button>
+      <button class="btn secondary" data-next disabled>Suivant →</button>
     </div>
   </div>
 
-  <!-- 4) Étape 2 : Lignes de commande -->
+  <!-- ◉ ÉTAPE 2 : Articles -->
   <div class="step" data-step="2">
     <h2>Articles</h2>
     <div id="lines-container"></div>
-    <button type="button"
-            id="add-line-btn"
-            class="fab"
-            aria-label="Ajouter une ligne">+</button>
+    <button id="add-line-btn" class="fab" aria-label="Ajouter une ligne">+</button>
     <div class="wizard-nav">
-      <button type="button" class="btn secondary" data-prev>
-        ← Précédent
-      </button>
-      <button type="button" class="btn primary" data-next disabled>
-        Suivant →
-      </button>
+      <button class="btn secondary" data-prev>← Précédent</button>
+      <button class="btn primary"   data-next disabled>Suivant →</button>
     </div>
   </div>
 
-  <!-- 5) Étape 3 : Résumé & validation -->
+  <!-- ◉ ÉTAPE 3 : Résumé -->
   <div class="step" data-step="3">
     <h2>Résumé</h2>
     <div class="summary">
@@ -943,247 +782,184 @@ main.page {
       <div>Coût total : <span id="sum-cost">€0.00</span></div>
     </div>
     <div class="wizard-nav">
-      <button type="button" class="btn secondary" data-prev>
-        ← Précédent
-      </button>
-      <button type="button" id="submit-supply" class="btn primary" disabled>
-        Valider et envoyer
-      </button>
+      <button class="btn secondary" data-prev>← Précédent</button>
+      <button id="submit-supply" class="btn primary" disabled>Valider & envoyer</button>
     </div>
   </div>
+
+  <!-- ◉ Bottom-sheet partagé -->
+  <ul id="sugg-sheet" class="sugg-sheet"></ul>
+
+  <!-- ◉ SCRIPT -->
+  <script>
+    (function(){
+      /*────────── VARIABLES GLOBALES ──────────*/
+      const db  = firebase.firestore();
+      const auth= firebase.auth();
+      const suppliers=[];            // charge-les ailleurs si besoin
+
+      /*────────── RÉFS DOM ──────────*/
+      const main      = document.getElementById('new-supply');
+      const steps     = [...main.querySelectorAll('.step')];
+      const sheet     = document.getElementById('sugg-sheet');
+      const supplierI = main.querySelector('#supplier-search');
+      const linesC    = main.querySelector('#lines-container');
+      const tmplLine  = document.getElementById('tmpl-line').content;
+      const sumQtyEl  = main.querySelector('#sum-qty');
+      const sumCostEl = main.querySelector('#sum-cost');
+      const addLineBtn= main.querySelector('#add-line-btn');
+      const submitBtn = main.querySelector('#submit-supply');
+
+      /*────────── WIZARD ──────────*/
+      let step=1;
+      function showStep(n){steps.forEach(s=>s.classList.toggle('active',+s.dataset.step===n))}
+      main.addEventListener('click',e=>{
+        if(e.target.matches('[data-next]:not([disabled])')){step++;if(step===3)updateSummary();showStep(step)}
+        if(e.target.matches('[data-prev]')){step--;showStep(step)}
+      });
+      showStep(step);
+
+      /*────────── FOURNISSEUR ──────────*/
+      supplierI.addEventListener('input',()=>main.querySelector('[data-step="1"] [data-next]').disabled=!supplierI.value.trim());
+
+      /*────────── AJOUT LIGNE ──────────*/
+      let lineId=0;
+      addLineBtn.addEventListener('click',()=>addLine());
+      function addLine(data={}){
+        lineId++;
+        const row = document.importNode(tmplLine,true).firstElementChild;
+        row.dataset.id=lineId;
+        const bookI=row.querySelector('.book-search');
+        const qtyI =row.querySelector('.line-qty');
+        const costI=row.querySelector('.line-cost');
+        const total=row.querySelector('.line-total');
+
+        // préremplissage éventuel
+        if(data.title)bookI.value=data.title;
+        if(data.qty)  qtyI.value=data.qty;
+        if(data.cost) costI.value=data.cost;
+
+        /*── Suggestion mobile ──*/
+        let debounceT=null;
+        function renderSheet(docs){
+          sheet.innerHTML='';
+          if(!docs.length){sheet.innerHTML='<li style="text-align:center">Aucun résultat</li>'}
+          else docs.forEach(d=>{
+            const li=document.createElement('li');
+            li.innerHTML=`<span class="sugg-title">${d.data().title}</span>
+                           <span class="sugg-qty">Qté : ${d.data().quantity}</span>`;
+            li.addEventListener('touchend',()=>{
+              bookI.value=d.data().title;
+              if(!costI.value)costI.value=(d.data().price||0).toFixed(2);
+              sheet.style.display='none';bookI.blur();updateLine();toggleStep2Next();
+            });
+            sheet.append(li);
+          });
+          sheet.style.display='block';
+        }
+        function searchBooks(){
+          const t=bookI.value.trim();
+          if(t.length<2){sheet.style.display='none';return}
+          clearTimeout(debounceT);
+          debounceT=setTimeout(async()=>{
+            try{
+              const snap=await db.collection('books')
+                .where('title','>=',t).where('title','<=',t+'\uf8ff')
+                .orderBy('title').limit(10).get();
+              renderSheet(snap.docs);
+            }catch(err){console.error(err)}
+          },250);
+        }
+        bookI.addEventListener('input',searchBooks);
+        bookI.addEventListener('focus',searchBooks);
+
+        /*── Calcul ligne & résumé ──*/
+        function updateLine(){
+          const q=parseInt(qtyI.value,10)||0;
+          const c=parseFloat(costI.value)||0;
+          total.textContent='€'+(q*c).toFixed(2);
+          updateSummary();
+        }
+        qtyI.addEventListener('input',updateLine);
+        costI.addEventListener('input',updateLine);
+
+        /*── suppression ligne ──*/
+        row.querySelector('.remove-line').addEventListener('click',()=>{
+          row.remove();updateSummary();toggleStep2Next();
+        });
+
+        linesC.append(row);
+        updateLine();toggleStep2Next();
+      }
+
+      /*──── Affiche / cache la feuille au tap hors zone ────*/
+      document.addEventListener('touchstart',e=>{
+        if(!sheet.contains(e.target))sheet.style.display='none';
+      });
+      /*── Ajuste au clavier virtuel ─*/
+      if(window.visualViewport){
+        window.visualViewport.addEventListener('resize',()=>{
+          const kbH=window.innerHeight-window.visualViewport.height;
+          sheet.style.bottom=kbH+'px';
+        });
+      }
+
+      /*────────── RÉSUMÉ & VALIDATION ──────────*/
+      function updateSummary(){
+        let sumQ=0,sumC=0;
+        [...linesC.children].forEach(r=>{
+          const q=parseInt(r.querySelector('.line-qty').value,10)||0;
+          const c=parseFloat(r.querySelector('.line-cost').value)||0;
+          sumQ+=q;sumC+=q*c;
+        });
+        sumQtyEl.textContent=sumQ;
+        sumCostEl.textContent='€'+sumC.toFixed(2);
+        submitBtn.disabled=!(sumQ>0&&supplierI.value.trim());
+      }
+      function toggleStep2Next(){
+        main.querySelector('[data-step="2"] [data-next]').disabled=!linesC.children.length;
+      }
+
+      /*────────── ENVOI FIRESTORE ──────────*/
+      submitBtn.addEventListener('click',async()=>{
+        submitBtn.disabled=true;
+        const user=auth.currentUser;
+        const supplierName=supplierI.value.trim();
+        let sup=suppliers.find(s=>s.name===supplierName);
+        if(!sup){const ref=await db.collection('suppliers').add({name:supplierName});
+                 sup={id:ref.id,name:supplierName}}
+        const lines=[...linesC.children].map(r=>({
+          title:r.querySelector('.book-search').value,
+          quantity:parseInt(r.querySelector('.line-qty').value,10),
+          unitCost:parseFloat(r.querySelector('.line-cost').value)
+        }));
+        const totalQ=parseInt(sumQtyEl.textContent,10);
+        const totalC=parseFloat(sumCostEl.textContent.replace('€',''));
+        const batch=db.batch();
+        const supplyRef=db.collection('users').doc(user.uid).collection('supplies').doc();
+        batch.set(supplyRef,{supplierId:sup.id,supplierName:sup.name,
+          date:firebase.firestore.FieldValue.serverTimestamp(),
+          lines,totalQty:totalQ,totalCost:totalC});
+        for(const ln of lines){
+          const snap=await db.collection('books').where('title','==',ln.title).limit(1).get();
+          if(!snap.empty){
+            batch.update(snap.docs[0].ref,{
+              quantity:firebase.firestore.FieldValue.increment(ln.quantity)
+            });
+          }
+        }
+        await batch.commit();
+        window.location.hash='supply';
+        const toast=document.createElement('div');
+        toast.className='toast';toast.textContent='Approvisionnement enregistré !';
+        Object.assign(toast.style,{position:'fixed',bottom:'64px',left:'50%',transform:'translateX(-50%)',
+          background:'#333',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000});
+        document.body.append(toast);setTimeout(()=>toast.remove(),2000);
+      });
+    })();
+  </script>
 </main>
 
-<!-- 6) Script de contrôle (Firebase, wizard, draft, envoi) -->
-<script>
-  (function(){
-    // — Références Firebase —
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-
-    // — DOM —
-    const main = document.getElementById('new-supply');
-    main.classList.add('visible');
-    const steps = [...main.querySelectorAll('.step')];
-    const supplierInput = main.querySelector('#supplier-search');
-    const supplierList  = main.querySelector('#supplier-list');
-    const btnNext        = [...main.querySelectorAll('[data-next]')];
-    const btnPrev        = [...main.querySelectorAll('[data-prev]')];
-    const linesContainer = main.querySelector('#lines-container');
-    const addLineBtn     = main.querySelector('#add-line-btn');
-    const sumQtyEl       = main.querySelector('#sum-qty');
-    const sumCostEl      = main.querySelector('#sum-cost');
-    const submitBtn      = main.querySelector('#submit-supply');
-    const tmplLine       = document.getElementById('tmpl-line').content;
-
-    // — Wizard —
-    let currentStep = 1, totalSteps = 3;
-    function showStep(n){
-      steps.forEach(s=>s.classList.toggle('active', +s.dataset.step===n));
-    }
-    btnNext.forEach(b=>b.addEventListener('click', ()=>{
-      if(currentStep<totalSteps){
-        currentStep++;
-        if(currentStep===3) updateSummary();
-        showStep(currentStep);
-      }
-    }));
-    btnPrev.forEach(b=>b.addEventListener('click', ()=>{
-      if(currentStep>1){
-        currentStep--;
-        showStep(currentStep);
-      }
-    }));
-    showStep(currentStep);
-
-    // — Chargement fournisseurs —
-    const suppliers = [];
-    async function loadSuppliers(){
-      const snap = await db.collection('suppliers').orderBy('name').get();
-      snap.forEach(d=>suppliers.push({ id:d.id, name:d.data().name }));
-      suppliers.forEach(s=>{
-        const o = document.createElement('option');
-        o.value = s.name;
-        supplierList.append(o);
-      });
-    }
-    loadSuppliers();
-
-    // — Draft dans localStorage —
-    function saveDraft(){
-      const lines = [...linesContainer.children].map(r=>({
-        title: r.querySelector('.book-search').value,
-        qty:   r.querySelector('.line-qty').value,
-        cost:  r.querySelector('.line-cost').value
-      }));
-      localStorage.setItem('draftSupply', JSON.stringify({
-        supplier: supplierInput.value,
-        lines
-      }));
-    }
-    function loadDraft(){
-      const d = JSON.parse(localStorage.getItem('draftSupply')||'{}');
-      if(d.supplier) supplierInput.value = d.supplier;
-      if(d.lines){
-        linesContainer.innerHTML = '';
-        d.lines.forEach(l=> addLine(l));
-      }
-      toggleStep1Next();
-      toggleStep2Next();
-    }
-    window.addEventListener('beforeunload', saveDraft);
-    loadDraft();
-
-    // — Étape 1 : validation —
-    function toggleStep1Next(){
-      main.querySelector('[data-step="1"] [data-next]').disabled =
-        supplierInput.value.trim()==='';
-    }
-    supplierInput.addEventListener('input', toggleStep1Next);
-
-    // — Ajout / gestion des lignes —
-    let lineId = 0;
-    function addLine(data={}){
-      lineId++;
-      const clone = document.importNode(tmplLine,true);
-      const row = clone.querySelector('.line-row');
-      row.dataset.id = lineId;
-      const bookInput = row.querySelector('.book-search');
-      const qtyInput  = row.querySelector('.line-qty');
-      const costInput = row.querySelector('.line-cost');
-      // liste de suggestions dynamiques
-      const dl = document.createElement('datalist');
-      dl.id = `books-${lineId}`;
-      bookInput.setAttribute('list', dl.id);
-      row.insertBefore(dl, qtyInput);
-      // préremplissage
-      if(data.title) bookInput.value = data.title;
-      if(data.qty)   qtyInput.value  = data.qty;
-      if(data.cost)  costInput.value = data.cost;
-      // live-search
-      bookInput.addEventListener('input', async ()=>{
-        const t = bookInput.value.trim();
-        dl.innerHTML = '';
-        if(t.length<2) return;
-        const snap = await db.collection('books')
-          .where('title','>=',t)
-          .where('title','<=',t+'\uf8ff')
-          .limit(5).get();
-        snap.forEach(d=>{
-          const o = document.createElement('option');
-          o.value = d.data().title;
-          o.dataset.id = d.id;
-          dl.append(o);
-        });
-      });
-      // calcul total ligne & résumé
-      function upd(){
-        const q = parseInt(qtyInput.value,10)||0;
-        const c = parseFloat(costInput.value)||0;
-        row.querySelector('.line-total').textContent = '€'+(q*c).toFixed(2);
-        updateSummary();
-        toggleStep2Next();
-      }
-      qtyInput.addEventListener('input', upd);
-      costInput.addEventListener('input', upd);
-      // suppression
-      row.querySelector('.remove-line').addEventListener('click', ()=>{
-        row.remove();
-        updateSummary();
-        toggleStep2Next();
-      });
-      linesContainer.append(row);
-      upd();
-    }
-    addLineBtn.addEventListener('click', ()=>addLine());
-
-    function toggleStep2Next(){
-      main.querySelector('[data-step="2"] [data-next]').disabled =
-        linesContainer.children.length===0;
-    }
-
-    // — Résumé & validation finale —
-    function updateSummary(){
-      let sq=0, sc=0;
-      [...linesContainer.children].forEach(r=>{
-        const q=parseInt(r.querySelector('.line-qty').value,10)||0;
-        const c=parseFloat(r.querySelector('.line-cost').value)||0;
-        sq+=q; sc+=q*c;
-      });
-      sumQtyEl.textContent = sq;
-      sumCostEl.textContent= '€'+sc.toFixed(2);
-      submitBtn.disabled = !(sq>0 && supplierInput.value.trim()!=='');
-    }
-
-    // — Envoi vers Firestore —
-    submitBtn.addEventListener('click', async ()=>{
-      submitBtn.disabled = true;
-      const user = auth.currentUser;
-      const name = supplierInput.value.trim();
-      let sup = suppliers.find(s=>s.name===name);
-      if(!sup){
-        const r = await db.collection('suppliers').add({ name });
-        sup = { id:r.id, name };
-      }
-      const lines = [...linesContainer.children].map(r=>({
-        title: r.querySelector('.book-search').value,
-        quantity: parseInt(r.querySelector('.line-qty').value,10),
-        unitCost: parseFloat(r.querySelector('.line-cost').value)
-      }));
-      const totalQty  = parseInt(sumQtyEl.textContent,10);
-      const totalCost = parseFloat(sumCostEl.textContent.replace('€',''));
-      const batch = db.batch();
-      const supplyRef = db
-        .collection('users').doc(user.uid)
-        .collection('supplies').doc();
-      batch.set(supplyRef, {
-        supplierId: sup.id,
-        supplierName: sup.name,
-        date: firebase.firestore.FieldValue.serverTimestamp(),
-        lines, totalQty, totalCost
-      });
-      for(const ln of lines){
-        const snap = await db.collection('books')
-          .where('title','==',ln.title)
-          .limit(1).get();
-        if(!snap.empty){
-          batch.update(snap.docs[0].ref, {
-            quantity: firebase.firestore.FieldValue.increment(ln.quantity)
-          });
-        }
-      }
-      await batch.commit();
-      localStorage.removeItem('draftSupply');
-      window.location.hash = 'supply';
-      // toast de confirmation
-      const t = document.createElement('div');
-      t.className='toast';
-      t.textContent='Approvisionnement enregistré !';
-      document.body.append(t);
-      setTimeout(()=>t.remove(),2000);
-    });
-
-  })();
-
-   (function() {
-    const nav = document.querySelector('.wizard-nav');
-    if (!window.visualViewport || !nav) return;
-
-    function adjustNav() {
-      // hauteur clavier ≃ innerHeight – visualViewport.height
-      const keyboardH = window.innerHeight - window.visualViewport.height;
-      // on décale le bottom de la nav
-      nav.style.bottom = `${keyboardH + 10}px`; // +10px de marge
-    }
-
-    window.visualViewport.addEventListener('resize',  adjustNav);
-    window.visualViewport.addEventListener('scroll',  adjustNav);
-
-    // reset au départ
-    window.visualViewport.addEventListener('orientationchange', () => {
-      nav.style.bottom = 'env(safe-area-inset-bottom)';
-    });
-  })();
-</script>
 
   <!-- MY ORDERS PAGE -->
   <main id="orders" class="page">
