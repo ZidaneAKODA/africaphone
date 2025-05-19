@@ -852,13 +852,11 @@ main.page {
         row.dataset.id=lineId;
         const bookI=row.querySelector('.book-search');
         bookI.readOnly = true;                     // ② sécurité JS
-        bookI.addEventListener('click', () => {
-  currentBookInput = bookI;                               // variable globale déjà dans l’overlay
-  document.getElementById('select-book-search').value = ''; // on vide la barre de recherche
-  document.getElementById('select-book-overlay').classList.add('visible');
-  document.querySelector('nav').style.display = 'none';     // masque la nav
+       bookI.addEventListener('click', () => {
+  currentBookInput = bookI;
+  // on navigue vers notre nouvelle page
+  location.hash = 'select-book';
 });
-
 
         const qtyI =row.querySelector('.line-qty');
         const costI=row.querySelector('.line-cost');
@@ -948,7 +946,7 @@ main.page {
 </main>
 
 <!-- Sélection de livre pour approvisionnement -->
-<main id="select-book-overlay" class="page">
+<main id="select-book" class="page">
   <header class="sell-header">
     <button class="btn-close" aria-label="Annuler">
       <i class="bi bi-x-lg"></i>
@@ -988,11 +986,10 @@ main.page {
   });
 
   // Fermer la page sur “X”
-  document.querySelector('#select-book-overlay .btn-close').onclick = function() {
-    document.getElementById('select-book-overlay').classList.remove('visible');
-    document.querySelector('nav').style.removeProperty('display');
-    currentBookInput = null;
-  };
+document.querySelector('#select-book .btn-close').onclick = function() {
+  location.hash = 'new-supply';  // ou quel que soit ton “retour”
+  currentBookInput = null;
+};
 
   // Recherche dynamique
   const searchInput = document.getElementById('select-book-search');
@@ -1698,7 +1695,7 @@ window.addEventListener('appinstalled', () => {
       pages.forEach(p =>
         p.classList.toggle('visible', p.id === pageId)
       );
-      if (['activation','sell','supply','new-supply'].includes(pageId)) {
+      if (['activation','sell','supply','new-supply','select-book'].includes(pageId)) {
         nav.style.display = 'none';
       } else {
         nav.style.removeProperty('display');
