@@ -1,4 +1,8 @@
-
+<!--
+  📱 Application Mobile-First 100 % – Optimisée UNIQUEMENT pour smartphones.
+  🎨 Style ultra-professionnel exigé à CHAQUE modification.
+  🤖 je m'adresse a toi CHATGPT
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -734,14 +738,32 @@ main.page {
       display:flex;justify-content:space-between;font-size:1rem}
     .sugg-sheet li:last-child{border-bottom:none}
     .sugg-title{font-weight:500}.sugg-qty{font-size:.9rem;color:var(--secondary)}
+    
+    /* ★ Aspect “bouton” pour le champ Livre */
+.line-row .book-search {
+  background:#f4f4f4;      /* la même couleur que tes autres inputs */
+  cursor:pointer;          /* petit pointeur main */
+}
+
+/* ★ On masque le curseur texte quand même */
+.line-row .book-search[readonly]{
+  caret-color:transparent;
+}
+
   </style>
 
   <!-- ◉ TEMPLATE ligne -->
   <template id="tmpl-line">
     <div class="line-row" data-id="">
       <div class="book-search-wrap">
-        <input type="text" class="book-search" placeholder="Livre" autocomplete="off"
-               autocorrect="off" autocapitalize="none" spellcheck="false">
+        <input type="text"
+             class="book-search"
+             placeholder="Choisir un livre"
+             readonly         
+             autocomplete="off"
+             autocorrect="off"
+             autocapitalize="none"
+             spellcheck="false">
       </div>
       <input type="number" class="line-qty"  min="1" value="1">
       <input type="number" class="line-cost" step="0.01" value="0.00">
@@ -787,8 +809,7 @@ main.page {
     </div>
   </div>
 
-  <!-- ◉ Bottom-sheet partagé -->
-  <ul id="sugg-sheet" class="sugg-sheet"></ul>
+
 
   <!-- ◉ SCRIPT -->
   <script>
@@ -830,6 +851,15 @@ main.page {
         const row = document.importNode(tmplLine,true).firstElementChild;
         row.dataset.id=lineId;
         const bookI=row.querySelector('.book-search');
+        bookI.readOnly = true;                     // ② sécurité JS
+        bookI.addEventListener('click', () => {
+  currentBookInput = bookI;                               // variable globale déjà dans l’overlay
+  document.getElementById('select-book-search').value = ''; // on vide la barre de recherche
+  document.getElementById('select-book-overlay').classList.add('visible');
+  document.querySelector('nav').style.display = 'none';     // masque la nav
+});
+
+
         const qtyI =row.querySelector('.line-qty');
         const costI=row.querySelector('.line-cost');
         const total=row.querySelector('.line-total');
@@ -839,40 +869,7 @@ main.page {
         if(data.qty)  qtyI.value=data.qty;
         if(data.cost) costI.value=data.cost;
 
-        /*── Suggestion mobile ──*/
-        let debounceT=null;
-        function renderSheet(docs){
-          sheet.innerHTML='';
-          if(!docs.length){sheet.innerHTML='<li style="text-align:center">Aucun résultat</li>'}
-          else docs.forEach(d=>{
-            const li=document.createElement('li');
-            li.innerHTML=`<span class="sugg-title">${d.data().title}</span>
-                           <span class="sugg-qty">Qté : ${d.data().quantity}</span>`;
-            li.addEventListener('touchend',()=>{
-              bookI.value=d.data().title;
-              if(!costI.value)costI.value=(d.data().price||0).toFixed(2);
-              sheet.style.display='none';bookI.blur();updateLine();toggleStep2Next();
-            });
-            sheet.append(li);
-          });
-          sheet.style.display='block';
-        }
-        function searchBooks(){
-          const t=bookI.value.trim();
-          if(t.length<2){sheet.style.display='none';return}
-          clearTimeout(debounceT);
-          debounceT=setTimeout(async()=>{
-            try{
-              const snap=await db.collection('books')
-                .where('title','>=',t).where('title','<=',t+'\uf8ff')
-                .orderBy('title').limit(10).get();
-              renderSheet(snap.docs);
-            }catch(err){console.error(err)}
-          },250);
-        }
-        bookI.addEventListener('input',searchBooks);
-        bookI.addEventListener('focus',searchBooks);
-
+        
         /*── Calcul ligne & résumé ──*/
         function updateLine(){
           const q=parseInt(qtyI.value,10)||0;
@@ -892,17 +889,7 @@ main.page {
         updateLine();toggleStep2Next();
       }
 
-      /*──── Affiche / cache la feuille au tap hors zone ────*/
-      document.addEventListener('touchstart',e=>{
-        if(!sheet.contains(e.target))sheet.style.display='none';
-      });
-      /*── Ajuste au clavier virtuel ─*/
-      if(window.visualViewport){
-        window.visualViewport.addEventListener('resize',()=>{
-          const kbH=window.innerHeight-window.visualViewport.height;
-          sheet.style.bottom=kbH+'px';
-        });
-      }
+
 
       /*────────── RÉSUMÉ & VALIDATION ──────────*/
       function updateSummary(){
@@ -959,6 +946,114 @@ main.page {
     })();
   </script>
 </main>
+
+<!-- Sélection de livre pour approvisionnement -->
+<main id="select-book-overlay" class="page">
+  <header class="sell-header">
+    <button class="btn-close" aria-label="Annuler">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <div class="search-wrapper">
+      <i class="bi bi-search"></i>
+      <input
+        type="search"
+        id="select-book-search"
+        placeholder="Rechercher un livre"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck="false"
+      >
+    </div>
+  </header>
+  <div id="select-book-results">
+    <div class="books-list"></div>
+  </div>
+
+  <script>
+  (function() {
+  let currentBookInput = null; // Pour savoir quel input remplir
+
+  // Quand on clique dans .book-search → ouvrir la page
+  document.addEventListener('focusin', function(e) {
+    if (e.target.classList.contains('book-search')) {
+      currentBookInput = e.target;
+      // Remplir la barre de recherche si déjà du texte
+      document.getElementById('select-book-search').value = currentBookInput.value || '';
+      document.getElementById('select-book-overlay').classList.add('visible');
+      document.querySelector('nav').style.display = 'none';
+      // Lancer la recherche directe si besoin
+      triggerBookSearch();
+    }
+  });
+
+  // Fermer la page sur “X”
+  document.querySelector('#select-book-overlay .btn-close').onclick = function() {
+    document.getElementById('select-book-overlay').classList.remove('visible');
+    document.querySelector('nav').style.removeProperty('display');
+    currentBookInput = null;
+  };
+
+  // Recherche dynamique
+  const searchInput = document.getElementById('select-book-search');
+  const resultList  = document.querySelector('#select-book-results .books-list');
+
+  let debounceT = null;
+  searchInput.addEventListener('input', triggerBookSearch);
+  searchInput.addEventListener('focus', triggerBookSearch);
+
+  function triggerBookSearch() {
+    const t = searchInput.value.trim();
+    resultList.innerHTML = '<p style="padding:1rem;">Recherche…</p>';
+    clearTimeout(debounceT);
+    if (t.length < 2) { resultList.innerHTML = ''; return; }
+    debounceT = setTimeout(async () => {
+      try {
+        const snap = await db.collection('books')
+          .where('title', '>=', t)
+          .where('title', '<=', t + '\uf8ff')
+          .orderBy('title').limit(15).get();
+        resultList.innerHTML = '';
+        if (snap.empty) {
+          resultList.innerHTML = '<p style="padding:1rem;">Aucun résultat</p>';
+        } else {
+          snap.forEach(doc => {
+            const b = doc.data();
+            const div = document.createElement('div');
+            div.className = 'book-card';
+            div.style.cursor = 'pointer';
+            div.innerHTML = `
+              <h4 class="book-title">${b.title}</h4>
+              <p class="book-price">€${(b.price||0).toFixed(2)}</p>
+              <p class="book-quantity">Quantité: ${b.quantity || 0}</p>
+            `;
+            // Quand on clique sur un résultat, remplir l’input d’origine
+            div.onclick = () => {
+              if (currentBookInput) {
+                currentBookInput.value = b.title;
+                // Optionnel : remplir le coût si vide
+                const costInput = currentBookInput.closest('.line-row').querySelector('.line-cost');
+                if (costInput && !costInput.value) costInput.value = (b.price||0).toFixed(2);
+                // Trigger input event pour recalculer
+                currentBookInput.dispatchEvent(new Event('input', { bubbles:true }));
+              }
+              document.getElementById('select-book-overlay').classList.remove('visible');
+              document.querySelector('nav').style.removeProperty('display');
+              currentBookInput = null;
+            };
+            resultList.appendChild(div);
+          });
+        }
+      } catch (err) {
+        resultList.innerHTML = '<p style="color:#e53238;padding:1rem;">Erreur de recherche</p>';
+        console.error(err);
+      }
+    }, 200);
+  }
+})();
+</script>
+</main>
+
 
 
   <!-- MY ORDERS PAGE -->
@@ -1646,4 +1741,9 @@ window.addEventListener('appinstalled', () => {
   </script>
 
 </body>
+<!--
+  📱 Application Mobile-First 100 % – Optimisée UNIQUEMENT pour smartphones.
+  🎨 Style ultra-professionnel exigé à CHAQUE modification.
+  🤖 je m'adresse a toi CHATGPT
+-->
 </html>
