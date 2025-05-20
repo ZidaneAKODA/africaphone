@@ -1175,7 +1175,18 @@ document.querySelector('#select-book .btn-close').onclick = function() {
     <form id="form-add-book">
       <div class="form-group">
         <label for="new-book-title">Titre</label>
-        <input type="text" id="new-book-title" required>
+        <input
+  type="text"
+  id="new-book-title"
+  name="new-book-title"
+  required
+  autocomplete="off"        
+  autocorrect="off"
+  autocapitalize="none"
+  spellcheck="false"
+  enterkeyhint="done"       
+  inputmode="text"
+>
       </div>
       <button type="submit">Enregistrer</button>
     </form>
