@@ -593,6 +593,31 @@ main.page {
       gap: 1rem;
       padding: 1rem;
     }
+/* Chip “Ajouter un livre” – mobile-only */
+.search-noresult {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1rem;                 /* plus confortable au pouce */
+  border-radius: var(--border-radius-pill);
+  background: rgba(0,100,210,0.1);
+  color: var(--accent);
+  font-size: 1rem;
+  line-height: 1.2;
+  cursor: pointer;
+  user-select: none;
+  /* on ne met plus de pseudo-hover */
+  transition: background 0.2s;
+}
+.search-noresult:active {
+  background: rgba(0,100,210,0.2);      /* feedback tactile */
+}
+.search-noresult i {
+  margin-left: 0.5rem;
+  font-size: 1.3rem;
+  color: var(--accent);
+}
+
+
     .book-card {
       border: 1px solid #ddd;
       border-radius: 0.5rem;
@@ -730,15 +755,6 @@ main.page {
     .summary{padding:1rem;background:#f9f9f9;border-radius:var(--radius);margin-bottom:1rem}
     .summary div{margin-bottom:.3rem}
 
-    /* ► Bottom-sheet suggestions ◄ */
-    .sugg-sheet{position:fixed;left:0;right:0;bottom:0;max-height:45vh;overflow-y:auto;
-      background:#fff;border-top:1px solid #ddd;border-radius:12px 12px 0 0;
-      box-shadow:0 -4px 12px rgba(0,0,0,.15);list-style:none;margin:0;padding:.3rem 0;display:none;z-index:999}
-    .sugg-sheet li{padding:1rem 1.25rem;border-bottom:1px solid #eee;
-      display:flex;justify-content:space-between;font-size:1rem}
-    .sugg-sheet li:last-child{border-bottom:none}
-    .sugg-title{font-weight:500}.sugg-qty{font-size:.9rem;color:var(--secondary)}
-    
     /* ★ Aspect “bouton” pour le champ Livre */
 .line-row .book-search {
   background:#f4f4f4;      /* la même couleur que tes autres inputs */
@@ -822,7 +838,6 @@ main.page {
       /*────────── RÉFS DOM ──────────*/
       const main      = document.getElementById('new-supply');
       const steps     = [...main.querySelectorAll('.step')];
-      const sheet     = document.getElementById('sugg-sheet');
       const supplierI = main.querySelector('#supplier-search');
       const linesC    = main.querySelector('#lines-container');
       const tmplLine  = document.getElementById('tmpl-line').content;
@@ -1011,9 +1026,19 @@ document.querySelector('#select-book .btn-close').onclick = function() {
           .where('title', '<=', t + '\uf8ff')
           .orderBy('title').limit(15).get();
         resultList.innerHTML = '';
-        if (snap.empty) {
-          resultList.innerHTML = '<p style="padding:1rem;">Aucun résultat</p>';
-        } else {
+       if (snap.empty) {
+  resultList.innerHTML = `
+    <div id="add-book-chip" class="search-noresult">
+      Ajouter « ${t} »
+      <i class="bi bi-plus-circle"></i>
+    </div>
+  `;
+  document.getElementById('add-book-chip').addEventListener('click', () => {
+    // Ouvre le modal pour ajouter un livre
+    openAddBookModal(t);
+  });
+}
+ else {
           snap.forEach(doc => {
             const b = doc.data();
             const div = document.createElement('div');
@@ -1051,7 +1076,141 @@ document.querySelector('#select-book .btn-close').onclick = function() {
 </script>
 </main>
 
+<main id="add-book-modal" class="modal-overlay" aria-hidden="true">
+  <style>
+    /* === Modal “Ajouter un livre” (100% mobile-first) === */
+    #add-book-modal.modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none;           /* caché par défaut */
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 50;
+    }
+    #add-book-modal.modal-overlay.visible {
+      display: flex;
+    }
+    #add-book-modal .modal {
+      background: #fff;
+      border-radius: var(--border-radius-pill);
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+    }
+    #add-book-modal .modal header {
+      padding: 1rem;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #add-book-modal .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    #add-book-modal .form-group {
+      padding: 0.75rem 1rem;
+    }
+    #add-book-modal label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+      color: var(--secondary-text);
+    }
+    #add-book-modal input {
+      width: 100%;
+      padding: 0.7rem;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius-pill);
+      font-size: 1rem;
+      outline: none;
+    }
+    #add-book-modal button[type="submit"] {
+      width: calc(100% - 2rem);
+      margin: 1rem;
+      padding: 0.85rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--border-radius-pill);
+      background: var(--accent);
+      color: #fff;
+    }
+    #add-book-modal button[type="submit"]:active {
+      background: #014fa5;
+    }
+  </style>
 
+  <div class="modal">
+    <header>
+      <h3>Ajouter un nouveau livre</h3>
+      <button class="modal-close" aria-label="Fermer">&times;</button>
+    </header>
+    <form id="form-add-book">
+      <div class="form-group">
+        <label for="new-book-title">Titre</label>
+        <input type="text" id="new-book-title" required>
+      </div>
+      <div class="form-group">
+        <label for="new-book-price">Prix (€)</label>
+        <input type="number" id="new-book-price" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <label for="new-book-quantity">Quantité</label>
+        <input type="number" id="new-book-quantity" min="1" value="1" required>
+      </div>
+      <button type="submit">Enregistrer</button>
+    </form>
+  </div>
+</main>
+ <script>
+    // 1) Définition de la fonction d’ouverture
+    function openAddBookModal(defaultTitle = '') {
+      const modal = document.getElementById('add-book-modal');
+      if (!modal) return console.error('Modal #add-book-modal introuvable');
+      modal.classList.add('visible');
+      modal.setAttribute('aria-hidden', 'false');
+      // Pré-remplissage du titre si besoin
+      const titleInput = document.getElementById('new-book-title');
+      if (titleInput && defaultTitle) {
+        titleInput.value = defaultTitle;
+      }
+    }
+
+    // 2) Attacher le handler au chip
+    document.addEventListener('click', e => {
+      const chip = e.target.closest('#add-book-chip');
+      if (!chip) return;
+      // On extrait juste le texte entre guillemets (« … »)
+      const suggestedTitle = chip.textContent.trim().replace(/^Ajouter « | »$/g, '');
+      openAddBookModal(suggestedTitle);
+    });
+
+    // 3) Listener pour fermer le modal
+    const closeBtn = document.querySelector('#add-book-modal .modal-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        const modal = document.getElementById('add-book-modal');
+        modal.classList.remove('visible');
+        modal.setAttribute('aria-hidden', 'true');
+      });
+    }
+
+    // 4) (Optionnel) fermer si on clique hors de la boîte
+    const overlay = document.getElementById('add-book-modal');
+    if (overlay) {
+      overlay.addEventListener('click', e => {
+        if (e.target === overlay) {
+          overlay.classList.remove('visible');
+          overlay.setAttribute('aria-hidden', 'true');
+        }
+      });
+    }
+  </script>
 
   <!-- MY ORDERS PAGE -->
   <main id="orders" class="page">
