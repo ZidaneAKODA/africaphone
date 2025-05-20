@@ -1153,6 +1153,17 @@ document.querySelector('#select-book .btn-close').onclick = function() {
     #add-book-modal button[type="submit"]:active {
       background: #014fa5;
     }
+
+    #add-book-modal .modal {
+  /* par défaut centré verticalement */
+  margin: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  position: relative;
+  transition: transform 0.2s ease;
+}
+/* la translation sera gérée par le JS */
+
    
   </style>
 
@@ -1182,6 +1193,10 @@ document.querySelector('#select-book .btn-close').onclick = function() {
       if (titleInput && defaultTitle) {
         titleInput.value = defaultTitle;
       }
+
+       setTimeout(() => {
+    titleInput.focus();
+  }, 100);
     }
 
     // 2) Attacher le handler au chip
@@ -1213,6 +1228,24 @@ document.querySelector('#select-book .btn-close').onclick = function() {
         }
       });
     }
+    (function() {
+  const modalContent = document.querySelector('#add-book-modal .modal');
+  let initialH = window.innerHeight;
+
+  window.addEventListener('resize', () => {
+    const currentH = window.innerHeight;
+    if (!modalContent) return;
+    if (currentH < initialH) {
+      // clavier ouvert → on remonte le modal
+      modalContent.style.transform = 'translateY(-30%)'; 
+      modalContent.style.transition = 'transform 0.2s';
+    } else {
+      // clavier fermé → on recentre
+      modalContent.style.transform = '';
+    }
+  });
+})();
+
   </script>
 
   <!-- MY ORDERS PAGE -->
