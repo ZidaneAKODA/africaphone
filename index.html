@@ -671,6 +671,58 @@ main.page {
     .fab:active {
       background: #5ea83a;
     }
+    /* Skeleton loader */
+.skeleton-batch-card {
+  background: #f4f4f4;
+  height: 100px;
+  margin: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+/* Nouvelle batch card */
+.supply-batch-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  margin: 0.75rem 1rem;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.supply-batch-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+.supply-batch-card header strong {
+  font-size: 1rem;
+}
+
+.supply-batch-card header small {
+  font-size: 0.75rem;
+  color: var(--secondary-text);
+}
+
+.supply-batch-card ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.supply-batch-card li {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
   </style>
 
   <!-- En-tête -->
@@ -680,18 +732,6 @@ main.page {
 
   <!-- Liste hard-codée des approvisionnements passés -->
   <div id="supply-list" class="books-list">
-    <div class="book-card">
-      <h4 class="book-title">The Great Gatsby</h4>
-      <p class="book-quantity">Quantité : 3</p>
-      <p class="book-price">€10.99</p>
-      <small class="book-date">Le 01/05/2025</small>
-    </div>
-    <div class="book-card">
-      <h4 class="book-title">1984</h4>
-      <p class="book-quantity">Quantité : 5</p>
-      <p class="book-price">€8.50</p>
-      <small class="book-date">Le 10/04/2025</small>
-    </div>
   </div>
 
   <!-- Bouton flottant “Nouvel approvisionnement” -->
@@ -707,6 +747,79 @@ main.page {
         location.hash = 'new-supply';
       });
   </script>
+  <script>
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      // rediriger si pas connecté
+      return window.location.replace('login.html');
+    }
+
+    const suppliesRef = db
+      .collection('users')
+      .doc(user.uid)
+      .collection('supplies')
+      .orderBy('date', 'desc');
+
+    const supplyListEl = document.getElementById('supply-list');
+
+    // ① Skeleton loader en attendant Firestore
+    supplyListEl.innerHTML = Array(3)
+      .fill('')
+      .map(() => '<div class="skeleton-batch-card"></div>')
+      .join('');
+
+    // ② On stocke la fonction pour pouvoir se désabonner
+    const unsubscribe = suppliesRef.onSnapshot(snapshot => {
+      supplyListEl.innerHTML = ''; // on vide à chaque update
+
+      if (snapshot.empty) {
+        supplyListEl.innerHTML = '<p style="padding:1rem;color:#555;">Aucun approvisionnement pour l’instant.</p>';
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const supply = doc.data();
+        const dateObj = supply.date?.toDate() || new Date();
+        const dateStr = dateObj.toLocaleDateString('fr-FR', {
+          day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+
+        // Calcul du total du batch
+        const totalBatch = supply.lines.reduce((sum, l) => sum + l.quantity * l.unitCost, 0);
+
+        // Création de la carte
+        const batchCard = document.createElement('div');
+        batchCard.className = 'supply-batch-card';
+        batchCard.innerHTML = `
+          <header>
+            <strong>${supply.supplierName}</strong>
+            <small>Le ${dateStr} • ${totalBatch.toLocaleString('fr-FR', {
+              style: 'currency', currency: 'XOF'
+            })}</small>
+          </header>
+          <ul>
+            ${supply.lines.map(line =>
+              `<li>
+                ${line.title} – Qté : ${line.quantity}, PU : ${line.unitCost.toLocaleString('fr-FR',{
+                  style:'currency',currency:'XOF'
+                })}
+              </li>`
+            ).join('')}
+          </ul>
+        `;
+        supplyListEl.appendChild(batchCard);
+      });
+    }, err => {
+      console.error('Erreur Firestore supplies :', err);
+      supplyListEl.innerHTML = '<p style="padding:1rem;color:#e53238;">Erreur de chargement</p>';
+    });
+
+    // ③ Se désabonner proprement si la page se décharge
+    window.addEventListener('beforeunload', () => unsubscribe());
+  });
+</script>
+
+
 </main>
 <!-- NOUVEL APPRO – 100 % MOBILE -->
 <main id="new-supply" class="page">
@@ -940,14 +1053,22 @@ main.page {
         batch.set(supplyRef,{supplierId:sup.id,supplierName:sup.name,
           date:firebase.firestore.FieldValue.serverTimestamp(),
           lines,totalQty:totalQ,totalCost:totalC});
-        for(const ln of lines){
-          const snap=await db.collection('books').where('title','==',ln.title).limit(1).get();
-          if(!snap.empty){
-            batch.update(snap.docs[0].ref,{
-              quantity:firebase.firestore.FieldValue.increment(ln.quantity)
-            });
-          }
-        }
+        const uid = auth.currentUser.uid;
+const userBooksRef = db
+  .collection('users')
+  .doc(uid)
+  .collection('books');
+
+for(const ln of lines){
+  const snap = await userBooksRef
+    .where('title','==', ln.title)
+    .limit(1).get();
+  if (!snap.empty) {
+    batch.update(snap.docs[0].ref, {
+      quantity: firebase.firestore.FieldValue.increment(ln.quantity)
+    });
+  }
+}
         await batch.commit();
         window.location.hash='supply';
         const toast=document.createElement('div');
@@ -985,7 +1106,7 @@ main.page {
 
   <script>
   (function() {
-  let currentBookInput = null; // Pour savoir quel input remplir
+   window.currentBookInput = null; // Pour savoir quel input remplir
 
   // Quand on clique dans .book-search → ouvrir la page
   document.addEventListener('focusin', function(e) {
@@ -1021,10 +1142,19 @@ document.querySelector('#select-book .btn-close').onclick = function() {
     if (t.length < 2) { resultList.innerHTML = ''; return; }
     debounceT = setTimeout(async () => {
       try {
-        const snap = await db.collection('books')
-          .where('title', '>=', t)
-          .where('title', '<=', t + '\uf8ff')
-          .orderBy('title').limit(15).get();
+const uid = auth.currentUser.uid;
+const userBooksRef = db
+  .collection('users')
+  .doc(uid)
+  .collection('books');
+
+const snap = await userBooksRef
+  .where('title', '>=', t)
+  .where('title', '<=', t + '\uf8ff')
+  .orderBy('title')
+  .limit(15)
+  .get();
+
         resultList.innerHTML = '';
        if (snap.empty) {
   resultList.innerHTML = `
@@ -1177,7 +1307,7 @@ document.querySelector('#select-book .btn-close').onclick = function() {
         <label for="new-book-title">Titre</label>
         <input
   type="search"
-  id="search-input-sell"
+  id="new-book-title"
   placeholder="Taper le titre du livre"
   autocomplete="off"
   autocorrect="off"
@@ -1191,71 +1321,114 @@ document.querySelector('#select-book .btn-close').onclick = function() {
   </div>
 </main>
  <script>
-    // 1) Définition de la fonction d’ouverture
-    function openAddBookModal(defaultTitle = '') {
+  // 1) Définition de la fonction d’ouverture
+  function openAddBookModal(defaultTitle = '') {
+    const modal = document.getElementById('add-book-modal');
+    if (!modal) return console.error('Modal #add-book-modal introuvable');
+    modal.classList.add('visible');
+    modal.setAttribute('aria-hidden', 'false');
+    const titleInput = document.getElementById('new-book-title');
+    if (titleInput && defaultTitle) {
+      titleInput.value = defaultTitle;
+    }
+    // focus après affichage
+    setTimeout(() => titleInput && titleInput.focus(), 100);
+  }
+
+  // 2) Attacher le handler au “chip” Ajouter « … »
+  document.addEventListener('click', e => {
+    const chip = e.target.closest('#add-book-chip');
+    if (!chip) return;
+    const suggestedTitle = chip.textContent
+      .trim()
+      .replace(/^Ajouter « | »$/g, '');
+    openAddBookModal(suggestedTitle);
+  });
+
+  // 3) Fermeture via la croix
+  const closeBtn = document.querySelector('#add-book-modal .modal-close');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
       const modal = document.getElementById('add-book-modal');
-      if (!modal) return console.error('Modal #add-book-modal introuvable');
-      modal.classList.add('visible');
-      modal.setAttribute('aria-hidden', 'false');
-      // Pré-remplissage du titre si besoin
-      const titleInput = document.getElementById('new-book-title');
-      if (titleInput && defaultTitle) {
-        titleInput.value = defaultTitle;
-      }
-
-       setTimeout(() => {
-    titleInput.focus();
-  }, 100);
-    }
-
-    // 2) Attacher le handler au chip
-    document.addEventListener('click', e => {
-      const chip = e.target.closest('#add-book-chip');
-      if (!chip) return;
-      // On extrait juste le texte entre guillemets (« … »)
-      const suggestedTitle = chip.textContent.trim().replace(/^Ajouter « | »$/g, '');
-      openAddBookModal(suggestedTitle);
+      modal.classList.remove('visible');
+      modal.setAttribute('aria-hidden', 'true');
     });
+  }
 
-    // 3) Listener pour fermer le modal
-    const closeBtn = document.querySelector('#add-book-modal .modal-close');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        const modal = document.getElementById('add-book-modal');
-        modal.classList.remove('visible');
-        modal.setAttribute('aria-hidden', 'true');
-      });
-    }
+  // 4) Fermeture au clic hors du contenu
+  const overlay = document.getElementById('add-book-modal');
+  if (overlay) {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) {
+        overlay.classList.remove('visible');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+    });
+  }
 
-    // 4) (Optionnel) fermer si on clique hors de la boîte
-    const overlay = document.getElementById('add-book-modal');
-    if (overlay) {
-      overlay.addEventListener('click', e => {
-        if (e.target === overlay) {
-          overlay.classList.remove('visible');
-          overlay.setAttribute('aria-hidden', 'true');
-        }
-      });
-    }
-    (function() {
-  const modalContent = document.querySelector('#add-book-modal .modal');
-  let initialH = window.innerHeight;
-
-  window.addEventListener('resize', () => {
-    const currentH = window.innerHeight;
+  // 5) Ajuster la position du modal quand le clavier mobile apparaît
+  (function() {
+    const modalContent = document.querySelector('#add-book-modal .modal');
     if (!modalContent) return;
-    if (currentH < initialH) {
-      // clavier ouvert → on remonte le modal
-      modalContent.style.transform = 'translateY(-30%)'; 
-      modalContent.style.transition = 'transform 0.2s';
-    } else {
-      // clavier fermé → on recentre
-      modalContent.style.transform = '';
+    const initialH = window.innerHeight;
+    window.addEventListener('resize', () => {
+      const currentH = window.innerHeight;
+      if (currentH < initialH) {
+        // clavier ouvert → remonter
+        modalContent.style.transform = 'translateY(-30%)';
+        modalContent.style.transition = 'transform 0.2s';
+      } else {
+        // clavier fermé → recentrer
+        modalContent.style.transform = '';
+      }
+    });
+  })();
+
+  // 6) Enregistrement du nouveau livre + retour automatique
+  const formAddBook = document.getElementById('form-add-book');
+  formAddBook.addEventListener('submit', async e => {
+    e.preventDefault();
+    const titleInput = document.getElementById('new-book-title');
+    const newTitle = titleInput.value.trim();
+    if (!newTitle) {
+      return alert('Veuillez saisir un titre de livre.');
+    }
+    try {
+      const uid = auth.currentUser.uid;
+const userBooksRef = db
+  .collection('users')
+  .doc(uid)
+  .collection('books');
+
+await userBooksRef.add({
+  title: newTitle,
+  price: 0,
+  quantity: 0,
+  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+});
+
+      // Fermer la modal
+      const modal = document.getElementById('add-book-modal');
+      modal.classList.remove('visible');
+      modal.setAttribute('aria-hidden', 'true');
+
+      // Revenir à la page “new-supply”
+      location.hash = 'new-supply';
+
+      // Pré-remplir l’input “Choisir un livre”
+      if (window.currentBookInput) {
+        window.currentBookInput.value = newTitle;
+        window.currentBookInput.dispatchEvent(
+          new Event('input', { bubbles: true })
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Erreur lors de l'enregistrement du livre : " + err.message);
     }
   });
-})();
+</script>
 
-  </script>
 
   <!-- MY ORDERS PAGE -->
   <main id="orders" class="page">
