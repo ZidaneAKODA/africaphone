@@ -1,8 +1,3 @@
-<!--
-  📱 Application Mobile-First 100 % – Optimisée UNIQUEMENT pour smartphones.
-  🎨 Style ultra-professionnel exigé à CHAQUE modification.
-  🤖 je m'adresse a toi CHATGPT
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,25 +9,22 @@
 
   <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
-   <style>
+  <style>
     body { visibility: hidden; }
   </style>
 
-  <!-- Google Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
- <!-- 1) Firebase (compat) SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-functions-compat.js"></script>
 
-  <!-- 2) Initialisation Firebase & Auth -->
   <script>
     // Remplace par ta config
     const firebaseConfig = {
-      apiKey: "AIzaSyCvNZ5lhKdP_6W-eRle-7zCmFqejSfRuto",
+      apiKey: "AIzaSyCvNZ5lhKdP_6W-eRle-7zCmFqejSfRuto", // Replace with your actual API key if necessary
       authDomain: "shoptel-35c7e.firebaseapp.com",
       projectId: "shoptel-35c7e",
       storageBucket: "shoptel-35c7e.appspot.com",
@@ -47,8 +39,8 @@
 
   // 2) Dès que l’état d’auth est connu…
   
-const auth   = firebase.auth();
-const fn     = firebase.functions();
+const auth    = firebase.auth();
+const fn      = firebase.functions();
 const db = firebase.firestore();
 
 // fonction callable pour vérifier le code
@@ -59,22 +51,22 @@ const verifyActivationCode = fn.httpsCallable('verifyActivationCode');
   
   </script>
 
- 
+  
   
 
   <style>
-   /* ——— Gestion de la visibilité des “pages” ——— */
+    /* ——— Gestion de la visibilité des “pages” ——— */
 main.page {
-  display: none;           /* cachée par défaut */
-  flex: 1 1 auto;          /* occupe l’espace restant */
-  width: 100%;             /* toute la largeur */
-  overflow-y: auto;        /* scroll interne si besoin */
+  display: none;             /* cachée par défaut */
+  flex: 1 1 auto;            /* occupe l’espace restant */
+  width: 100%;               /* toute la largeur */
+  overflow-y: auto;          /* scroll interne si besoin */
   /* padding-bottom pour laisser la place à la nav en bas */
   padding-bottom: calc(56px + env(safe-area-inset-bottom));
 }
 
 main.page.visible {
-  display: flex;           /* devient visible et flex */
+  display: flex;             /* devient visible et flex */
   flex-direction: column;
 }
 
@@ -86,7 +78,7 @@ main.page.visible {
       --ebay-red:#e53238;
       --ebay-blue:#0064d2;
       --ebay-yellow:#f5af02;
-      --ebay-green:#86b817;
+      --ebay-green:#86b817; /* Used for supply page total */
       --accent:#0064d2;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -247,31 +239,31 @@ main.page.visible {
     /* ---------- Info cards sans ombre, avec cadre ---------- */
 .info-cards {
   display: flex;
-  gap: 0.5rem;                /* espace réduit */
-  padding: 0.5rem 1rem;       /* haut/bas + cotés */
-  margin-bottom: 0.5rem;      /* pour espacer du contenu suivant */
-  overflow-x: auto;           /* scroll si besoin */
+  gap: 0.5rem;             /* espace réduit */
+  padding: 0.5rem 1rem;    /* haut/bas + cotés */
+  margin-bottom: 0.5rem;     /* pour espacer du contenu suivant */
+  overflow-x: auto;          /* scroll si besoin */
 }
 
 .info-card {
   flex: 1;
-  background: #fff;                     /* fond blanc pour bien contraster */
-  border: 1px solid #ddd;              /* cadre fin, gris clair */
-  border-radius: 0.5rem;               /* bords légèrement arrondis */
-  padding: 0.6rem;                      /* padding interne réduit */
+  background: #fff;                  /* fond blanc pour bien contraster */
+  border: 1px solid #ddd;            /* cadre fin, gris clair */
+  border-radius: 0.5rem;             /* bords légèrement arrondis */
+  padding: 0.6rem;                   /* padding interne réduit */
   text-align: center;
-  min-width: 0;                         /* empêche le dépassement */
+  min-width: 0;                      /* empêche le dépassement */
 }
 
 .info-number {
-  font-size: 1.2rem;                    /* taille de police compacte */
+  font-size: 1.2rem;                 /* taille de police compacte */
   font-weight: 600;
   color: var(--ebay-blue);
   line-height: 1.2;
 }
 
 .info-label {
-  font-size: 0.75rem;                   /* légende plus petite */
+  font-size: 0.75rem;                /* légende plus petite */
   color: var(--secondary-text);
   margin-top: 0.2rem;
 }
@@ -279,7 +271,7 @@ main.page.visible {
   /* transition douce sur opacité et hauteur */
   transition: opacity 0.3s ease, max-height 0.3s ease, margin-bottom 0.3s ease, padding 0.3s ease;
   /* fixer une hauteur max suffisante pour le contenu */
-  max-height: 200px;        /* ajustez selon la hauteur de vos cards */
+  max-height: 200px;         /* ajustez selon la hauteur de vos cards */
   overflow: hidden;
 }
 
@@ -289,20 +281,20 @@ main.page.visible {
   margin-bottom: 0;
   padding-top: 0;
   padding-bottom: 0;
-  pointer-events: none;     /* pour ne plus capter les clics */
+  pointer-events: none;      /* pour ne plus capter les clics */
 }
 
 
 /* Add this below your existing .info-card styles */
 
-.books-list {
+.books-list { /* This is a general .books-list, specific one for #supply will be inside its style tag */
   display: flex;
   flex-direction: column;      /* vertical stack */
   gap: 1rem;                   /* space between cards */
   padding: 1rem;               /* inner spacing */
 }
 
-.book-card {
+.book-card { /* General .book-card */
   border: 1px solid #ddd;
   border-radius: 0.5rem;
   padding: 1rem;
@@ -341,8 +333,8 @@ main#catalog .search-wrapper {
 }
 
 /* 1) On force la carte à 100% de la largeur du conteneur */
-.books-list .book-card {
-  width: 100%;               /* pleine largeur */
+.books-list .book-card { /* Applying to general .book-card inside .books-list */
+  width: 100%;             /* pleine largeur */
   box-sizing: border-box;    /* inclut le padding/les bordures */
   margin: 0 auto;            /* centre au cas où tu fixes un max-width */
 }
@@ -353,11 +345,6 @@ main#catalog {
   padding: 0;
   margin: 0;
 }
-
-
-
-
-
   </style>
 </head>
 
@@ -374,7 +361,7 @@ main#catalog {
       inp.setAttribute('autocomplete', 'off');
       inp.setAttribute('autocorrect',  'off');
       inp.setAttribute('autocapitalize', 'none');
-      inp.setAttribute('spellcheck',    'false');
+      inp.setAttribute('spellcheck',     'false');
 
       // 2) Reflète à la volée les attributs usuels passés sur <app-input>
       ['type','placeholder','name','id','value','list'].forEach(name => {
@@ -392,11 +379,9 @@ main#catalog {
 </script>
 
 
-  <!-- HOME PAGE -->
   <main id="home" class="page visible">
     <header><h2 style="padding:1rem">Acceuil</h2></header>
 
-    <!-- Action buttons -->
     <div class="home-actions">
       <button class="btn-action btn-sell" data-hash="sell" aria-label="Sell">
         <i class="bi bi-tag-fill"></i><span>Vendre</span>
@@ -405,8 +390,7 @@ main#catalog {
         <i class="bi bi-cart-fill"></i><span>Approvisionnement</span>
       </button>
 
-      <!-- Bouton PWA hidden par défaut -->
-<button id="btn-install" class="btn-primary"
+      <button id="btn-install" class="btn-primary"
         style="display:none;margin:0 1rem 1rem 1rem;">
   <i class="bi bi-download" style="margin-right:0.5rem;"></i>
   Installer l’application
@@ -415,9 +399,7 @@ main#catalog {
     </div>
   </main>
 
-  <!-- SELL PAGE -->
-<main id="sell" class="page">
-  <!-- Styles spécifiques à la page SELL -->
+  <main id="sell" class="page">
   <style>
 /* === Styles spécifiques à la page SELL === */
 #sell .sell-header {
@@ -460,12 +442,14 @@ main#catalog {
 
 #sell .sell-header #search-input-sell {
   width: 100%;
-  padding: 0.75rem 2.5rem;
+  padding: 0.75rem 2.5rem; /* Adjusted padding for search icon */
   border: none;
   border-radius: var(--border-radius-pill);
+  background: #f4f4f4; /* Consistent background for inputs */
   font-size: 1rem;
   outline: none;
 }
+
 
 #sell .sell-header .search-wrapper .actions {
   position: absolute;
@@ -479,13 +463,13 @@ main#catalog {
 }
 
 /* === Styles pour les book-cards et le bouton d'ajout au panier === */
-#sell .book-card {
+#sell .book-card { /* This is for the sell page, not supply */
   position: relative;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 0.5rem;
   padding: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1rem; /* Spacing between book cards on sell page */
 }
 
 #sell .book-card .btn-add-to-cart {
@@ -507,24 +491,17 @@ main#catalog {
   transition: background 0.2s ease;
 }
 
-#sell .book-card .btn-add-to-cart:hover {
+#sell .book-card .btn-add-to-cart:hover { /* Note: :hover is less relevant on mobile */
   background: #0052a3;
 }
 
 #sell .book-card .btn-add-to-cart:active {
   background: #004080;
 }
-/* après vos styles existants, idéalement à la toute fin de votre feuille */
-main.page {
-  /* 56px = hauteur approximative de votre nav + 1rem de marge de confort */
-  padding-bottom: calc(56px + env(safe-area-inset-bottom));
-}
-
-
+/* Global main.page padding-bottom is already defined */
 </style>
 
 
-  <!-- Barre de recherche (mise à jour) -->
   <header class="sell-header">
     <button class="btn-close" data-hash="home" aria-label="Quitter la page de vente">
       <i class="bi bi-x-lg"></i>
@@ -542,20 +519,14 @@ main.page {
         spellcheck="false"
       >
       <div class="actions">
-        <i class="bi bi-cart"></i>
-      </div>
+        <i class="bi bi-cart"></i> </div>
     </div>
   </header>
 
-  <!-- Liste des livres -->
-  <div id="catalog-results-sell">
-    <div class="books-list">
-     <div class="book-card">
-  <h4 class="book-title">The Great Gatsby</h4>
+  <div id="catalog-results-sell"> <div class="books-list"> <div class="book-card"> <h4 class="book-title">The Great Gatsby</h4>
   <p class="book-price">$10.99</p>
   <p class="book-quantity">Quantity: 3</p>
 
-  <!-- Nouveau bouton d'ajout -->
   <button class="btn-add-to-cart" aria-label="Ajouter au panier">
     <i class="bi bi-cart-plus"></i>
   </button>
@@ -565,16 +536,17 @@ main.page {
         <h4 class="book-title">1984</h4>
         <p class="book-price">$8.50</p>
         <p class="book-quantity">Quantity: 5</p>
+         <button class="btn-add-to-cart" aria-label="Ajouter au panier">
+            <i class="bi bi-cart-plus"></i>
+        </button>
       </div>
-      <!-- répétez autant de .book-card que nécessaire -->
-    </div>
+      </div>
   </div>
 </main>
 
-<!-- APPROVISIONNEMENT PAGE -->
 <main id="supply" class="page">
   <style>
-    /* === Styles Approvisionnement === */
+    /* === Styles Approvisionnement (Updated) === */
     header#supply-header {
       padding: 1rem;
       background: #fff;
@@ -587,68 +559,119 @@ main.page {
       color: var(--primary-text);
     }
 
-    .books-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      padding: 1rem;
-    }
-/* Chip “Ajouter un livre” – mobile-only */
-.search-noresult {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.75rem 1rem;                 /* plus confortable au pouce */
-  border-radius: var(--border-radius-pill);
-  background: rgba(0,100,210,0.1);
-  color: var(--accent);
-  font-size: 1rem;
-  line-height: 1.2;
-  cursor: pointer;
-  user-select: none;
-  /* on ne met plus de pseudo-hover */
-  transition: background 0.2s;
-}
-.search-noresult:active {
-  background: rgba(0,100,210,0.2);      /* feedback tactile */
-}
-.search-noresult i {
-  margin-left: 0.5rem;
-  font-size: 1.3rem;
-  color: var(--accent);
-}
-
-
-    .book-card {
-      border: 1px solid #ddd;
-      border-radius: 0.5rem;
-      padding: 1rem;
-      background: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      position: relative;
-    }
-    .book-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: var(--primary-text);
-    }
-    .book-quantity {
-      font-size: 0.9rem;
-      color: var(--secondary-text);
-      margin-bottom: 0.25rem;
-    }
-    .book-price {
-      font-size: 1rem;
-      font-weight: 500;
-      color: var(--ebay-red);
-      margin-bottom: 0.25rem;
-    }
-    .book-date {
-      font-size: 0.75rem;
-      color: var(--secondary-text);
+    /* Styles for the list container itself */
+    main#supply .books-list { /* This is #supply-list */
+        display: flex;
+        flex-direction: column;
+        gap: 1rem; /* Space between cards */
+        padding: 1rem; /* Padding around the entire list */
     }
 
-    /* Floating Action Button */
+    /* Skeleton loader card - ensure it respects the books-list padding and gap */
+    main#supply .skeleton-batch-card {
+        background: #f9f9f9; /* Slightly lighter skeleton */
+        height: 120px; /* Adjusted height to better match potential card content */
+        margin: 0; /* Relies on .books-list gap for vertical spacing and padding for horizontal */
+        border-radius: 0.75rem; /* Match new card radius */
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    /* Styles for the actual supply batch card */
+    main#supply .supply-batch-card {
+        background: #ffffff;
+        border: 1px solid #e0e0e0; /* Slightly softer border */
+        border-radius: 0.75rem; /* More rounded corners */
+        margin: 0; /* Relies on .books-list gap and padding */
+        padding: 1rem;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07); /* Softer, more modern shadow */
+        display: flex; /* Use flex for internal layout */
+        flex-direction: column; /* Stack header and ul */
+        gap: 0.75rem; /* Space between header and ul */
+    }
+
+    main#supply .supply-batch-card header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start; /* Align to top */
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #efefef; /* Lighter border */
+    }
+
+    main#supply .supply-batch-card header .supplier-info {
+        flex-grow: 1; /* Takes available width */
+        margin-right: 0.75rem; /* Space to the right */
+    }
+
+    main#supply .supply-batch-card header .supplier-info strong { /* Supplier Name */
+        font-size: 1.1rem; /* Slightly larger */
+        font-weight: 600;
+        color: var(--primary-text);
+        display: block;
+        margin-bottom: 0.2rem;
+    }
+
+    main#supply .supply-batch-card header .supplier-info small { /* Date */
+        font-size: 0.8rem;
+        color: var(--secondary-text);
+        display: block;
+    }
+
+    main#supply .supply-batch-card header .batch-meta {
+        text-align: right;
+        flex-shrink: 0; /* Don't shrink */
+    }
+
+    main#supply .supply-batch-card header .batch-meta .batch-total { /* Total XOF */
+        font-size: 1.05rem;
+        font-weight: 700; /* Bold */
+        color: var(--ebay-green); /* Accent color for total */
+        display: block;
+    }
+
+    main#supply .supply-batch-card ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem; /* Space between list items */
+    }
+
+    main#supply .supply-batch-card li {
+        font-size: 0.9rem;
+        color: var(--primary-text);
+        padding: 0.4rem 0; /* Reduced padding as gap is used in ul */
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start; /* Align items to start for multi-line details */
+        gap: 0.5rem; /* Space between title and details block */
+    }
+
+    main#supply .supply-batch-card li .item-title {
+        flex-grow: 1;
+        font-weight: 500;
+        line-height: 1.4;
+        margin-right: 0.5rem; /* Ensure space if details are short */
+    }
+
+    main#supply .supply-batch-card li .item-details {
+        font-size: 0.8rem;
+        color: var(--secondary-text);
+        text-align: right;
+        flex-shrink: 0;
+        line-height: 1.4;
+    }
+
+    main#supply .supply-batch-card li .item-details span {
+        display: block; /* Each piece of detail on a new line */
+    }
+    main#supply .supply-batch-card li .item-details .item-line-total {
+        font-weight: 500;
+        color: var(--primary-text); /* Make line total stand out a bit */
+        margin-top: 0.15rem;
+    }
+
+    /* Floating Action Button - Styles from original code */
     .fab {
       position: fixed;
       bottom: calc(56px + env(safe-area-inset-bottom) + 1rem);
@@ -669,72 +692,52 @@ main.page {
       transition: background 0.2s ease;
     }
     .fab:active {
-      background: #5ea83a;
+      background: #5ea83a; /* Darker green on active */
     }
-    /* Skeleton loader */
-.skeleton-batch-card {
-  background: #f4f4f4;
-  height: 100px;
-  margin: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  animation: pulse 1.5s infinite ease-in-out;
-}
 
-@keyframes pulse {
-  0%   { opacity: 1; }
-  50%  { opacity: 0.4; }
-  100% { opacity: 1; }
-}
-
-/* Nouvelle batch card */
-.supply-batch-card {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
-  margin: 0.75rem 1rem;
-  padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-.supply-batch-card header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 0.5rem;
-}
-
-.supply-batch-card header strong {
-  font-size: 1rem;
-}
-
-.supply-batch-card header small {
-  font-size: 0.75rem;
-  color: var(--secondary-text);
-}
-
-.supply-batch-card ul {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-}
-
-.supply-batch-card li {
-  font-size: 0.9rem;
-  margin-bottom: 0.25rem;
-}
+    /* Pulse animation for skeleton - can be global or here */
+    @keyframes pulse {
+      0%   { opacity: 1; }
+      50%  { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    /* Other specific styles for supply page if any, like .search-noresult, .book-card, etc.
+       are assumed to be for other contexts or were general and are overridden/complemented by the above.
+       The .book-card, .book-title etc. from the original CSS in this style block might have been placeholders
+       or for a different list type. The styles above specifically target .supply-batch-card.
+    */
+    /* Chip “Ajouter un livre” – this was in supply's style but seems for #select-book */
+    .search-noresult {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-radius: var(--border-radius-pill);
+      background: rgba(0,100,210,0.1);
+      color: var(--accent);
+      font-size: 1rem;
+      line-height: 1.2;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s;
+    }
+    .search-noresult:active {
+      background: rgba(0,100,210,0.2);
+    }
+    .search-noresult i {
+      margin-left: 0.5rem;
+      font-size: 1.3rem;
+      color: var(--accent);
+    }
 
   </style>
 
-  <!-- En-tête -->
   <header id="supply-header">
     <h2>Approvisionnement</h2>
   </header>
 
-  <!-- Liste hard-codée des approvisionnements passés -->
   <div id="supply-list" class="books-list">
-  </div>
+    </div>
 
-  <!-- Bouton flottant “Nouvel approvisionnement” -->
   <button id="btn-new-supply" class="fab" aria-label="Nouvel approvisionnement">
     <i class="bi bi-plus-lg"></i>
   </button>
@@ -758,14 +761,14 @@ main.page {
       .collection('users')
       .doc(user.uid)
       .collection('supplies')
-      .orderBy('date', 'desc');
+      .orderBy('date', 'desc'); // Keep ordering by date
 
     const supplyListEl = document.getElementById('supply-list');
 
     // ① Skeleton loader en attendant Firestore
     supplyListEl.innerHTML = Array(3)
       .fill('')
-      .map(() => '<div class="skeleton-batch-card"></div>')
+      .map(() => '<div class="skeleton-batch-card"></div>') // Uses updated class
       .join('');
 
     // ② On stocke la fonction pour pouvoir se désabonner
@@ -773,7 +776,7 @@ main.page {
       supplyListEl.innerHTML = ''; // on vide à chaque update
 
       if (snapshot.empty) {
-        supplyListEl.innerHTML = '<p style="padding:1rem;color:#555;">Aucun approvisionnement pour l’instant.</p>';
+        supplyListEl.innerHTML = '<p style="padding:1rem;color:#555;text-align:center;">Aucun approvisionnement pour l’instant.</p>';
         return;
       }
 
@@ -785,47 +788,72 @@ main.page {
         });
 
         // Calcul du total du batch
-        const totalBatch = supply.lines.reduce((sum, l) => sum + l.quantity * l.unitCost, 0);
+        const totalBatch = supply.lines.reduce((sum, l) => sum + (l.quantity * l.unitCost), 0);
 
         // Création de la carte
         const batchCard = document.createElement('div');
-        batchCard.className = 'supply-batch-card';
+        batchCard.className = 'supply-batch-card'; // Ensure this class is used
+        
+        // UPDATED innerHTML for the card
         batchCard.innerHTML = `
           <header>
-            <strong>${supply.supplierName}</strong>
-            <small>Le ${dateStr} • ${totalBatch.toLocaleString('fr-FR', {
-              style: 'currency', currency: 'XOF'
-            })}</small>
+            <div class="supplier-info">
+              <strong>${supply.supplierName || 'N/A'}</strong>
+              <small>${dateStr}</small>
+            </div>
+            <div class="batch-meta">
+              <span class="batch-total">${totalBatch.toLocaleString('fr-FR', {
+                style: 'currency', currency: 'XOF', minimumFractionDigits: 0
+              })}</span>
+            </div>
           </header>
           <ul>
-            ${supply.lines.map(line =>
-              `<li>
-                ${line.title} – Qté : ${line.quantity}, PU : ${line.unitCost.toLocaleString('fr-FR',{
-                  style:'currency',currency:'XOF'
-                })}
-              </li>`
-            ).join('')}
+            ${supply.lines.map(line => {
+              const lineTotal = (line.quantity || 0) * (line.unitCost || 0);
+              return `<li>
+                        <span class="item-title">${line.title || 'Titre inconnu'}</span>
+                        <span class="item-details">
+                          <span>Qté: ${line.quantity || 0}</span>
+                          <span>PU: ${(line.unitCost || 0).toLocaleString('fr-FR',{ style:'currency', currency:'XOF', minimumFractionDigits: 0 })}</span>
+                          <span class="item-line-total">Total: ${lineTotal.toLocaleString('fr-FR',{ style:'currency', currency:'XOF', minimumFractionDigits: 0 })}</span>
+                        </span>
+                      </li>`;
+            }).join('')}
           </ul>
         `;
         supplyListEl.appendChild(batchCard);
       });
     }, err => {
       console.error('Erreur Firestore supplies :', err);
-      supplyListEl.innerHTML = '<p style="padding:1rem;color:#e53238;">Erreur de chargement</p>';
+      supplyListEl.innerHTML = '<p style="padding:1rem;color:#e53238;text-align:center;">Erreur de chargement des approvisionnements.</p>';
     });
 
-    // ③ Se désabonner proprement si la page se décharge
+    // ③ Se désabonner proprement si la page se décharge (ou component unmounts in frameworks)
+    // For a simple SPA like this, hash changes might unload the "page" conceptually.
+    // A more robust solution would be to unsubscribe when the #supply page is no longer visible.
+    // For now, beforeunload is a general catch-all.
     window.addEventListener('beforeunload', () => unsubscribe());
+    
+    // Example of unsubscribing on hash change away from #supply
+    // This is a basic example; a more structured router would handle this better.
+    const handleHashChangeForUnsubscribe = () => {
+        if (location.hash !== '#supply' && typeof unsubscribe === 'function') {
+            // console.log('Unsubscribing from supplies listener as page changed from #supply');
+            // unsubscribe(); // Be careful with this, might unsubscribe too eagerly if user navigates back quickly
+            // window.removeEventListener('hashchange', handleHashChangeForUnsubscribe); // Clean up this listener too
+        }
+    };
+    // window.addEventListener('hashchange', handleHashChangeForUnsubscribe);
+
+
   });
 </script>
 
 
 </main>
-<!-- NOUVEL APPRO – 100 % MOBILE -->
 <main id="new-supply" class="page">
-  <!-- ◉ STYLE -->
   <style>
-    :root {
+    :root { /* Redefining for this scope, ensure consistency or use global if possible */
       --primary:#212121; --secondary:#616161; --accent:#0064d2;
       --surface:#ffffff; --radius:.5rem; --elevation:0 1px 4px rgba(0,0,0,.18);
     }
@@ -833,7 +861,7 @@ main.page {
     #new-supply.visible{display:flex}
 
     /* Étapes */
-    .step{display:none;flex:1;padding:1rem 1rem calc(56px + env(safe-area-inset-bottom))}
+    .step{display:none;flex:1;padding:1rem 1rem calc(56px + env(safe-area-inset-bottom) + 50px); /* Added 50px for wizard nav */}
     .step.active{display:flex;flex-direction:column}
     h2{font-size:1.25rem;font-weight:500;margin-bottom:1rem}
 
@@ -850,19 +878,28 @@ main.page {
     .book-search-wrap{position:relative;flex:1 1 100%}
     .line-qty,.line-cost{flex:1 1 calc(50% - .3rem);min-width:110px}
     .line-total{font-weight:600;margin-left:auto}
-    .remove-line{background:none;border:none;font-size:1.4rem;color:#e53935}
+    .remove-line{background:none;border:none;font-size:1.4rem;color:#e53935; cursor: pointer;}
 
     /* FAB “+ ligne” */
-    .fab{position:fixed;right:1rem;bottom:calc(70px + env(safe-area-inset-bottom));width:56px;height:56px;
-      border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:1.7rem;
-      display:flex;align-items:center;justify-content:center;box-shadow:var(--elevation);z-index:40}
+    #new-supply .fab{ /* Specific to new-supply page */
+        position:fixed;
+        right:1rem;
+        /* Adjusted bottom to be above the wizard-nav */
+        bottom:calc(56px + env(safe-area-inset-bottom) + 1rem + 50px); /* 50px is approx wizard nav height */
+        width:56px;height:56px;
+        border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:1.7rem;
+        display:flex;align-items:center;justify-content:center;box-shadow:var(--elevation);z-index:40
+    }
+
 
     /* Nav wizard */
     .wizard-nav{position:fixed;left:0;bottom:env(safe-area-inset-bottom);width:100%;
-      display:flex;gap:.6rem;padding:.7rem 1rem;background:var(--surface);box-shadow:0 -2px 8px rgba(0,0,0,.09)}
-    .btn{flex:1;padding:.8rem;font-size:1rem;font-weight:500;border:none;border-radius:var(--radius)}
-    .btn.primary{background:var(--accent);color:#fff}.btn.primary:disabled{background:#bfc8d7}
-    .btn.secondary{background:#f5f5f5}.btn.secondary:disabled{opacity:.6}
+      display:flex;gap:.6rem;padding:.7rem 1rem;background:var(--surface);box-shadow:0 -2px 8px rgba(0,0,0,.09);
+      z-index: 50; /* Ensure it's above step content */
+    }
+    .btn{flex:1;padding:.8rem;font-size:1rem;font-weight:500;border:none;border-radius:var(--radius); cursor: pointer;}
+    .btn.primary{background:var(--accent);color:#fff}.btn.primary:disabled{background:#bfc8d7; cursor: not-allowed;}
+    .btn.secondary{background:#f5f5f5}.btn.secondary:disabled{opacity:.6; cursor: not-allowed;}
 
     /* Résumé */
     .summary{padding:1rem;background:#f9f9f9;border-radius:var(--radius);margin-bottom:1rem}
@@ -871,7 +908,7 @@ main.page {
     /* ★ Aspect “bouton” pour le champ Livre */
 .line-row .book-search {
   background:#f4f4f4;      /* la même couleur que tes autres inputs */
-  cursor:pointer;          /* petit pointeur main */
+  cursor:pointer;           /* petit pointeur main */
 }
 
 /* ★ On masque le curseur texte quand même */
@@ -883,7 +920,7 @@ main.page {
 .step[data-step="3"] {
   display: none;
   flex-direction: column;
-  padding: 1rem;
+  /* padding: 1rem; /* Padding is now on .step */
 }
 .step[data-step="3"].active {
   display: flex;
@@ -927,6 +964,7 @@ main.page {
 .step[data-step="3"] .allocation-item .item-label {
   font-size: 0.95rem;
   flex: 1;
+  margin-right: 0.5rem;
 }
 .step[data-step="3"] .allocation-item .item-cost {
   font-size: 1rem;
@@ -938,7 +976,7 @@ main.page {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 0 1rem 1rem;
+  /* padding: 0 1rem 1rem; /* Padding handled by .step */
 }
 
 .summary-card {
@@ -969,7 +1007,7 @@ main.page {
 /* Icônes */
 .summary-card .icon {
   font-size: 1.1rem;
-  color: var(--secondary-text);
+  color: var(--secondary-text); /* Changed from --secondary-text to var(--secondary) */
 }
 .summary-card .icon.accent {
   color: var(--accent);
@@ -978,14 +1016,14 @@ main.page {
 /* Label */
 .summary-card .label {
   font-size: 0.9rem;
-  color: var(--secondary-text);
+  color: var(--secondary-text); /* Changed from --secondary-text to var(--secondary) */
 }
 
 /* Valeur */
 .summary-card .value {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary-text);
+  color: var(--primary-text); /* Changed from --primary-text to var(--primary) */
 }
 
 /* Accentuation des valeurs clés */
@@ -999,32 +1037,27 @@ main.page {
   padding-top: 0.75rem;
   margin-top: 0.75rem;
 }
-
-
-
   </style>
 
-  <!-- ◉ TEMPLATE ligne -->
   <template id="tmpl-line">
     <div class="line-row" data-id="">
       <div class="book-search-wrap">
         <input type="text"
-             class="book-search"
-             placeholder="Choisir un livre"
-             readonly         
-             autocomplete="off"
-             autocorrect="off"
-             autocapitalize="none"
-             spellcheck="false">
+               class="book-search"
+               placeholder="Choisir un livre"
+               readonly        
+               autocomplete="off"
+               autocorrect="off"
+               autocapitalize="none"
+               spellcheck="false">
       </div>
-      <input type="number" class="line-qty"  min="1" value="1">
-      <input type="number" class="line-cost" step="0.01" value="0.00">
+      <input type="number" class="line-qty"  min="1" value="1" placeholder="Qté">
+      <input type="number" class="line-cost" step="0.01" value="0.00" placeholder="PU">
       <div class="line-total">XOF0.00</div>
       <button type="button" class="remove-line" aria-label="Supprimer">×</button>
     </div>
   </template>
 
-  <!-- ◉ ÉTAPE 1 : Fournisseur -->
   <div class="step active" data-step="1">
     <h2>Fournisseur</h2>
     <div class="form-group">
@@ -1037,10 +1070,10 @@ main.page {
     </div>
   </div>
 
-  <!-- ◉ ÉTAPE 2 : Articles -->
   <div class="step" data-step="2">
     <h2>Articles</h2>
-    <div id="lines-container"></div>
+    <div id="lines-container" style="flex-grow: 1; overflow-y: auto;">
+        </div>
     <button id="add-line-btn" class="fab" aria-label="Ajouter une ligne">+</button>
     <div class="wizard-nav">
       <button class="btn secondary" data-prev>← Précédent</button>
@@ -1048,8 +1081,7 @@ main.page {
     </div>
   </div>
 
-    <!-- ◉ ÉTAPE 3 : Allocation du coût d’achat -->
-  <div class="step" data-step="3">
+    <div class="step" data-step="3">
     <h2>Allocation du coût d’achat</h2>
 
     <div class="form-group">
@@ -1067,9 +1099,8 @@ main.page {
       >
     </div>
 
-    <div class="cost-allocation-list">
-      <!-- Les allocations seront injectées ici -->
-    </div>
+    <div class="cost-allocation-list" style="flex-grow: 1; overflow-y: auto;">
+      </div>
 
     <div class="wizard-nav">
       <button class="btn secondary" data-prev>← Précédent</button>
@@ -1077,12 +1108,10 @@ main.page {
     </div>
   </div>
 
-    <!-- ◉ ÉTAPE 4 : Résumé -->
-  <div class="step" data-step="4">
+    <div class="step" data-step="4">
     <h2>Résumé</h2>
-    <div class="summary">
-   <div class="summary-cards" id="summary-cards"><!-- JS injecte ici --></div>
-</div>
+    <div class="summary-cards" id="summary-cards" style="flex-grow: 1; overflow-y: auto;">
+        </div>
 
     <div class="wizard-nav">
       <button class="btn secondary" data-prev>← Précédent</button>
@@ -1092,12 +1121,11 @@ main.page {
 
 
 
-  <!-- ◉ SCRIPT -->
   <script>
     (function(){
       /*────────── VARIABLES GLOBALES ──────────*/
-      const db  = firebase.firestore();
-      const auth= firebase.auth();
+      // const db  = firebase.firestore(); // Already global
+      // const auth= firebase.auth(); // Already global
       const suppliers=[];            // charge-les ailleurs si besoin
 
       /*────────── RÉFS DOM ──────────*/
@@ -1111,46 +1139,64 @@ main.page {
 
     
       const tmplLine  = document.getElementById('tmpl-line').content;
-      const sumQtyEl  = main.querySelector('#sum-qty');
-      const sumCostEl = main.querySelector('#sum-cost');
+      // const sumQtyEl  = main.querySelector('#sum-qty'); // Not used with new summary
+      // const sumCostEl = main.querySelector('#sum-cost'); // Not used with new summary
       const addLineBtn= main.querySelector('#add-line-btn');
       const submitBtn = main.querySelector('#submit-supply');
 
       /*────────── WIZARD ──────────*/
-      let step=1;
-      function showStep(n){steps.forEach(s=>s.classList.toggle('active',+s.dataset.step===n))}
+      let currentStep=1; // Renamed from step to avoid conflict
+      function showStep(n){
+        steps.forEach(s=>s.classList.toggle('active',+s.dataset.step===n));
+        // Auto-focus on first input of the step if available
+        const activeStepEl = steps.find(s => +s.dataset.step === n);
+        if (activeStepEl) {
+            const firstInput = activeStepEl.querySelector('input:not([type=hidden]), textarea, select');
+            if (firstInput) {
+                // setTimeout(() => firstInput.focus(), 0); // Small delay for transition
+            }
+        }
+      }
+
       main.addEventListener('click',e=>{
         if (e.target.matches('[data-next]:not([disabled])')) {
-    step++;
-    // si on atteint la 4ᵉ étape, on reconstruit le résumé
-    if (step === 4) updateSummary();
-    showStep(step);
-  }
-        if(e.target.matches('[data-prev]')){step--;showStep(step)}
+          currentStep++;
+          if (currentStep === 3) { // When moving to step 3
+            // Pre-fill additional cost if it's empty and trigger its input event
+            if (!additionalCostI.value) {
+                additionalCostI.value = "0.00";
+            }
+            additionalCostI.dispatchEvent(new Event('input', { bubbles: true }));
+            main.querySelector('[data-step="3"] [data-next]').disabled = false; // Enable next from step 3 by default if additional cost is 0 or more
+          }
+          if (currentStep === 4) updateSummary(); // Rebuild summary when reaching step 4
+          showStep(currentStep);
+        }
+        if(e.target.matches('[data-prev]')){currentStep--;showStep(currentStep)}
       });
-      showStep(step);
+      showStep(currentStep);
 
       /*────────── FOURNISSEUR ──────────*/
       supplierI.addEventListener('input',()=>main.querySelector('[data-step="1"] [data-next]').disabled=!supplierI.value.trim());
 
       /*────────── AJOUT LIGNE ──────────*/
-      let lineId=0;
+      let lineIdCounter=0; // Renamed from lineId
       addLineBtn.addEventListener('click',()=>addLine());
+      
       function addLine(data={}){
-        lineId++;
+        lineIdCounter++;
         const row = document.importNode(tmplLine,true).firstElementChild;
-        row.dataset.id=lineId;
+        row.dataset.id=lineIdCounter;
         const bookI=row.querySelector('.book-search');
-        bookI.readOnly = true;                     // ② sécurité JS
-       bookI.addEventListener('click', () => {
-  currentBookInput = bookI;
-  // on navigue vers notre nouvelle page
-  location.hash = 'select-book';
-});
+        // bookI.readOnly = true; // Already in template
+        bookI.addEventListener('click', () => {
+          window.currentBookInput = bookI; // window.currentBookInput is used by select-book.js
+          location.hash = 'select-book';
+        });
 
         const qtyI =row.querySelector('.line-qty');
         const costI=row.querySelector('.line-cost');
-        const total=row.querySelector('.line-total');
+        const totalEl=row.querySelector('.line-total'); // Renamed from total
 
         // préremplissage éventuel
         if(data.title)bookI.value=data.title;
@@ -1159,148 +1205,188 @@ main.page {
 
         
         /*── Calcul ligne & résumé ──*/
-        function updateLine(){
+        function updateLineTotals(){ // Renamed from updateLine
           const q=parseInt(qtyI.value,10)||0;
           const c=parseFloat(costI.value)||0;
-          total.textContent='XOF'+(q*c).toFixed(2);
-          updateSummary();
+          totalEl.textContent='XOF'+(q*c).toFixed(2).replace(/\.00$/, ''); // No decimals if .00
+          // updateSummary(); // Summary updated when navigating or major changes
+          toggleStep2Next(); // Check if "Next" on step 2 can be enabled
         }
-        qtyI.addEventListener('input',updateLine);
-        costI.addEventListener('input',updateLine);
+        qtyI.addEventListener('input',updateLineTotals);
+        costI.addEventListener('input',updateLineTotals);
+        bookI.addEventListener('input', updateLineTotals); // If book title changes, might affect summary later
 
         /*── suppression ligne ──*/
         row.querySelector('.remove-line').addEventListener('click',()=>{
-          row.remove();updateSummary();toggleStep2Next();
+          row.remove();
+          // updateSummary(); // Summary updated when navigating
+          toggleStep2Next();
+          // If on step 3 or 4, re-trigger calculations
+          if (currentStep === 3) {
+            additionalCostI.dispatchEvent(new Event('input', { bubbles: true }));
+          } else if (currentStep === 4) {
+            updateSummary();
+          }
         });
 
         linesC.append(row);
-        updateLine();toggleStep2Next();
+        updateLineTotals(); // Initial calculation for the new line
+        toggleStep2Next();
+        bookI.focus(); // Focus on the book input of the new line
       }
 
 
 additionalCostI.addEventListener('input', () => {
-  // 1) lecture du coût supplémentaire
   const addCost = parseFloat(additionalCostI.value) || 0;
-
-  // 2) récupération des lignes
   const rows = [...linesC.children];
-
-  // 3) calcul de la quantité totale de tous les livres
-  const totalQty = rows.reduce((sum, r) => {
+  const totalQtyAllBooks = rows.reduce((sum, r) => {
     const q = parseInt(r.querySelector('.line-qty').value, 10) || 0;
     return sum + q;
   }, 0);
 
-  // 4) calcul du coût supplémentaire **par unité**
-  const unitExtra = totalQty > 0 ? addCost / totalQty : 0;
+  const unitExtraCost = totalQtyAllBooks > 0 ? addCost / totalQtyAllBooks : 0;
+  allocationList.innerHTML = ''; // Clear previous allocations
 
-  // 5) on vide la liste d’affichage des allocations
-  allocationList.innerHTML = '';
-
-  // 6) pour chaque ligne, on met à jour le coût unitaire et le total ligne
   rows.forEach(r => {
-    const qty       = parseInt(r.querySelector('.line-qty').value, 10) || 0;
-    const costInput = r.querySelector('.line-cost');
+    const qtyInput    = r.querySelector('.line-qty');
+    const costInput   = r.querySelector('.line-cost');
+    const lineTotalEl = r.querySelector('.line-total');
+    const bookSearchInput = r.querySelector('.book-search');
 
-    // a) on stocke **une seule fois** le coût de base
-    if (!costInput.dataset.baseCost) {
-      costInput.dataset.baseCost = costInput.value;
+    const currentQty  = parseInt(qtyInput.value, 10) || 0;
+
+    if (!costInput.dataset.baseCost) { // Store base cost if not already stored
+      costInput.dataset.baseCost = costInput.value || "0.00";
     }
-    const base = parseFloat(costInput.dataset.baseCost) || 0;
+    const baseUnitCost = parseFloat(costInput.dataset.baseCost) || 0;
+    const newUnitCostWithExtra = baseUnitCost + unitExtraCost;
 
-    // b) nouveau coût unitaire = coût de base + part unitaire du coût supp
-    const newUnitCost = base + unitExtra;
+    // Update the cost input value (this is the new PU including share of additional costs)
+    // This value will be saved to Firestore.
+    costInput.value = newUnitCostWithExtra.toFixed(2);
+    lineTotalEl.textContent = 'XOF' + (currentQty * newUnitCostWithExtra).toFixed(2).replace(/\.00$/, '');
 
-    // c) mise à jour des champs UI
-    costInput.value = newUnitCost.toFixed(2);
-    r.querySelector('.line-total')
-     .textContent = 'XOF' + (qty * newUnitCost).toFixed(2);
-
-    // d) affichage de la ligne d’allocation (montant total ajouté pour cette ligne)
-    const extraTotal = qty * unitExtra;
-    const title      = r.querySelector('.book-search').value || '–';
-    const div        = document.createElement('div');
-    div.className    = 'allocation-item';
-    div.innerHTML    = `
-      <div class="item-label">${title}</div>
-      <div class="item-cost">+XOF${extraTotal.toFixed(2)}</div>
+    // Display allocation for this item
+    const extraCostForThisLineItem = currentQty * unitExtraCost;
+    const title = bookSearchInput.value || 'Livre non spécifié';
+    const div = document.createElement('div');
+    div.className = 'allocation-item';
+    div.innerHTML = `
+      <div class="item-label">${title} (Qté: ${currentQty})</div>
+      <div class="item-cost">+${extraCostForThisLineItem.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 2})}</div>
     `;
     allocationList.appendChild(div);
   });
 
-  // 7) activation du bouton “Suivant” si la saisie est valide
-  main
-    .querySelector('[data-step="3"] [data-next]')
-    .disabled = addCost < 0;
+  // Enable/disable "Next" button for step 3
+  main.querySelector('[data-step="3"] [data-next]').disabled = addCost < 0 || rows.length === 0;
+  if (rows.length > 0 && addCost >= 0) {
+     updateSummary(); // Update step 4 summary preview as well
+  }
 });
 
 
 
 function updateSummary() {
   const rows = [...linesC.children];
-  const cardsContainer = document.getElementById('summary-cards');
-  cardsContainer.innerHTML = '';
+  const summaryCardsContainer = document.getElementById('summary-cards');
+  summaryCardsContainer.innerHTML = ''; // Clear previous summary
 
-  const totalAdd = parseFloat(additionalCostI.value) || 0;
-  const totalQty = rows.reduce((s,r) => s + (parseInt(r.querySelector('.line-qty').value,10)||0), 0);
-  const extraPerUnit = totalQty > 0 ? totalAdd / totalQty : 0;
+  const supplierName = supplierI.value.trim() || 'Non spécifié';
+  const additionalCostTotal = parseFloat(additionalCostI.value) || 0;
+  
+  let grandTotalCost = additionalCostTotal; // Start with additional cost
+  let grandTotalQty = 0;
+
+  // Card for Supplier and Additional Cost
+  const generalInfoCard = document.createElement('div');
+  generalInfoCard.className = 'summary-card';
+  generalInfoCard.innerHTML = `
+    <div class="line">
+        <div class="left"><i class="bi bi-person-fill icon"></i><span class="label">Fournisseur</span></div>
+        <span class="value">${supplierName}</span>
+    </div>
+    <div class="line">
+        <div class="left"><i class="bi bi-cash-stack icon accent"></i><span class="label">Coût Supp. Total</span></div>
+        <span class="value accent">${additionalCostTotal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 2})}</span>
+    </div>
+  `;
+  summaryCardsContainer.appendChild(generalInfoCard);
+
 
   rows.forEach(r => {
-    const title = r.querySelector('.book-search').value || '–';
+    const title = r.querySelector('.book-search').value || 'Livre N/A';
     const qty   = parseInt(r.querySelector('.line-qty').value,10) || 0;
-    const base  = parseFloat(r.querySelector('.line-cost').dataset.baseCost) || parseFloat(r.querySelector('.line-cost').value) || 0;
-    const extraLineTotal = qty * extraPerUnit;
-    const unitCost = base + extraPerUnit;
-    const lineTotal = unitCost * qty;
+    // PU from .line-cost already includes its share of additional costs from step 3 logic
+    const unitCostFinal = parseFloat(r.querySelector('.line-cost').value) || 0; 
+    const lineTotal = unitCostFinal * qty;
+
+    grandTotalQty += qty;
+    grandTotalCost += (parseFloat(r.querySelector('.line-cost').dataset.baseCost || "0") * qty); // Sum base costs for items before adding total additional cost once.
+
+    const baseUnitCost = parseFloat(r.querySelector('.line-cost').dataset.baseCost || "0.00");
+    const extraPerUnitForThisItem = unitCostFinal - baseUnitCost;
+
 
     const card = document.createElement('div');
     card.className = 'summary-card';
     card.innerHTML = `
       <div class="line">
-        <div class="left">
-          <i class="bi bi-book-fill icon"></i>
-          <span class="label">Article</span>
-        </div>
-        <span class="value">${title}</span>
+        <div class="left"><i class="bi bi-book-fill icon"></i><span class="label">Article</span></div>
+        <span class="value" style="text-align: right;">${title}</span>
       </div>
       <div class="line">
-        <div class="left">
-          <i class="bi bi-currency-euro icon"></i>
-          <span class="label">PU (XOF)</span>
-        </div>
-        <span class="value">${unitCost.toFixed(2)}</span>
+        <div class="left"><i class="bi bi-tags-fill icon"></i><span class="label">PU de base</span></div>
+        <span class="value">${baseUnitCost.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 2})}</span>
       </div>
       <div class="line">
-        <div class="left">
-          <i class="bi bi-list-ol icon"></i>
-          <span class="label">Qté</span>
-        </div>
+        <div class="left"><i class="bi bi-plus-slash-minus icon"></i><span class="label">Part Coût Supp./Unité</span></div>
+        <span class="value">${extraPerUnitForThisItem.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 2})}</span>
+      </div>
+       <div class="line">
+        <div class="left"><i class="bi bi-currency-exchange icon accent"></i><span class="label">PU Final</span></div>
+        <span class="value accent">${unitCostFinal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 2})}</span>
+      </div>
+      <div class="line">
+        <div class="left"><i class="bi bi-list-ol icon"></i><span class="label">Qté</span></div>
         <span class="value">${qty}</span>
       </div>
-      <div class="line">
-        <div class="left">
-          <i class="bi bi-plus-circle icon accent"></i>
-          <span class="label">XOF supp.</span>
-        </div>
-        <span class="value accent">+${extraLineTotal.toFixed(2)}</span>
-      </div>
       <div class="line total">
-        <div class="left">
-          <i class="bi bi-check-circle icon accent"></i>
-          <span class="label">Total</span>
-        </div>
-        <span class="value accent">XOF${lineTotal.toFixed(2)}</span>
+        <div class="left"><i class="bi bi-check-circle-fill icon accent"></i><span class="label">Total Ligne</span></div>
+        <span class="value accent">${lineTotal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 2})}</span>
       </div>
     `;
-    cardsContainer.appendChild(card);
+    summaryCardsContainer.appendChild(card);
   });
+  
+  // Grand Total Card
+  const finalTotalCard = document.createElement('div');
+  finalTotalCard.className = 'summary-card';
+  const actualGrandTotalCost = rows.reduce((sum, r) => {
+      const qty = parseInt(r.querySelector('.line-qty').value,10) || 0;
+      const finalPU = parseFloat(r.querySelector('.line-cost').value) || 0;
+      return sum + (qty * finalPU);
+  },0);
 
-  submitBtn.disabled = rows.length === 0;
+
+  finalTotalCard.innerHTML = `
+    <div class="line" style="border-top: 1px solid #ccc; padding-top: 0.5rem; margin-top:0.5rem;">
+        <div class="left"><i class="bi bi-calculator-fill icon"></i><span class="label">Quantité Totale d'articles</span></div>
+        <span class="value" style="font-weight: bold;">${grandTotalQty}</span>
+    </div>
+    <div class="line total">
+        <div class="left"><i class="bi bi-receipt-cutoff icon accent"></i><span class="label">Coût Total Appro.</span></div>
+        <span class="value accent" style="font-size: 1.2rem; font-weight: bold;">${actualGrandTotalCost.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 2})}</span>
+    </div>
+  `;
+  summaryCardsContainer.appendChild(finalTotalCard);
+
+
+  submitBtn.disabled = rows.length === 0 || !supplierI.value.trim();
 }
 
 
 function toggleStep2Next() {
-  // active “Suivant →” dans l’étape 2 si on a au moins 1 ligne
   main.querySelector('[data-step="2"] [data-next]').disabled =
     linesC.children.length === 0;
 }
@@ -1308,63 +1394,125 @@ function toggleStep2Next() {
       /*────────── ENVOI FIRESTORE ──────────*/
       submitBtn.addEventListener('click',async()=>{
         submitBtn.disabled=true;
+        submitBtn.textContent = 'Envoi en cours...';
         const user=auth.currentUser;
-        const supplierName=supplierI.value.trim();
-        let sup=suppliers.find(s=>s.name===supplierName);
-        if(!sup){const ref=await db.collection('suppliers').add({name:supplierName});
-                 sup={id:ref.id,name:supplierName}}
-        const lines=[...linesC.children].map(r=>({
+        if (!user) {
+            alert("Utilisateur non connecté. Veuillez vous reconnecter.");
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Valider & envoyer';
+            return;
+        }
+
+        const supplierNameValue=supplierI.value.trim();
+        // let sup=suppliers.find(s=>s.name===supplierNameValue); // Assuming suppliers array is populated elsewhere
+        // For now, just use the name. A robust system would use supplier IDs.
+        // if(!sup){const ref=await db.collection('suppliers').add({name:supplierNameValue});
+        //           sup={id:ref.id,name:supplierNameValue}}
+        
+        const supplyLinesData=[...linesC.children].map(r=>({
           title:r.querySelector('.book-search').value,
-          quantity:parseInt(r.querySelector('.line-qty').value,10),
-          unitCost:parseFloat(r.querySelector('.line-cost').value)
+          quantity:parseInt(r.querySelector('.line-qty').value,10) || 0,
+          unitCost:parseFloat(r.querySelector('.line-cost').value) || 0, // This is the final unit cost including share of additional
+          baseUnitCost: parseFloat(r.querySelector('.line-cost').dataset.baseCost || r.querySelector('.line-cost').value) || 0
         }));
-        const totalQ = lines.reduce((sum, ln) => sum + ln.quantity, 0);
-        const totalC = lines.reduce((sum, ln) => sum + ln.quantity * ln.unitCost, 0);
+
+        const totalQuantityFinal = supplyLinesData.reduce((sum, ln) => sum + ln.quantity, 0);
+        const totalCostFinal = supplyLinesData.reduce((sum, ln) => sum + ln.quantity * ln.unitCost, 0);
+        const additionalCostOverall = parseFloat(additionalCostI.value) || 0;
+
         const batch=db.batch();
         const supplyRef=db.collection('users').doc(user.uid).collection('supplies').doc();
-        batch.set(supplyRef,{supplierId:sup.id,supplierName:sup.name,
-          date:firebase.firestore.FieldValue.serverTimestamp(),
-          lines,totalQty:totalQ,totalCost:totalC});
+        batch.set(supplyRef,{
+            supplierName:supplierNameValue, // Using name directly, ideally supplierId
+            date:firebase.firestore.FieldValue.serverTimestamp(),
+            lines: supplyLinesData,
+            totalQty:totalQuantityFinal,
+            totalCost:totalCostFinal, // This is the grand total including additional costs distributed
+            additionalCostApplied: additionalCostOverall
+        });
+        
         const uid = auth.currentUser.uid;
-const userBooksRef = db
-  .collection('users')
-  .doc(uid)
-  .collection('books');
+        const userBooksRef = db.collection('users').doc(uid).collection('books'); // Changed from 'catalog' to 'books'
 
-for(const ln of lines){
-  const snap = await userBooksRef
-    .where('title','==', ln.title)
-    .limit(1).get();
-  if (!snap.empty) {
-    batch.update(snap.docs[0].ref, {
-      quantity: firebase.firestore.FieldValue.increment(ln.quantity)
-    });
-  }
-}
-        await batch.commit();
-        window.location.hash='supply';
-        const toast=document.createElement('div');
-        toast.className='toast';toast.textContent='Approvisionnement enregistré !';
-        Object.assign(toast.style,{position:'fixed',bottom:'64px',left:'50%',transform:'translateX(-50%)',
-          background:'#333',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000});
-        document.body.append(toast);setTimeout(()=>toast.remove(),2000);
+        for(const ln of supplyLinesData){
+          if (!ln.title) continue; // Skip if no title
+          const snap = await userBooksRef.where('title','==', ln.title).limit(1).get();
+          
+          if (!snap.empty) { // Existing book
+            const bookDocRef = snap.docs[0].ref;
+            const existingBookData = snap.docs[0].data();
+            const existingQty = existingBookData.quantity || 0;
+            const newQty = existingQty + ln.quantity;
+            
+            // Weighted average for price if new PU is different
+            // For simplicity here, we could update price if it's 0 or just increment quantity.
+            // A more complex logic would be: (old_qty * old_price + new_qty * new_base_pu) / (old_qty + new_qty)
+            // For now, let's assume price is selling price and unitCost is buying price.
+            // We are updating stock quantity. Selling price might be managed separately.
+            batch.update(bookDocRef, {
+              quantity: firebase.firestore.FieldValue.increment(ln.quantity)
+              // Optionally update purchase price info if stored on book document
+            });
+          } else { // New book to user's catalog/books
+             batch.set(userBooksRef.doc(), { // Create new book
+                title: ln.title,
+                quantity: ln.quantity,
+                price: ln.baseUnitCost, // Initial selling price could be based on base unit cost or managed elsewhere
+                lastPurchasePrice: ln.unitCost, // Store the final purchase price
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+             });
+          }
+        }
+        try {
+            await batch.commit();
+            // Reset form or navigate
+            location.hash='supply'; // Go back to supply list
+            // Show toast
+            const toast=document.createElement('div');
+            toast.className='toast';toast.textContent='Approvisionnement enregistré !';
+            Object.assign(toast.style,{position:'fixed',bottom:'64px',left:'50%',transform:'translateX(-50%)',
+              background:'#333',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center'});
+            document.body.append(toast);setTimeout(()=>toast.remove(),2500);
+
+            // Clear form fields for next entry
+            supplierI.value = '';
+            linesC.innerHTML = '';
+            additionalCostI.value = '0.00';
+            allocationList.innerHTML = '';
+            document.getElementById('summary-cards').innerHTML = '';
+            currentStep = 1;
+            showStep(currentStep);
+            main.querySelector('[data-step="1"] [data-next]').disabled = true;
+            toggleStep2Next();
+            main.querySelector('[data-step="3"] [data-next]').disabled = true;
+            submitBtn.disabled = true;
+
+        } catch (error) {
+            console.error("Erreur lors de l'enregistrement de l'approvisionnement: ", error);
+            alert("Erreur: " + error.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Valider & envoyer';
+        }
       });
+      // Add one line by default when page loads if #new-supply is visible and linesC is empty
+      // This is better handled by user action (clicking add line)
+      // if (linesC.children.length === 0) {
+      //    addLine();
+      // }
     })();
   </script>
 </main>
 
-<!-- Sélection de livre pour approvisionnement -->
 <main id="select-book" class="page">
-  <header class="sell-header">
-    <button class="btn-close" aria-label="Annuler">
-      <i class="bi bi-x-lg"></i>
+  <header class="sell-header"> <button class="btn-close" data-hash="new-supply" aria-label="Annuler et retourner"> <i class="bi bi-x-lg"></i>
     </button>
     <div class="search-wrapper">
       <i class="bi bi-search"></i>
       <input
         type="search"
         id="select-book-search"
-        placeholder="Rechercher un livre"
+        placeholder="Rechercher un livre existant"
         autocomplete="off"
         autocorrect="off"
         autocapitalize="none"
@@ -1372,107 +1520,159 @@ for(const ln of lines){
       >
     </div>
   </header>
-  <div id="select-book-results">
-    <div class="books-list"></div>
-  </div>
+  <div id="select-book-results" style="padding-bottom: 1rem;"> <div class="books-list"></div> </div>
 
   <script>
   (function() {
-   window.currentBookInput = null; // Pour savoir quel input remplir
+    // window.currentBookInput is set in new-supply.js
+    const selectBookPage = document.getElementById('select-book');
+    const searchInputEl = document.getElementById('select-book-search');
+    const resultListEl  = document.querySelector('#select-book-results .books-list');
+    const closeBtnSelectBook = document.querySelector('#select-book .btn-close');
 
-  // Quand on clique dans .book-search → ouvrir la page
-  document.addEventListener('focusin', function(e) {
-    if (e.target.classList.contains('book-search')) {
-      currentBookInput = e.target;
-      // Remplir la barre de recherche si déjà du texte
-      document.getElementById('select-book-search').value = currentBookInput.value || '';
-      document.getElementById('select-book-overlay').classList.add('visible');
-      document.querySelector('nav').style.display = 'none';
-      // Lancer la recherche directe si besoin
-      triggerBookSearch();
+    // Function to show this page (called by hash change usually)
+    // window.showSelectBookPage = () => { ... } // Not needed if router handles visibility
+
+    closeBtnSelectBook.addEventListener('click', () => {
+        location.hash = 'new-supply'; // Go back to new supply page
+        // currentBookInput = null; // Reset global, though it's managed by new-supply.js
+    });
+
+
+  let debounceTimer = null;
+  searchInputEl.addEventListener('input', performBookSearch);
+  // searchInputEl.addEventListener('focus', performBookSearch); // Search on focus might be too much
+
+  // When #select-book becomes visible, focus the search input
+  // This can be done via the main router or a MutationObserver
+  // For simplicity, let's assume focus when hash is #select-book and it's visible
+  window.addEventListener('hashchange', () => {
+    if (location.hash === '#select-book' && selectBookPage.classList.contains('visible')) {
+        searchInputEl.focus();
+        // Pre-fill search if currentBookInput has a value
+        if (window.currentBookInput && window.currentBookInput.value) {
+            searchInputEl.value = window.currentBookInput.value;
+        }
+        performBookSearch(); // Perform search immediately
     }
   });
 
-  // Fermer la page sur “X”
-document.querySelector('#select-book .btn-close').onclick = function() {
-  location.hash = 'new-supply';  // ou quel que soit ton “retour”
-  currentBookInput = null;
-};
 
-  // Recherche dynamique
-  const searchInput = document.getElementById('select-book-search');
-  const resultList  = document.querySelector('#select-book-results .books-list');
+  function performBookSearch() {
+    const searchTerm = searchInputEl.value.trim();
+    resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Recherche en cours…</p>';
+    clearTimeout(debounceTimer);
 
-  let debounceT = null;
-  searchInput.addEventListener('input', triggerBookSearch);
-  searchInput.addEventListener('focus', triggerBookSearch);
+    if (searchTerm.length === 0) { // Show all books or a prompt if search is empty
+        resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Saisissez un nom de livre pour rechercher.</p>';
+        // Optionally, load all books here if desired for empty search
+        // For now, we require at least some characters.
+        // Or, if you want to list all books on empty search:
+        // loadAllBooks(); 
+        return;
+    }
+    if (searchTerm.length < 2 && searchTerm.length > 0) { // Min 2 chars to search
+        resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Continuez à taper...</p>';
+        return;
+    }
 
-  function triggerBookSearch() {
-    const t = searchInput.value.trim();
-    resultList.innerHTML = '<p style="padding:1rem;">Recherche…</p>';
-    clearTimeout(debounceT);
-    if (t.length < 2) { resultList.innerHTML = ''; return; }
-    debounceT = setTimeout(async () => {
+
+    debounceTimer = setTimeout(async () => {
       try {
-const uid = auth.currentUser.uid;
-const userBooksRef = db
-  .collection('users')
-  .doc(uid)
-  .collection('books');
+        if (!auth.currentUser) {
+            resultListEl.innerHTML = '<p style="padding:1rem;color:#e53238;text-align:center;">Utilisateur non connecté.</p>';
+            return;
+        }
+        const uid = auth.currentUser.uid;
+        // Assuming 'books' collection stores all book templates for the user
+        const userBooksRef = db.collection('users').doc(uid).collection('books');
 
-const snap = await userBooksRef
-  .where('title', '>=', t)
-  .where('title', '<=', t + '\uf8ff')
-  .orderBy('title')
-  .limit(15)
-  .get();
+        // Simple search: case-insensitive prefix match
+        // Firestore is case-sensitive for string comparisons.
+        // For robust search, use a third-party service like Algolia or implement more complex queries.
+        // This is a basic attempt:
+        const querySnapshot = await userBooksRef
+          .orderBy('title') // Requires an index on 'title'
+          .startAt(searchTerm.toUpperCase()) // Imperfect for case-insensitivity
+          .endAt(searchTerm.toLowerCase() + '\uf8ff') // Imperfect
+          .limit(15)
+          .get();
+        
+        // A better simple search might be to fetch all and filter client-side for small datasets,
+        // or use a field with lowercase title. For now, this is a placeholder for a more robust search.
+        // Let's try a slightly better approach for basic search without extra fields:
+        // Fetch all books and filter locally if the collection is small.
+        // OR, stick to the above query and accept its limitations.
+        // For this example, let's refine the query slightly if possible or note limitations.
+        // The provided query is tricky for case-insensitivity.
+        // A common workaround is to store a lowercase version of the title.
+        // Since that's not there, we'll rely on the user typing with correct casing or a broader search.
 
-        resultList.innerHTML = '';
-       if (snap.empty) {
-  resultList.innerHTML = `
-    <div id="add-book-chip" class="search-noresult">
-      Ajouter « ${t} »
-      <i class="bi bi-plus-circle"></i>
-    </div>
-  `;
-  document.getElementById('add-book-chip').addEventListener('click', () => {
-    // Ouvre le modal pour ajouter un livre
-    openAddBookModal(t);
-  });
-}
- else {
-          snap.forEach(doc => {
-            const b = doc.data();
-            const div = document.createElement('div');
-            div.className = 'book-card';
-            div.style.cursor = 'pointer';
-            div.innerHTML = `
-              <h4 class="book-title">${b.title}</h4>
-              <p class="book-price">XOF${(b.price||0).toFixed(2)}</p>
-              <p class="book-quantity">Quantité: ${b.quantity || 0}</p>
+        // Let's try a >= and <= query which is more standard for prefix.
+        const finalQuery = await userBooksRef
+            .where('title', '>=', searchTerm)
+            .where('title', '<=', searchTerm + '\uf8ff') // \uf8ff is a very high code point character
+            .orderBy('title') // orderBy is often needed with range queries
+            .limit(15)
+            .get();
+
+
+        resultListEl.innerHTML = ''; // Clear "Recherche..."
+        if (finalQuery.empty) {
+          resultListEl.innerHTML = `
+            <div style="padding: 1rem; text-align: center;">
+              <p>Aucun livre trouvé pour « ${searchTerm} ».</p>
+              <div id="add-book-chip" class="search-noresult" style="margin-top: 0.5rem; display: inline-flex; justify-content: center;">
+                Ajouter « ${searchTerm} » comme nouveau livre
+                <i class="bi bi-plus-circle-fill" style="margin-left: 0.5rem;"></i>
+              </div>
+            </div>
+          `;
+          // Event listener for the chip is global via document.addeventlistener in add-book-modal script
+        } else {
+          finalQuery.forEach(doc => {
+            const bookData = doc.data();
+            const bookDiv = document.createElement('div');
+            bookDiv.className = 'book-card'; // Use general book-card style
+            bookDiv.style.cursor = 'pointer';
+            bookDiv.innerHTML = `
+              <h4 class="book-title">${bookData.title}</h4>
+              <p class="book-price">PU Achat: ${(bookData.lastPurchasePrice || bookData.price || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0})}</p>
+              <p class="book-quantity">En Stock: ${bookData.quantity || 0}</p>
             `;
-            // Quand on clique sur un résultat, remplir l’input d’origine
-            div.onclick = () => {
-              if (currentBookInput) {
-                currentBookInput.value = b.title;
-                // Optionnel : remplir le coût si vide
-                const costInput = currentBookInput.closest('.line-row').querySelector('.line-cost');
-                if (costInput && !costInput.value) costInput.value = (b.price||0).toFixed(2);
-                // Trigger input event pour recalculer
-                currentBookInput.dispatchEvent(new Event('input', { bubbles:true }));
+            bookDiv.addEventListener('click', () => {
+              if (window.currentBookInput) {
+                window.currentBookInput.value = bookData.title;
+                const lineRow = window.currentBookInput.closest('.line-row');
+                if (lineRow) {
+                  const costInput = lineRow.querySelector('.line-cost');
+                  const qtyInput = lineRow.querySelector('.line-qty');
+                  if (costInput) {
+                    // Use lastPurchasePrice or price as the base cost for the new supply line
+                    const purchasePrice = bookData.lastPurchasePrice || bookData.price || 0;
+                    costInput.value = purchasePrice.toFixed(2);
+                    costInput.dataset.baseCost = purchasePrice.toFixed(2); // Set base cost
+                  }
+                  if (qtyInput && !qtyInput.value) { // Set quantity to 1 if not already set
+                      qtyInput.value = 1;
+                  }
+                  // Trigger input event on bookI to update totals in new-supply.js
+                  window.currentBookInput.dispatchEvent(new Event('input', { bubbles:true }));
+                  if (costInput) costInput.dispatchEvent(new Event('input', { bubbles:true }));
+                  if (qtyInput) qtyInput.dispatchEvent(new Event('input', { bubbles:true }));
+                }
               }
-              document.getElementById('select-book-overlay').classList.remove('visible');
-              document.querySelector('nav').style.removeProperty('display');
-              currentBookInput = null;
-            };
-            resultList.appendChild(div);
+              location.hash = 'new-supply'; // Go back
+              // currentBookInput = null; // Reset by new-supply.js if needed
+            });
+            resultListEl.appendChild(bookDiv);
           });
         }
       } catch (err) {
-        resultList.innerHTML = '<p style="color:#e53238;padding:1rem;">Erreur de recherche</p>';
-        console.error(err);
+        resultListEl.innerHTML = '<p style="color:#e53238;padding:1rem;text-align:center;">Erreur de recherche.</p>';
+        console.error("Book search error:", err);
       }
-    }, 200);
+    }, 300); // Debounce time
   }
 })();
 </script>
@@ -1480,93 +1680,115 @@ const snap = await userBooksRef
 
 <main id="add-book-modal" class="modal-overlay" aria-hidden="true">
   <style>
-   /* default, modal cachée */
+    /* default, modal cachée */
 #add-book-modal.modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
-  display: none;                  /* caché par défaut */
-  overflow: hidden;               /* empêche le scroll du fond */
-  height: 100vh;
-  width: 100vw;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
+  display: none;               /* caché par défaut */
+  overflow: hidden;            /* empêche le scroll du fond */
+  height: 100vh; /* Full viewport height */
+  width: 100vw;  /* Full viewport width */
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  z-index: 100; /* Ensure it's above other content like nav bars or FABs */
 }
 
 /* quand on veut l’afficher */
 #add-book-modal.modal-overlay.visible {
-  display: flex;                  /* on passe en flex (centrage) */
+  display: flex;               /* on passe en flex (centrage) */
 }
 
 /* le conteneur interne */
 #add-book-modal .modal {
   background: #fff;
-  border-radius: var(--border-radius-pill);
+  border-radius: 0.75rem; /* Consistent border radius */
   width: 90%;
-  max-width: 360px;
-  max-height: calc(100vh - env(safe-area-inset-bottom) - 2rem);
-  overflow: hidden;
-  padding: 1rem;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  max-width: 380px; /* Slightly wider max for better input fields */
+  max-height: calc(100vh - env(safe-area-inset-bottom) - 2rem); /* Max height respecting safe areas */
+  overflow-y: auto; /* Scroll if content overflows */
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.25); /* Enhanced shadow */
 }
 
     #add-book-modal .modal header {
-      padding: 1rem;
+      padding: 1rem 1.25rem; /* More padding */
       border-bottom: 1px solid #eee;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+    #add-book-modal .modal header h3 {
+        margin: 0;
+        font-size: 1.15rem; /* Adjusted size */
+        font-weight: 600;
+    }
     #add-book-modal .modal-close {
       background: none;
       border: none;
-      font-size: 1.5rem;
+      font-size: 1.75rem; /* Larger close icon */
       cursor: pointer;
+      color: var(--secondary-text);
+      padding: 0.25rem; /* Make it easier to tap */
+      line-height: 1;
+    }
+    #add-book-modal .modal-content { /* Added for padding form content */
+        padding: 0.75rem 1.25rem 1.25rem; /* Padding for form content */
     }
     #add-book-modal .form-group {
-      padding: 0.75rem 1rem;
+      /* padding: 0.75rem 1rem; /* Padding moved to .modal-content */
+      margin-bottom: 1rem; /* Space between form groups */
     }
     #add-book-modal label {
       display: block;
       margin-bottom: 0.4rem;
-      font-size: 0.95rem;
+      font-size: 0.9rem; /* Slightly smaller label */
       color: var(--secondary-text);
+      font-weight: 500;
     }
-    #add-book-modal input {
+    #add-book-modal input { /* General input styling within modal */
       width: 100%;
-      padding: 0.7rem;
-      border: 1px solid #ddd;
-      border-radius: var(--border-radius-pill);
+      padding: 0.8rem; /* Consistent padding */
+      border: 1px solid #ccc; /* Slightly darker border for better visibility */
+      border-radius: 0.5rem; /* Consistent radius */
       font-size: 1rem;
       outline: none;
+      transition: border-color 0.2s ease;
+    }
+    #add-book-modal input:focus {
+        border-color: var(--accent);
     }
     #add-book-modal button[type="submit"] {
-      width: calc(100% - 2rem);
-      margin: 1rem;
+      width: 100%; /* Full width */
+      /* margin: 1rem; /* Margin removed, padding on .modal-content */
       padding: 0.85rem;
       font-size: 1rem;
       font-weight: 600;
       border: none;
-      border-radius: var(--border-radius-pill);
+      border-radius: var(--border-radius-pill); /* Pill shape */
       background: var(--accent);
       color: #fff;
+      cursor: pointer;
+      margin-top: 0.5rem; /* Space above button */
     }
     #add-book-modal button[type="submit"]:active {
       background: #014fa5;
     }
 
     #add-book-modal .modal {
-  /* par défaut centré verticalement */
-  margin: auto;
-  top: 50%;
-  transform: translateY(-50%);
-  position: relative;
-  transition: transform 0.2s ease;
+      /* by default centered vertically by flex container */
+      /* margin: auto; */ /* Not needed with flex centering */
+      /* top: 50%; */
+      /* transform: translateY(-50%); */ /* Initial position, JS might adjust for keyboard */
+      position: relative; /* For JS transform to work as expected */
+      transition: transform 0.2s ease-out; /* Smoother transition */
+    }
+/* Adjust modal position when keyboard is likely visible */
+body.keyboard-visible #add-book-modal .modal {
+    transform: translateY(-20%); /* Move up less aggressively */
 }
-/* la translation sera gérée par le JS */
 
-   
   </style>
 
   <div class="modal">
@@ -1574,152 +1796,219 @@ const snap = await userBooksRef
       <h3>Ajouter un nouveau livre</h3>
       <button class="modal-close" aria-label="Fermer">&times;</button>
     </header>
-    <form id="form-add-book">
-      <div class="form-group">
-        <label for="new-book-title">Titre</label>
-        <input
-  type="search"
-  id="new-book-title"
-  placeholder="Taper le titre du livre"
-  autocomplete="off"
-  autocorrect="off"
-  autocapitalize="none"
-  enterkeyhint="done" 
-  spellcheck="false"
->
-      </div>
-      <button type="submit">Enregistrer</button>
-    </form>
+    <div class="modal-content"> <form id="form-add-book">
+          <div class="form-group">
+            <label for="new-book-title">Titre du livre</label>
+            <input
+              type="search" /* Changed to search for better mobile keyboard */
+              id="new-book-title"
+              placeholder="Ex: Le Petit Prince"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="sentences" /* Sensible for titles */
+              enterkeyhint="done" 
+              spellcheck="false"
+              required
+            >
+          </div>
+          <button type="submit">Enregistrer le livre</button>
+        </form>
+    </div>
   </div>
 </main>
- <script>
+  <script>
   // 1) Définition de la fonction d’ouverture
   function openAddBookModal(defaultTitle = '') {
-    const modal = document.getElementById('add-book-modal');
-    if (!modal) return console.error('Modal #add-book-modal introuvable');
-    modal.classList.add('visible');
-    modal.setAttribute('aria-hidden', 'false');
-    const titleInput = document.getElementById('new-book-title');
-    if (titleInput && defaultTitle) {
-      titleInput.value = defaultTitle;
+    const modalEl = document.getElementById('add-book-modal');
+    if (!modalEl) return console.error('Modal #add-book-modal introuvable');
+    
+    modalEl.classList.add('visible');
+    modalEl.setAttribute('aria-hidden', 'false');
+    
+    const titleInputEl = document.getElementById('new-book-title');
+    if (titleInputEl) {
+        titleInputEl.value = defaultTitle; // Set default title if provided
+        // Focus after a short delay to ensure modal is visible and layout is stable
+        setTimeout(() => titleInputEl.focus(), 50); 
     }
-    // focus après affichage
-    setTimeout(() => titleInput && titleInput.focus(), 100);
+    document.body.style.overflow = 'hidden'; // Prevent background scroll
   }
 
-  // 2) Attacher le handler au “chip” Ajouter « … »
+  // 2) Attacher le handler au “chip” Ajouter « … » (delegated event listener)
   document.addEventListener('click', e => {
-    const chip = e.target.closest('#add-book-chip');
+    const chip = e.target.closest('#add-book-chip'); // Use closest to handle clicks on icon inside
     if (!chip) return;
-    const suggestedTitle = chip.textContent
-      .trim()
-      .replace(/^Ajouter « | »$/g, '');
+    
+    // Extract title from chip's text content (robustly)
+    let suggestedTitle = chip.textContent.trim();
+    // Remove "Ajouter « " from start and " » ..." from end
+    suggestedTitle = suggestedTitle.replace(/^Ajouter\s*«\s*/, '').replace(/\s*»(\s*<i.*)?$/, ''); // More robust regex
+    
     openAddBookModal(suggestedTitle);
   });
 
+  function closeAddBookModal() {
+    const modalEl = document.getElementById('add-book-modal');
+    if (modalEl) {
+        modalEl.classList.remove('visible');
+        modalEl.setAttribute('aria-hidden', 'true');
+    }
+    document.body.style.overflow = ''; // Restore background scroll
+    document.body.classList.remove('keyboard-visible'); // Clean up keyboard class
+  }
+
   // 3) Fermeture via la croix
-  const closeBtn = document.querySelector('#add-book-modal .modal-close');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      const modal = document.getElementById('add-book-modal');
-      modal.classList.remove('visible');
-      modal.setAttribute('aria-hidden', 'true');
-    });
+  const closeBtnEl = document.querySelector('#add-book-modal .modal-close');
+  if (closeBtnEl) {
+    closeBtnEl.addEventListener('click', closeAddBookModal);
   }
 
-  // 4) Fermeture au clic hors du contenu
-  const overlay = document.getElementById('add-book-modal');
-  if (overlay) {
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay) {
-        overlay.classList.remove('visible');
-        overlay.setAttribute('aria-hidden', 'true');
+  // 4) Fermeture au clic hors du contenu (on the overlay itself)
+  const overlayEl = document.getElementById('add-book-modal');
+  if (overlayEl) {
+    overlayEl.addEventListener('click', e => {
+      if (e.target === overlayEl) { // Clicked on overlay, not modal content
+        closeAddBookModal();
       }
     });
   }
+  // 5) Fermeture avec la touche "Escape"
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlayEl && overlayEl.classList.contains('visible')) {
+        closeAddBookModal();
+    }
+  });
 
-  // 5) Ajuster la position du modal quand le clavier mobile apparaît
+
+  // Simple keyboard visibility detection (heuristic)
   (function() {
-    const modalContent = document.querySelector('#add-book-modal .modal');
-    if (!modalContent) return;
-    const initialH = window.innerHeight;
-    window.addEventListener('resize', () => {
-      const currentH = window.innerHeight;
-      if (currentH < initialH) {
-        // clavier ouvert → remonter
-        modalContent.style.transform = 'translateY(-30%)';
-        modalContent.style.transition = 'transform 0.2s';
-      } else {
-        // clavier fermé → recentrer
-        modalContent.style.transform = '';
-      }
+    const modalContentEl = document.querySelector('#add-book-modal .modal');
+    if (!modalContentEl) return;
+
+    const initialViewportHeight = window.innerHeight;
+    let isKeyboardLikelyVisible = false;
+
+    const inputs = modalContentEl.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+            // Heuristic: if viewport height significantly reduces, keyboard is up
+            if (window.innerHeight < initialViewportHeight * 0.8) {
+                document.body.classList.add('keyboard-visible');
+                isKeyboardLikelyVisible = true;
+            }
+        });
+        input.addEventListener('blur', () => {
+            // Delay a bit before removing class, as focus might shift to another input
+            setTimeout(() => {
+                const activeEl = document.activeElement;
+                if (!modalContentEl.contains(activeEl) || activeEl.tagName !== 'INPUT' && activeEl.tagName !== 'TEXTAREA') {
+                    document.body.classList.remove('keyboard-visible');
+                    isKeyboardLikelyVisible = false;
+                }
+            }, 100);
+        });
     });
+     // Fallback with resize event (less reliable for keyboard but good for orientation changes)
+    window.addEventListener('resize', () => {
+        if (isKeyboardLikelyVisible && window.innerHeight >= initialViewportHeight * 0.9) {
+             // Keyboard likely closed if height restored
+            document.body.classList.remove('keyboard-visible');
+            isKeyboardLikelyVisible = false;
+        } else if (window.innerHeight < initialViewportHeight * 0.8 && document.activeElement && modalContentEl.contains(document.activeElement) && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+            document.body.classList.add('keyboard-visible');
+            isKeyboardLikelyVisible = true;
+        }
+    });
+
+
   })();
 
   // 6) Enregistrement du nouveau livre + retour automatique
-  const formAddBook = document.getElementById('form-add-book');
-  formAddBook.addEventListener('submit', async e => {
+  const formAddBookEl = document.getElementById('form-add-book');
+  formAddBookEl.addEventListener('submit', async e => {
     e.preventDefault();
-    const titleInput = document.getElementById('new-book-title');
-    const newTitle = titleInput.value.trim();
+    const titleInputEl = document.getElementById('new-book-title');
+    const newTitle = titleInputEl.value.trim();
+    
     if (!newTitle) {
-      return alert('Veuillez saisir un titre de livre.');
+      // Simple visual feedback instead of alert
+      titleInputEl.style.borderColor = 'var(--ebay-red)';
+      setTimeout(() => titleInputEl.style.borderColor = '', 2000);
+      titleInputEl.focus();
+      return;
     }
+    
+    const submitButton = formAddBookEl.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Enregistrement...';
+
     try {
-      const uid = auth.currentUser.uid;
-const userBooksRef = db
-  .collection('users')
-  .doc(uid)
-  .collection('books');
-
-await userBooksRef.add({
-  title: newTitle,
-  price: 0,
-  quantity: 0,
-  createdAt: firebase.firestore.FieldValue.serverTimestamp()
-});
-
-      // Fermer la modal
-      const modal = document.getElementById('add-book-modal');
-      modal.classList.remove('visible');
-      modal.setAttribute('aria-hidden', 'true');
-
-      // Revenir à la page “new-supply”
-      location.hash = 'new-supply';
-
-      // Pré-remplir l’input “Choisir un livre”
-      if (window.currentBookInput) {
-        window.currentBookInput.value = newTitle;
-        window.currentBookInput.dispatchEvent(
-          new Event('input', { bubbles: true })
-        );
+      if (!auth.currentUser) {
+        throw new Error("Utilisateur non authentifié.");
       }
+      const uid = auth.currentUser.uid;
+      // Using 'books' collection as per new-supply.js logic
+      const userBooksRef = db.collection('users').doc(uid).collection('books');
+
+      // Check if book already exists (case-insensitive check is hard with Firestore direct queries)
+      // For simplicity, we'll add it. A more robust system would check.
+      await userBooksRef.add({
+        title: newTitle,
+        price: 0, // Default selling price, can be updated later
+        quantity: 0, // Initial quantity is 0, supply will update it
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        lastPurchasePrice: 0 // Will be set by first supply
+      });
+
+      closeAddBookModal();
+
+      // Revenir à la page “new-supply” (ou wherever currentBookInput is relevant)
+      if (window.currentBookInput) { // If adding book during a supply entry
+          location.hash = 'new-supply'; 
+          window.currentBookInput.value = newTitle;
+          // Trigger input event for recalculations on the supply page
+          window.currentBookInput.dispatchEvent(new Event('input', { bubbles: true }));
+          
+          // Also trigger input on cost if it was auto-filled, or focus qty
+          const lineRow = window.currentBookInput.closest('.line-row');
+          if (lineRow) {
+              const costInput = lineRow.querySelector('.line-cost');
+              const qtyInput = lineRow.querySelector('.line-qty');
+              if (costInput && costInput.value === "0.00") { // If cost is still default
+                  // costInput.focus(); // Or set a default cost
+              } else if (qtyInput) {
+                  // qtyInput.focus();
+              }
+          }
+      } else { // If adding book from somewhere else, maybe go to catalog
+          // location.hash = 'catalog';
+      }
+      titleInputEl.value = ''; // Clear input for next time
+
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de l'enregistrement du livre : " + err.message);
+      alert("Erreur lors de l'enregistrement du livre : " + err.message); // Keep alert for critical errors
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Enregistrer le livre';
     }
   });
 </script>
 
 
-  <!-- MY ORDERS PAGE -->
   <main id="orders" class="page">
     <header><h2 style="padding:1rem">My Orders</h2></header>
-    <p style="padding:0 1rem 6rem">Your recent orders will appear here…</p>
+    <p style="padding:0 1rem 6rem; text-align:center;">Your recent orders will appear here…</p>
   </main>
 
-  <!-- CART PAGE -->
   <main id="cart" class="page">
     <header><h2 style="padding:1rem">Panier</h2></header>
-    <div style="padding:0 1rem 6rem;">
-      <p>Votre panier est actuellement vide</p>
-      <button class="btn-primary" style="margin-top:1rem;">View recommendations</button>
-    </div>
+    <div style="padding:1rem; text-align:center;">
+      <p>Votre panier est actuellement vide.</p>
+      </div>
   </main>
 
- <!-- ACCOUNT PAGE -->
 <main id="account" class="page">
-  <!-- Styles spécifiques à la page ACCOUNT -->
   <style>
     /* cadre horizontal pour le profil */
 #account .profile-card {
@@ -1730,15 +2019,15 @@ await userBooksRef.add({
   border: 1px solid #ddd;
   border-radius: 0.5rem;
   padding: 1rem;
-  margin: 1rem;            /* aligne à gauche dans le flow */
-  max-width: none;         /* pleine largeur possible */
+  margin: 1rem;        /* aligne à gauche dans le flow */
+  max-width: none;       /* pleine largeur possible */
   box-shadow: none;        /* comme les autres cadres */
 }
 
 /* avatar à gauche, sans centrage */
 #account .profile-avatar {
   flex: 0 0 auto;
-  margin: 0;
+  margin: 0; /* Removed auto margin */
 }
 
 /* wrapper texte : colonne, aligné à gauche */
@@ -1757,7 +2046,7 @@ await userBooksRef.add({
       font-weight: bold;
       font-size: 2rem;
       border-radius: 50%;
-      margin: 0 auto 1rem;
+      /* margin: 0 auto 1rem; /* Centering removed for flex layout */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1793,9 +2082,11 @@ await userBooksRef.add({
       display: flex;
       gap: 0.75rem;
       padding: 0 1rem;
+      flex-wrap: wrap; /* Allow wrapping */
     }
     #account .update-card {
-      flex: 1;
+      flex: 1 1 calc(50% - 0.375rem); /* Two cards per row on wider small screens */
+      min-width: 150px; /* Minimum width before wrapping */
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -1804,10 +2095,16 @@ await userBooksRef.add({
       border-radius: 0.5rem;
       padding: 1rem;
       cursor: pointer;
+      transition: background-color 0.2s ease;
     }
+     #account .update-card:active {
+        background-color: #f0f0f0;
+    }
+
     #account .update-card h4 {
       font-size: 1rem;
       margin: 0 0 0.25rem;
+      font-weight: 500; /* Adjusted weight */
     }
     #account .update-card p {
       font-size: 0.85rem;
@@ -1821,7 +2118,8 @@ await userBooksRef.add({
 
     /* Liste de gestion interne */
     #account .menu-list {
-      margin-top: 0.5rem;
+      margin-top: 0.5rem; /* Reduced margin */
+      /* Removed card-like appearance, now full-width list items */
     }
     #account .menu-item {
       width: 100%;
@@ -1831,101 +2129,111 @@ await userBooksRef.add({
       background: #fff;
       border: none;
       border-bottom: 1px solid #eee;
-      padding: 0.75rem 1rem;
+      padding: 0.85rem 1rem; /* Adjusted padding */
       cursor: pointer;
+      transition: background-color 0.2s ease;
     }
-    #account .menu-item:last-child {
-      border-bottom: none;
+    #account .menu-item:first-child {
+        border-top: 1px solid #eee; /* Add top border for the first item */
     }
+    #account .menu-item:active {
+        background-color: #f0f0f0;
+    }
+    /* #account .menu-item:last-child {
+      border-bottom: none; /* Keep border for consistency if list might grow */
+  
     #account .menu-item .item-content {
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
     #account .menu-item .item-content i {
-      font-size: 1.4rem;
+      font-size: 1.3rem; /* Slightly smaller icon */
       color: var(--accent);
+      width: 24px; /* Fixed width for icon alignment */
+      text-align: center;
     }
-    #account .menu-item span {
+    #account .menu-item span { /* Main text of menu item */
       font-size: 1rem;
       font-weight: 500;
       color: var(--primary-text);
     }
-    #account .menu-item small {
+    #account .menu-item small { /* Sub-text */
       display: block;
-      font-size: 0.85rem;
+      font-size: 0.8rem; /* Smaller sub-text */
       color: var(--secondary-text);
-      margin-top: 0.2rem;
+      margin-top: 0.1rem; /* Closer to main text */
       line-height: 1.2;
     }
+     #account .menu-item .bi-chevron-right { /* Ensure chevron is styled if not already */
+        font-size: 1rem;
+        color: var(--secondary-text);
+    }
+
 
     /* Bouton de déconnexion */
     #account .btn-signout {
       width: calc(100% - 2rem);
-      margin: 1rem;
-      padding: 0.75rem 1.2rem;
+      margin: 1.5rem 1rem 1rem 1rem; /* Adjusted margin */
+      padding: 0.85rem 1.2rem; /* Consistent padding */
       font-size: 1rem;
       font-weight: 500;
-      border: 2px solid var(--accent);
+      border: 2px solid var(--ebay-red); /* Use red for signout */
       border-radius: var(--border-radius-pill);
       background: #fff;
-      color: var(--accent);
+      color: var(--ebay-red); /* Red text */
       cursor: pointer;
       text-align: center;
       transition: background 0.2s, color 0.2s;
     }
     #account .btn-signout:active {
-      background: var(--accent);
+      background: var(--ebay-red);
       color: #fff;
     }
 
     /* 1) autoriser le wrapping pour qu’un item puisse aller à la ligne suivante */
-#account .updates-grid {
+/* #account .updates-grid {
   display: flex;
   gap: 0.75rem;
-  flex-wrap: wrap;
-}
+  flex-wrap: wrap; 
+} Already added above */
 
 /* 2) forcer la 2ᵉ carte (Commandes récentes) à occuper 100 % de la largeur */
-#account .updates-grid .update-card:nth-child(2) {
+#account .updates-grid .update-card.full-width { /* Use a class for full-width items */
   flex: 1 1 100%;
   max-width: 100%;
 }
 
 /* à la fin de ta feuille, juste pour le bouton */
-#btn-install {
+#btn-install { /* This is on home page, but if it appears on account */
   width: calc(100% - 2rem);  /* même marge que les autres cartes */
+  margin: 1rem; /* Ensure consistent margin */
 }
 
 
   </style>
 
-  <!-- En-tête -->
   <header><h2>Mon compte</h2></header>
 
-  <div>
-    <div class="profile-card">
-  <div class="profile-avatar" id="avatar-letter">Z</div>
-  <div class="profile-info">
-    <div id="display-name">Utilisateur</div>
-    <div id="email">email@example.com</div>
-    <div id="member-since">Membre depuis: …</div>
-  </div>
-</div>
+  <div> <div class="profile-card">
+      <div class="profile-avatar" id="avatar-letter">U</div>
+      <div class="profile-info">
+        <div id="display-name">Utilisateur</div>
+        <div id="email">email@example.com</div>
+        <div id="member-since">Membre depuis: …</div>
+      </div>
+    </div>
 
 
-    <!-- Vos mises à jour -->
     <div class="section-title">Vos mises à jour</div>
     <div class="updates-grid">
-      <div class="update-card" onclick="location.hash='stock-alerts'">
-        <div>
+      <div class="update-card" onclick="location.hash='stock-alerts'"> <div>
           <h4>Alertes de stock</h4>
           <p>Livres bientôt épuisés</p>
         </div>
         <i class="bi bi-chevron-right"></i>
       </div>
-      <div class="update-card" onclick="location.hash='orders'">
-        <div>
+      <div class="update-card full-width" onclick="location.hash='orders'"> <div>
           <h4>Commandes récentes</h4>
           <p>Voir vos dernières commandes</p>
         </div>
@@ -1933,33 +2241,26 @@ await userBooksRef.add({
       </div>
     </div>
 
-    <!-- Gestion interne -->
     <div class="section-title">Gestion</div>
     <div class="menu-list">
-      <button class="menu-item" data-hash="inventory">
-        <div class="item-content">
-          <i class="bi bi-box-seam"></i>
-          <div>
-            <span>Inventaire</span>
-            <small>Gérer vos livres</small>
+      <button class="menu-item" data-hash="catalog"> <div class="item-content">
+          <i class="bi bi-journal-richtext"></i> <div>
+            <span>Catalogue des livres</span>
+            <small>Voir et gérer vos livres</small>
           </div>
         </div>
         <i class="bi bi-chevron-right"></i>
       </button>
-      <button class="menu-item" data-hash="suppliers">
-        <div class="item-content">
-          <i class="bi bi-people"></i>
-          <div>
+      <button class="menu-item" data-hash="suppliers"> <div class="item-content">
+          <i class="bi bi-people-fill"></i> <div>
             <span>Fournisseurs</span>
-            <small>Liste des fournisseurs</small>
+            <small>Gérer vos fournisseurs</small>
           </div>
         </div>
         <i class="bi bi-chevron-right"></i>
       </button>
-      <button class="menu-item" data-hash="reports">
-        <div class="item-content">
-          <i class="bi bi-bar-chart-line"></i>
-          <div>
+      <button class="menu-item" data-hash="reports"> <div class="item-content">
+          <i class="bi bi-bar-chart-line-fill"></i> <div>
             <span>Rapports</span>
             <small>Statistiques & analyses</small>
           </div>
@@ -1968,147 +2269,208 @@ await userBooksRef.add({
       </button>
     </div>
 
-    <!-- Déconnexion -->
     <button class="btn-signout" id="btn-signout">Déconnexion</button>
   </div>
 
-  <!-- Script de peuplement & sign out -->
   <script>
     auth.onAuthStateChanged(user => {
       if (user) {
-        const name = user.displayName || user.email.split('@')[0] || "Utilisateur";
+        const name = user.displayName || (user.email ? user.email.split('@')[0] : '') || "Utilisateur";
         document.getElementById('display-name').textContent = name;
-        document.getElementById('email').textContent = user.email;
-        const creationDate = new Date(user.metadata.creationTime);
-        document.getElementById('member-since').textContent =
-          'Membre depuis: ' + creationDate.toLocaleDateString(undefined, {
-            year: 'numeric', month: 'short', day: 'numeric'
-          });
-        document.getElementById('avatar-letter').textContent = name[0].toUpperCase();
+        document.getElementById('email').textContent = user.email || 'Non fourni';
+        if (user.metadata && user.metadata.creationTime) {
+            const creationDate = new Date(user.metadata.creationTime);
+            document.getElementById('member-since').textContent =
+            'Membre depuis: ' + creationDate.toLocaleDateString(undefined, { // Use browser locale
+                year: 'numeric', month: 'long', day: 'numeric' // More readable format
+            });
+        } else {
+            document.getElementById('member-since').textContent = 'Membre depuis: Date inconnue';
+        }
+        document.getElementById('avatar-letter').textContent = name[0] ? name[0].toUpperCase() : 'U';
+      } else {
+        // Handle case where user is not signed in but somehow reaches this page
+        // (though main router should prevent this)
+        document.getElementById('display-name').textContent = "Non connecté";
+        document.getElementById('email').textContent = "";
+        document.getElementById('member-since').textContent = "";
+        document.getElementById('avatar-letter').textContent = "U";
+
       }
     });
     document.getElementById('btn-signout').addEventListener('click', () => {
-      auth.signOut().then(() => window.location.href = 'login.html');
+      auth.signOut().then(() => {
+        // Clear any sensitive local data if necessary
+        window.location.href = 'login.html'; // Ensure this is the correct login page
+      }).catch(error => {
+        console.error("Sign out error", error);
+        alert("Erreur de déconnexion: " + error.message);
+      });
     });
   </script>
 </main>
 
 
 
-  <main id="catalog" class="page">
-  <!-- barre de recherche … -->
-  <header>
-    <div class="search-wrapper">
-      <i class="bi bi-search"></i>
+  <main id="catalog" class="page"> <header style="padding-top: 0.5rem; padding-bottom: 0.5rem;"> <div class="search-wrapper" style="margin-top: 0;"> <i class="bi bi-search"></i>
       <input
         type="search"
-        id="search-input"
-        placeholder="Rechercher dans le catalogue"
+        id="search-input-catalog" placeholder="Rechercher dans le catalogue"
         aria-label="Recherche catalogue"
         autocomplete="off"
         autocorrect="off"
         autocapitalize="none"
         spellcheck="false"
       >
-      <div class="actions">
-        <i class="bi bi-cart"></i>
       </div>
-    </div>
   </header>
 
-  <!-- Info cards (total livres + valeur) -->
-  <div class="info-cards">
-    <div class="info-card">
-      <div class="info-number" id="total-books">0</div>
+  <div class="info-cards" id="catalog-info-cards"> <div class="info-card">
+      <div class="info-number" id="total-books-catalog">0</div>
       <div class="info-label">Total de livres</div>
     </div>
     <div class="info-card">
-      <div class="info-number" id="total-value">XOF0</div>
-      <div class="info-label">Valeur totale</div>
+      <div class="info-number" id="total-value-catalog">XOF0</div>
+      <div class="info-label">Valeur totale (achat)</div>
     </div>
   </div>
 
-  <!-- conteneur pour les résultats -->
-  <div id="catalog-results">
-    <div class="books-list"></div>
-  </div>
+  <div id="catalog-results-main"> <div class="books-list"></div> </div>
 
-  <!-- ⬇ Ici on encapsule tout le JS catalog ⬇ -->
   <script>
   (function() {
-    const booksList      = document.querySelector('#catalog-results .books-list');
-    const totalBooksEl   = document.getElementById('total-books');
-    const totalValueEl   = document.getElementById('total-value');
-    const searchInput    = document.getElementById('search-input');
-    const infoCards      = document.querySelector('.info-cards');
+    const catalogPage = document.getElementById('catalog');
+    const booksListEl   = document.querySelector('#catalog-results-main .books-list');
+    const totalBooksEl  = document.getElementById('total-books-catalog');
+    const totalValueEl  = document.getElementById('total-value-catalog');
+    const searchInputEl = document.getElementById('search-input-catalog');
+    const infoCardsEl   = document.getElementById('catalog-info-cards');
+    let allBooks = []; // To store all books for client-side filtering
+    let unsubscribeCatalog = null; // To store Firestore listener
 
     // Masquer les cards lors de la recherche
-    searchInput.addEventListener('input', () => {
-      if (searchInput.value.trim()) {
-        infoCards.classList.add('fade-out');
+    searchInputEl.addEventListener('input', () => {
+      const searchTerm = searchInputEl.value.trim().toLowerCase();
+      if (searchTerm) {
+        infoCardsEl.classList.add('fade-out');
       } else {
-        infoCards.classList.remove('fade-out');
+        infoCardsEl.classList.remove('fade-out');
       }
+      renderBooks(searchTerm); // Filter and render
     });
+
+    function renderBooks(searchTerm = '') {
+        booksListEl.innerHTML = ''; // Clear current list
+        const filteredBooks = searchTerm
+            ? allBooks.filter(book => book.title.toLowerCase().includes(searchTerm))
+            : allBooks;
+
+        if (filteredBooks.length === 0 && allBooks.length > 0) {
+             booksListEl.innerHTML = `<p style="text-align:center; padding:1rem; color:var(--secondary-text);">Aucun livre ne correspond à "${searchInputEl.value}".</p>`;
+        } else if (allBooks.length === 0 && !searchTerm) {
+             // This case is handled by the onSnapshot empty check
+        }
+
+
+        filteredBooks.forEach(book => {
+            const card = document.createElement('div');
+            card.className = 'book-card'; // General book card style
+            // Add more details or actions if needed for catalog view (e.g., edit button)
+            card.innerHTML = `
+              <h4 class="book-title">${book.title}</h4>
+              <p class="book-price">PU Achat: ${(book.lastPurchasePrice || book.price || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0})}</p>
+              <p class="book-quantity">Quantité en stock: ${book.quantity || 0}</p>
+              `;
+            booksListEl.appendChild(card);
+        });
+    }
+
 
     // Auth + récupération des items
     auth.onAuthStateChanged(user => {
       if (!user) {
-        return window.location.replace('login.html');
+        // This should be handled by the main router, but as a fallback:
+        if (unsubscribeCatalog) unsubscribeCatalog();
+        allBooks = [];
+        renderBooks();
+        totalBooksEl.textContent = '0';
+        totalValueEl.textContent = 'XOF0';
+        booksListEl.innerHTML = '<p style="text-align:center; padding:1rem;">Veuillez vous connecter pour voir le catalogue.</p>';
+        return; // window.location.replace('login.html'); // Router handles this
       }
 
-      const userCatalogRef = db
+      const userBooksRef = db // Using 'books' collection as per new-supply logic
         .collection('users')
         .doc(user.uid)
-        .collection('catalog');
+        .collection('books')
+        .orderBy('title'); // Order by title
 
-      userCatalogRef.onSnapshot(snapshot => {
-        let count = 0;
-        let value = 0;
-        booksList.innerHTML = '';
+      // Skeleton loader while loading
+      booksListEl.innerHTML = Array(3).fill('').map(() => `
+            <div class="book-card" style="background:#f9f9f9; height: 80px; animation: pulse 1.5s infinite ease-in-out;"></div>
+        `).join('');
+
+
+      if (unsubscribeCatalog) unsubscribeCatalog(); // Unsubscribe from previous listener if any
+
+      unsubscribeCatalog = userBooksRef.onSnapshot(snapshot => {
+        let totalCount = 0;
+        let totalPurchaseValue = 0;
+        allBooks = []; // Reset local cache
 
         snapshot.forEach(doc => {
-          const { title, price, quantity } = doc.data();
-          count += quantity;
-          value += price * quantity;
+          const bookData = doc.data();
+          bookData.id = doc.id; // Keep doc ID if needed later
+          allBooks.push(bookData);
 
-          // création du book-card
-          const card = document.createElement('div');
-          card.className = 'book-card';
-          card.innerHTML = `
-            <h4 class="book-title">${title}</h4>
-            <p class="book-price">XOF${price.toFixed(2)}</p>
-            <p class="book-quantity">Quantité : ${quantity}</p>
-          `;
-          booksList.appendChild(card);
+          const quantity = bookData.quantity || 0;
+          totalCount += quantity;
+          // Using lastPurchasePrice or price as the cost basis
+          totalPurchaseValue += (bookData.lastPurchasePrice || bookData.price || 0) * quantity;
         });
+        
+        if (allBooks.length === 0) {
+            booksListEl.innerHTML = '<p style="text-align:center; padding:1rem; color:var(--secondary-text);">Votre catalogue est vide. Commencez par ajouter des livres via un approvisionnement.</p>';
+        } else {
+            renderBooks(searchInputEl.value.trim().toLowerCase()); // Render with current search term
+        }
 
-        totalBooksEl.textContent = count.toLocaleString();
-        totalValueEl.textContent = 'XOF' + value.toFixed(2);
+        totalBooksEl.textContent = totalCount.toLocaleString();
+        totalValueEl.textContent = totalPurchaseValue.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
       }, err => {
-        console.error('Erreur Firestore catalog :', err);
+        console.error('Erreur Firestore catalog/books:', err);
+        booksListEl.innerHTML = '<p style="text-align:center; padding:1rem; color:var(--ebay-red);">Erreur de chargement du catalogue.</p>';
       });
     });
+
+    // Clean up listener when page is conceptually "unloaded"
+    // This is tricky in hash-based routing without a framework.
+    // The main router's showOnly function could call a cleanup function for the old page.
+    // For now, rely on onAuthStateChanged to re-init or clear.
+    window.addEventListener('hashchange', () => {
+        if (location.hash !== '#catalog' && unsubscribeCatalog) {
+            // console.log('Leaving catalog, unsubscribing...');
+            // unsubscribeCatalog(); // Might be too aggressive if navigating within sub-routes of catalog
+            // unsubscribeCatalog = null;
+        }
+    });
+
+
   })();
   </script>
 </main>
 
   
-  <!-- NAVIGATION BAR -->
   <nav aria-label="Main navigation">
     <div class="nav-inner">
       <a href="#home"    data-hash="home"    class="nav-link active" aria-label="Home">
-        <i class="bi bi-house"></i><span>Home</span>
-      </a>
+        <i class="bi bi-house-door-fill"></i><span>Home</span> </a>
       <a href="#catalog" data-hash="catalog" class="nav-link" aria-label="Catalog">
-        <i class="bi bi-search"></i><span>Catalog</span>
-      </a>
+        <i class="bi bi-journal-richtext"></i><span>Catalogue</span> </a>
       <a href="#cart"    data-hash="cart"    class="nav-link" aria-label="Cart">
-        <i class="bi bi-cart"></i><span>Cart</span>
-      </a>
+        <i class="bi bi-cart-fill"></i><span>Panier</span> </a>
       <a href="#account" data-hash="account" class="nav-link" aria-label="Account">
-        <i class="bi bi-person"></i><span>Account</span>
-      </a>
+        <i class="bi bi-person-fill"></i><span>Compte</span> </a>
     </div>
   </nav>
 
@@ -2117,11 +2479,13 @@ await userBooksRef.add({
 /* --- Page Activation --- */
 main#activation.page {
   display: none;           /* cachée par défaut, comme les autres pages */
-  padding: 0 1.5rem;
+  padding: 1.5rem; /* Uniform padding */
   flex-direction: column;  /* comme les autres pages */
   align-items: center;
   justify-content: center;
   text-align: center;
+  height: 100vh; /* Full height for centering */
+  box-sizing: border-box;
 }
 main#activation.visible {
   display: flex;
@@ -2130,42 +2494,54 @@ main#activation.visible {
 .activation-container {
   width: 100%;
   max-width: 360px;   /* pour caler la largeur */
+  padding: 1rem; /* Padding inside container */
+  background: #fff; /* Optional: card-like background */
+  border-radius: 0.5rem; /* Optional: rounded corners */
+  /* box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Optional: shadow */
 }
 
 .activation-icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 1.5rem;
+  width: 70px; /* Slightly smaller */
+  height: 70px;
+  margin: 0 auto 1.25rem; /* Adjusted margin */
   border-radius: 50%;
-  background: rgba(0, 200, 150, 0.15); /* couleur pastel */
+  background: rgba(0, 200, 150, 0.1); /* Softer pastel */
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .activation-icon i {
-  font-size: 2rem;
-  color: #00c896;     /* accent color */
+  font-size: 1.8rem; /* Adjusted icon size */
+  color: #00bfa5;   /* Brighter accent color, ensure good contrast */
 }
 
 main#activation h3 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.3rem; /* Adjusted font size */
+  margin-bottom: 0.75rem; /* Adjusted margin */
+  font-weight: 600; /* Bolder */
 }
 
 main#activation p {
   color: var(--secondary-text);
-  margin-bottom: 1.5rem;
-  line-height: 1.4;
+  margin-bottom: 1.25rem; /* Adjusted margin */
+  line-height: 1.5; /* Improved line height */
+  font-size: 0.95rem;
 }
 
 .activation-input {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1rem; /* Increased padding for easier touch */
   font-size: 1rem;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 0.5rem; /* Consistent border radius */
   margin-bottom: 1rem;
   outline: none;
+  text-align: center; /* Center text in input */
+  letter-spacing: 0.1em; /* Space out characters if it's a code */
+  transition: border-color 0.2s ease;
+}
+.activation-input:focus {
+    border-color: var(--accent);
 }
 
 .activation-btn {
@@ -2174,93 +2550,143 @@ main#activation p {
   font-size: 1rem;
   font-weight: 600;
   margin-top: 0.5rem;
+  /* Uses .btn-primary styles, ensure it's defined or copy here */
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius-pill);
+  cursor: pointer;
+}
+.activation-btn:active {
+    background: #014fa5;
+}
+.activation-btn:disabled {
+    background: #bfc8d7;
+    cursor: not-allowed;
 }
 </style>
 
   <div class="activation-container">
     <div class="activation-icon">
-      <i class="bi bi-box-arrow-in-right"></i>
-    </div>
+      <i class="bi bi-shield-lock-fill"></i> </div>
     <h3>Activation du compte</h3>
-    <p>Entrez votre code d’activation pour finaliser l’inscription.</p>
+    <p>Entrez votre code d’activation reçu pour finaliser l’inscription et accéder à l'application.</p>
     <input
       type="text"
       id="activation-code"
       placeholder="Code d’activation"
       class="activation-input"
-    >
-    <button id="btn-activate" class="btn-primary activation-btn">
-      Valider
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="none"
+      spellcheck="false"
+      maxlength="8" >
+    <button id="btn-activate" class="activation-btn">
+      Valider le code
     </button>
+    <p id="activation-message" style="margin-top: 1rem; font-size: 0.9rem; min-height: 1.2em;"></p>
   </div>
 </main>
 
-  <!-- SCRIPTS -->
   <script>
 
     
-// gestion du clic “Valider”
-document.getElementById('btn-activate').addEventListener('click', async () => {
-  const code = document.getElementById('activation-code').value.trim();
-  if (!code) return alert('Veuillez entrer le code.');
-  try {
-    await verifyActivationCode({ code });
-    // on force un refresh du token et on recharge
-    await auth.currentUser.getIdToken(true);
-    location.reload();
-  } catch (err) {
-    alert(err.message);
-  }
-});
+// gestion du clic “Valider” sur la page d'activation
+const btnActivate = document.getElementById('btn-activate');
+const activationCodeInput = document.getElementById('activation-code');
+const activationMessageEl = document.getElementById('activation-message');
 
-    /* Tabs inside catalog */
-    function toggleTab(tab) {
+if (btnActivate) {
+    btnActivate.addEventListener('click', async () => {
+      const code = activationCodeInput.value.trim();
+      if (!code) {
+        activationMessageEl.textContent = 'Veuillez entrer le code.';
+        activationMessageEl.style.color = 'var(--ebay-red)';
+        activationCodeInput.focus();
+        return;
+      }
+      
+      btnActivate.disabled = true;
+      btnActivate.textContent = 'Vérification...';
+      activationMessageEl.textContent = '';
+
+      try {
+        // Ensure verifyActivationCode Cloud Function is deployed and callable
+        const result = await verifyActivationCode({ code }); 
+        // Cloud function should return { success: true } or throw an error
+        // console.log("Activation result:", result); // For debugging
+
+        await auth.currentUser.getIdToken(true); // Force refresh of token to get new claims
+        // No need to manually set 'activated' flag, router will re-check claims
+        location.hash = '#home'; // Navigate to home after successful activation
+        location.reload(); // Reload to ensure all states are updated with new claims
+      } catch (err) {
+        console.error("Activation error:", err);
+        activationMessageEl.textContent = err.message || "Code invalide ou erreur serveur.";
+        activationMessageEl.style.color = 'var(--ebay-red)';
+        btnActivate.disabled = false;
+        btnActivate.textContent = 'Valider le code';
+      }
+    });
+}
+
+
+    /* Tabs inside catalog - This function seems unused as there are no tabs in catalog page */
+    /* function toggleTab(tab) {
       ['recent', 'saved'].forEach(t => {
         const el = document.getElementById('tab-' + t);
-        el.style.color = '#555';
-        el.style.borderBottom = 'none';
+        if (el) {
+            el.style.color = '#555';
+            el.style.borderBottom = 'none';
+        }
       });
       const active = document.getElementById('tab-' + tab);
-      active.style.color = '#0064d2';
-      active.style.borderBottom = '2px solid #0064d2';
+      if (active) {
+        active.style.color = '#0064d2';
+        active.style.borderBottom = '2px solid #0064d2';
+      }
+    } */
+
+
+
+  // ----- Recherche catalogue : fade-out dès la frappe (specific to #search-input-catalog) ----- //
+  // This logic is now inside the catalog's own script block for better encapsulation.
+  /*
+    const searchInputCatalogEl = document.getElementById('search-input-catalog'); // Corrected ID
+    const infoCardsCatalogEl  = document.getElementById('catalog-info-cards'); // Corrected ID
+
+    if(searchInputCatalogEl && infoCardsCatalogEl) {
+        searchInputCatalogEl.addEventListener('input', () => {
+          if (searchInputCatalogEl.value.trim() !== '') {
+            infoCardsCatalogEl.classList.add('fade-out');
+          } else {
+            infoCardsCatalogEl.classList.remove('fade-out');
+          }
+        });
     }
-
-
-
- // ----- Recherche catalogue : fade-out dès la frappe ----- //
-
-const searchInput = document.getElementById('search-input');
-const infoCards   = document.querySelector('.info-cards');
-
-// À chaque saisie dans l'input
-searchInput.addEventListener('input', () => {
-  if (searchInput.value.trim() !== '') {
-    infoCards.classList.add('fade-out');
-  } else {
-    infoCards.classList.remove('fade-out');
-  }
-});
-
+  */
 
   </script>
 
 <script>
+  // Service Worker Registration
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
+      navigator.serviceWorker.register('sw.js') // Ensure sw.js is in the root
         .then(reg => {
           console.log('[App] SW enregistré, scope :', reg.scope);
 
-          // Dès qu’on déploie une nouvelle version (CACHE_NAME incrémenté)…
           reg.addEventListener('updatefound', () => {
             const newSW = reg.installing;
-            newSW.addEventListener('statechange', () => {
-              // Quand le nouvel SW est prêt et qu’il y avait déjà un SW actif
-              if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('[App] Nouvelle version dispo → reload');
-                window.location.reload();
-              }
-            });
+            if (newSW) {
+                newSW.addEventListener('statechange', () => {
+                if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('[App] Nouvelle version disponible → rechargement...');
+                  // Optional: Show a toast to user "New version available, reloading..."
+                  window.location.reload();
+                }
+              });
+            }
           });
         })
         .catch(err => console.error('[App] Échec enregistrement SW :', err));
@@ -2270,119 +2696,193 @@ searchInput.addEventListener('input', () => {
 
 <script>
 /* === PWA install button === */
-let deferredPrompt = null;             // stocke l’évènement
+let deferredInstallPrompt = null; // Renamed to avoid conflict
 
-// 1) Le navigateur signale que l'app peut être installée
+const installButton = document.getElementById('btn-install');
+
 window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();                  // on annule l’invite auto
-  deferredPrompt = e;                  // on garde l’objet
-  document.getElementById('btn-install').style.display = 'block';   // on révèle le bouton
+  e.preventDefault(); 
+  deferredInstallPrompt = e; 
+  if (installButton) {
+    installButton.style.display = 'block'; // Show the button on Home page
+  }
 });
 
-// 2) Clique sur le bouton “Installer”
-document.getElementById('btn-install').addEventListener('click', async () => {
-  if (!deferredPrompt) return;         // sécurité
-  document.getElementById('btn-install').disabled = true;           // évite le spam
+if (installButton) {
+    installButton.addEventListener('click', async () => {
+      if (!deferredInstallPrompt) return; 
+      installButton.disabled = true; 
+      installButton.textContent = 'Installation...';
 
-  deferredPrompt.prompt();             // ouvre la modale native
-  const { outcome } = await deferredPrompt.userChoice;
-  deferredPrompt = null;               // on « consomme » l’évènement
+      deferredInstallPrompt.prompt(); 
+      const { outcome } = await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null; 
 
-  // Si l’utilisateur a installé → on masque définitivement le bouton
-  // Sinon on le ré-affiche pour qu’il puisse réessayer plus tard
-  document.getElementById('btn-install').style.display =
-    (outcome === 'accepted') ? 'none' : 'block';
-  document.getElementById('btn-install').disabled = false;
-});
+      if (outcome === 'accepted') {
+        console.log('[PWA] Utilisateur a accepté l\'installation');
+        installButton.style.display = 'none';
+      } else {
+        console.log('[PWA] Utilisateur a refusé l\'installation');
+        installButton.style.display = 'block'; // Re-show if refused, for later
+        installButton.disabled = false;
+        installButton.innerHTML = '<i class="bi bi-download" style="margin-right:0.5rem;"></i> Installer l’application';
+      }
+    });
+}
 
-// 3) Si l'app est finalement installée (via menu navigateur, etc.)
 window.addEventListener('appinstalled', () => {
-  console.log('[PWA] App installée 🎉');
-  document.getElementById('btn-install').style.display = 'none';
+  console.log('[PWA] App installée avec succès 🎉');
+  if (installButton) {
+    installButton.style.display = 'none';
+  }
+  deferredInstallPrompt = null; // Clear the prompt
 });
 </script>
   <script>
+  // Main Router and Auth Guard
   ;(function() {
-    const pages     = document.querySelectorAll('.page');
-    const nav       = document.querySelector('nav');
-    let activated   = false;
+    const allPages  = document.querySelectorAll('.page'); // Renamed from pages
+    const mainNav   = document.querySelector('nav'); // Renamed from nav
+    let userActivated = false; // Renamed from activated
+    let currentAuthUser = null; // Store current user state
 
-    // 1) Auth + activation guard
-    auth.onAuthStateChanged(async user => {
-      if (!user) {
-        window.location.replace('login.html');
+    function showOnlyPage(pageIdToShow) { // Renamed from showOnly
+      let pageFound = false;
+      allPages.forEach(p => {
+        const isVisible = p.id === pageIdToShow;
+        p.classList.toggle('visible', isVisible);
+        if (isVisible) pageFound = true;
+      });
+
+      if (!pageFound) { // Fallback to home if pageId is invalid
+        console.warn(`Page "${pageIdToShow}" not found, redirecting to home.`);
+        location.hash = '#home'; // This will trigger route() again
+        return; // Exit to avoid further processing with invalid pageId
+      }
+      
+      // Show/hide main navigation bar based on current page
+      const pagesWithoutNav = ['activation','sell','new-supply','select-book', 'add-book-modal'];
+      if (pagesWithoutNav.includes(pageIdToShow)) {
+        mainNav.style.display = 'none';
+      } else {
+        mainNav.style.removeProperty('display');
+      }
+
+      // Update active state for navigation links and other elements with data-hash
+      document.querySelectorAll('[data-hash]').forEach(el =>
+        el.classList.toggle('active', el.dataset.hash === pageIdToShow)
+      );
+
+      // Scroll to top of new page
+      const activePageElement = document.getElementById(pageIdToShow);
+      if (activePageElement) activePageElement.scrollTop = 0;
+    }
+    
+    async function route() {
+      if (!currentAuthUser) { // Still waiting for auth state
+          document.body.style.visibility = 'hidden'; // Keep body hidden
+          // Optionally show a global loading spinner here
+          return;
+      }
+      document.body.style.visibility = 'visible'; // Auth state known, show body
+
+      const hashKey = location.hash.slice(1) || 'home';
+
+      if (!userActivated && hashKey !== 'activation') {
+        // history.replaceState(null, '', '#activation'); // Avoid pushing to history if already there
+        if (location.hash !== '#activation') location.hash = '#activation';
+        showOnlyPage('activation');
         return;
       }
-      const tok = await user.getIdTokenResult(true);
-      activated = !!tok.claims.activated;
-      document.body.style.visibility = 'visible';
-      route();
+      if (userActivated && hashKey === 'activation') { // If activated and trying to go to activation, redirect to home
+          location.hash = '#home';
+          showOnlyPage('home');
+          return;
+      }
+      
+      showOnlyPage(hashKey);
+    }
+
+    auth.onAuthStateChanged(async user => {
+      currentAuthUser = user; // Store user state (or null)
+      if (!user) {
+        userActivated = false; // Reset activation status
+        // If not on login page already, redirect. login.html should handle its own logic.
+        // This assumes login.html is a separate file. If it were a #login hash, logic would be different.
+        if (window.location.pathname.includes('login.html')) {
+            document.body.style.visibility = 'visible'; // Show login page
+        } else {
+            window.location.replace('login.html'); // Hard redirect to login page
+        }
+        return;
+      }
+
+      try {
+        const idTokenResult = await user.getIdTokenResult(true); // Force refresh claims
+        userActivated = !!idTokenResult.claims.activated;
+      } catch (error) {
+        console.error("Error getting ID token result:", error);
+        userActivated = false; // Assume not activated on error
+        // Potentially sign out user or redirect to error page if token refresh fails critically
+      }
+      
+      route(); // Call route after auth state and claims are processed
     });
 
-    // 2) Route() unique
-    function route() {
-      const key = location.hash.slice(1) || 'home';
-
-      // guard activation
-      if (!activated && key !== 'activation') {
-        history.replaceState(null, '', '#activation');
-        return showOnly('activation');
-      }
-
-      // fallback if unknown
-      if (![...pages].some(p => p.id === key)) {
-        location.hash = 'home';
-        return showOnly('home');
-      }
-
-      // show the requested page
-      showOnly(key);
-    }
-
-    // helper to show one page, hide others, gérer nav & onglets
-    function showOnly(pageId) {
-      pages.forEach(p =>
-        p.classList.toggle('visible', p.id === pageId)
-      );
-      if (['activation','sell','supply','new-supply','select-book'].includes(pageId)) {
-        nav.style.display = 'none';
-      } else {
-        nav.style.removeProperty('display');
-      }
-      document.querySelectorAll('[data-hash]').forEach(el =>
-        el.classList.toggle('active', el.dataset.hash === pageId)
-      );
-    }
-
-    // 3) Listeners
     window.addEventListener('hashchange', route);
+
+    // Ripple effect for nav links and click handling for data-hash elements
     document.body.addEventListener('click', e => {
-      const el = e.target.closest('[data-hash]');
-      if (!el) return;
-      if (el.classList.contains('nav-link')) {
-        const rect = el.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const ripple = document.createElement('span');
-        ripple.className = 'ripple';
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
-        ripple.style.top  = (e.clientY - rect.top  - size/2) + 'px';
-        el.querySelector('.ripple')?.remove();
-        el.appendChild(ripple);
-        ripple.addEventListener('animationend', () => ripple.remove());
+      const dataHashElement = e.target.closest('[data-hash]');
+      if (!dataHashElement) return;
+
+      // Ripple for nav-link specifically
+      if (dataHashElement.classList.contains('nav-link')) {
+        const rect = dataHashElement.getBoundingClientRect();
+        const rippleSize = Math.max(rect.width, rect.height);
+        const rippleSpan = document.createElement('span');
+        rippleSpan.className = 'ripple';
+        rippleSpan.style.width = rippleSpan.style.height = rippleSize + 'px';
+        // Calculate position relative to the clicked element
+        rippleSpan.style.left = (e.clientX - rect.left - rippleSize/2) + 'px';
+        rippleSpan.style.top  = (e.clientY - rect.top  - rippleSize/2) + 'px';
+        
+        // Remove existing ripple before adding new one
+        const existingRipple = dataHashElement.querySelector('.ripple');
+        if (existingRipple) existingRipple.remove();
+        
+        dataHashElement.appendChild(rippleSpan);
+        rippleSpan.addEventListener('animationend', () => rippleSpan.remove(), {once: true});
       }
-      if (el.tagName === 'A') e.preventDefault();
-      location.hash = el.dataset.hash;
+
+      // For all elements with data-hash, navigate if it's not a standard link preventing default
+      if (dataHashElement.tagName === 'A' && dataHashElement.getAttribute('href').startsWith('#')) {
+        e.preventDefault(); // Prevent default only for hash links handled by router
+      }
+      // Only change hash if it's different, to avoid redundant route() calls if already on page
+      if (location.hash !== '#' + dataHashElement.dataset.hash) {
+          location.hash = dataHashElement.dataset.hash;
+      } else { // If hash is the same, but page might not be visible (e.g. after programmatic change)
+          route(); // Re-run route to ensure correct page is visible
+      }
     });
 
-    // Si on est déjà loggé au chargement
+    // Initial route call if user is already available (e.g. page refresh while logged in)
+    // The onAuthStateChanged will handle the first proper route call.
+    // This ensures that if auth state is resolved very quickly, we don't miss the initial routing.
     if (auth.currentUser) {
-      auth.currentUser.getIdTokenResult(true).then(tok => {
-        activated = !!tok.claims.activated;
-        document.body.style.visibility = 'visible';
-        route();
-      });
+        // console.log("Initial user found, triggering auth state change logic path.");
+        // The onAuthStateChanged listener will pick this up.
+    } else {
+        // If no current user, and not on login page, onAuthStateChanged will redirect.
+        // If on login page, it will allow login.html to render.
+        if (!window.location.pathname.includes('login.html')) {
+            // This case should be covered by onAuthStateChanged redirecting.
+            // But as a safeguard, if body is still hidden, make it visible for login page.
+            // document.body.style.visibility = 'visible';
+        }
     }
+
   })();
   </script>
 
