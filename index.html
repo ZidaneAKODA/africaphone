@@ -57,16 +57,16 @@ const verifyActivationCode = fn.httpsCallable('verifyActivationCode');
   <style>
     /* ——— Gestion de la visibilité des “pages” ——— */
 main.page {
-  display: none;             /* cachée par défaut */
-  flex: 1 1 auto;            /* occupe l’espace restant */
-  width: 100%;               /* toute la largeur */
-  overflow-y: auto;          /* scroll interne si besoin */
+  display: none;              /* cachée par défaut */
+  flex: 1 1 auto;             /* occupe l’espace restant */
+  width: 100%;                /* toute la largeur */
+  overflow-y: auto;           /* scroll interne si besoin */
   /* padding-bottom pour laisser la place à la nav en bas */
   padding-bottom: calc(56px + env(safe-area-inset-bottom));
 }
 
 main.page.visible {
-  display: flex;             /* devient visible et flex */
+  display: flex;              /* devient visible et flex */
   flex-direction: column;
 }
 
@@ -242,28 +242,28 @@ main.page.visible {
   gap: 0.5rem;             /* espace réduit */
   padding: 0.5rem 1rem;    /* haut/bas + cotés */
   margin-bottom: 0.5rem;     /* pour espacer du contenu suivant */
-  overflow-x: auto;          /* scroll si besoin */
+  overflow-x: auto;         /* scroll si besoin */
 }
 
 .info-card {
   flex: 1;
-  background: #fff;                  /* fond blanc pour bien contraster */
-  border: 1px solid #ddd;            /* cadre fin, gris clair */
-  border-radius: 0.5rem;             /* bords légèrement arrondis */
-  padding: 0.6rem;                   /* padding interne réduit */
+  background: #fff;                 /* fond blanc pour bien contraster */
+  border: 1px solid #ddd;           /* cadre fin, gris clair */
+  border-radius: 0.5rem;            /* bords légèrement arrondis */
+  padding: 0.6rem;                  /* padding interne réduit */
   text-align: center;
-  min-width: 0;                      /* empêche le dépassement */
+  min-width: 0;                     /* empêche le dépassement */
 }
 
 .info-number {
-  font-size: 1.2rem;                 /* taille de police compacte */
+  font-size: 1.2rem;                /* taille de police compacte */
   font-weight: 600;
   color: var(--ebay-blue);
   line-height: 1.2;
 }
 
 .info-label {
-  font-size: 0.75rem;                /* légende plus petite */
+  font-size: 0.75rem;               /* légende plus petite */
   color: var(--secondary-text);
   margin-top: 0.2rem;
 }
@@ -271,7 +271,7 @@ main.page.visible {
   /* transition douce sur opacité et hauteur */
   transition: opacity 0.3s ease, max-height 0.3s ease, margin-bottom 0.3s ease, padding 0.3s ease;
   /* fixer une hauteur max suffisante pour le contenu */
-  max-height: 200px;         /* ajustez selon la hauteur de vos cards */
+  max-height: 200px;        /* ajustez selon la hauteur de vos cards */
   overflow: hidden;
 }
 
@@ -281,7 +281,7 @@ main.page.visible {
   margin-bottom: 0;
   padding-top: 0;
   padding-bottom: 0;
-  pointer-events: none;      /* pour ne plus capter les clics */
+  pointer-events: none;     /* pour ne plus capter les clics */
 }
 
 
@@ -289,9 +289,9 @@ main.page.visible {
 
 .books-list { /* This is a general .books-list, specific one for #supply will be inside its style tag */
   display: flex;
-  flex-direction: column;      /* vertical stack */
-  gap: 1rem;                   /* space between cards */
-  padding: 1rem;               /* inner spacing */
+  flex-direction: column;     /* vertical stack */
+  gap: 1rem;                  /* space between cards */
+  padding: 1rem;              /* inner spacing */
 }
 
 .book-card { /* General .book-card */
@@ -334,9 +334,9 @@ main#catalog .search-wrapper {
 
 /* 1) On force la carte à 100% de la largeur du conteneur */
 .books-list .book-card { /* Applying to general .book-card inside .books-list */
-  width: 100%;             /* pleine largeur */
-  box-sizing: border-box;    /* inclut le padding/les bordures */
-  margin: 0 auto;            /* centre au cas où tu fixes un max-width */
+  width: 100%;            /* pleine largeur */
+  box-sizing: border-box;   /* inclut le padding/les bordures */
+  margin: 0 auto;           /* centre au cas où tu fixes un max-width */
 }
 
 /* dans ta feuille de styles, après les définitions existantes */
@@ -538,7 +538,7 @@ main#catalog {
         <p class="book-quantity">Quantity: 5</p>
          <button class="btn-add-to-cart" aria-label="Ajouter au panier">
             <i class="bi bi-cart-plus"></i>
-        </button>
+         </button>
       </div>
       </div>
   </div>
@@ -702,9 +702,9 @@ main#catalog {
       100% { opacity: 1; }
     }
     /* Other specific styles for supply page if any, like .search-noresult, .book-card, etc.
-       are assumed to be for other contexts or were general and are overridden/complemented by the above.
-       The .book-card, .book-title etc. from the original CSS in this style block might have been placeholders
-       or for a different list type. The styles above specifically target .supply-batch-card.
+        are assumed to be for other contexts or were general and are overridden/complemented by the above.
+        The .book-card, .book-title etc. from the original CSS in this style block might have been placeholders
+        or for a different list type. The styles above specifically target .supply-batch-card.
     */
     /* Chip “Ajouter un livre” – this was in supply's style but seems for #select-book */
     .search-noresult {
@@ -811,13 +811,13 @@ main#catalog {
             ${supply.lines.map(line => {
               const lineTotal = (line.quantity || 0) * (line.unitCost || 0);
               return `<li>
-                        <span class="item-title">${line.title || 'Titre inconnu'}</span>
-                        <span class="item-details">
-                          <span>Qté: ${line.quantity || 0}</span>
-                          <span>PU: ${(line.unitCost || 0).toLocaleString('fr-FR',{ style:'currency', currency:'XOF', minimumFractionDigits: 0 })}</span>
-                          <span class="item-line-total">Total: ${lineTotal.toLocaleString('fr-FR',{ style:'currency', currency:'XOF', minimumFractionDigits: 0 })}</span>
-                        </span>
-                      </li>`;
+                          <span class="item-title">${line.title || 'Titre inconnu'}</span>
+                          <span class="item-details">
+                            <span>Qté: ${line.quantity || 0}</span>
+                            <span>PU: ${(line.unitCost || 0).toLocaleString('fr-FR',{ style:'currency', currency:'XOF', minimumFractionDigits: 0 })}</span>
+                            <span class="item-line-total">Total: ${lineTotal.toLocaleString('fr-FR',{ style:'currency', currency:'XOF', minimumFractionDigits: 0 })}</span>
+                          </span>
+                        </li>`;
             }).join('')}
           </ul>
         `;
@@ -896,6 +896,7 @@ main#catalog {
     .wizard-nav{position:fixed;left:0;bottom:env(safe-area-inset-bottom);width:100%;
       display:flex;gap:.6rem;padding:.7rem 1rem;background:var(--surface);box-shadow:0 -2px 8px rgba(0,0,0,.09);
       z-index: 50; /* Ensure it's above step content */
+      transition: bottom 0.2s ease-out; /* Added for smooth transition when keyboard appears */
     }
     .btn{flex:1;padding:.8rem;font-size:1rem;font-weight:500;border:none;border-radius:var(--radius); cursor: pointer;}
     .btn.primary{background:var(--accent);color:#fff}.btn.primary:disabled{background:#bfc8d7; cursor: not-allowed;}
@@ -907,8 +908,8 @@ main#catalog {
 
     /* ★ Aspect “bouton” pour le champ Livre */
 .line-row .book-search {
-  background:#f4f4f4;      /* la même couleur que tes autres inputs */
-  cursor:pointer;           /* petit pointeur main */
+  background:#f4f4f4;     /* la même couleur que tes autres inputs */
+  cursor:pointer;          /* petit pointeur main */
 }
 
 /* ★ On masque le curseur texte quand même */
@@ -1126,7 +1127,7 @@ main#catalog {
       /*────────── VARIABLES GLOBALES ──────────*/
       // const db  = firebase.firestore(); // Already global
       // const auth= firebase.auth(); // Already global
-      const suppliers=[];            // charge-les ailleurs si besoin
+      const suppliers=[];           // charge-les ailleurs si besoin
 
       /*────────── RÉFS DOM ──────────*/
       const main      = document.getElementById('new-supply');
@@ -1248,8 +1249,8 @@ additionalCostI.addEventListener('input', () => {
   allocationList.innerHTML = ''; // Clear previous allocations
 
   rows.forEach(r => {
-    const qtyInput    = r.querySelector('.line-qty');
-    const costInput   = r.querySelector('.line-cost');
+    const qtyInput      = r.querySelector('.line-qty');
+    const costInput     = r.querySelector('.line-cost');
     const lineTotalEl = r.querySelector('.line-total');
     const bookSearchInput = r.querySelector('.book-search');
 
@@ -1407,7 +1408,7 @@ function toggleStep2Next() {
         // let sup=suppliers.find(s=>s.name===supplierNameValue); // Assuming suppliers array is populated elsewhere
         // For now, just use the name. A robust system would use supplier IDs.
         // if(!sup){const ref=await db.collection('suppliers').add({name:supplierNameValue});
-        //           sup={id:ref.id,name:supplierNameValue}}
+        //         sup={id:ref.id,name:supplierNameValue}}
         
         const supplyLinesData=[...linesC.children].map(r=>({
           title:r.querySelector('.book-search').value,
@@ -1500,6 +1501,82 @@ function toggleStep2Next() {
       // if (linesC.children.length === 0) {
       //    addLine();
       // }
+
+      // ----- START: Keyboard adjustment logic for Supplier Input -----
+      const supplierSearchField = main.querySelector('#supplier-search'); // This is 'supplierI'
+      const step1Element = main.querySelector('.step[data-step="1"]');
+      const step1WizardNav = step1Element ? step1Element.querySelector('.wizard-nav') : null;
+
+      function onSupplierSearchFocus() {
+        if (!step1WizardNav || !step1Element) return;
+
+        // Make sure VisualViewport API is available
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', adjustLayoutForKeyboard);
+            adjustLayoutForKeyboard(); // Call immediately to set initial state if keyboard is already up
+        } else {
+            // Fallback for browsers without VisualViewport API (less accurate)
+            // You could add a class to the body and use CSS to attempt adjustments
+            // e.g., document.body.classList.add('keyboard-active-fallback');
+            console.warn('VisualViewport API not supported. Keyboard adjustments might be less accurate.');
+        }
+      }
+
+      function onSupplierSearchBlur() {
+        if (window.visualViewport) {
+            window.visualViewport.removeEventListener('resize', adjustLayoutForKeyboard);
+        }
+
+        // Revert styles to CSS-defined values
+        if (step1WizardNav) {
+            step1WizardNav.style.bottom = ''; 
+        }
+        if (step1Element) {
+            step1Element.style.paddingBottom = '';
+        }
+        // if fallback class was added: document.body.classList.remove('keyboard-active-fallback');
+      }
+
+      function adjustLayoutForKeyboard() {
+        // Ensure elements are still valid and input is focused
+        if (!step1WizardNav || !step1Element || document.activeElement !== supplierSearchField) {
+            // If input lost focus or elements are gone, try to clean up.
+            // This might happen if user navigates away while input is focused.
+            // The blur handler should ideally manage this.
+            if (window.visualViewport && document.activeElement !== supplierSearchField) {
+                 window.visualViewport.removeEventListener('resize', adjustLayoutForKeyboard);
+                 if (step1WizardNav) step1WizardNav.style.bottom = '';
+                 if (step1Element) step1Element.style.paddingBottom = '';
+            }
+            return;
+        }
+
+        const visualViewport = window.visualViewport;
+        // Calculate the height of the area obscured by the keyboard at the bottom
+        const keyboardHeight = window.innerHeight - (visualViewport.offsetTop + visualViewport.height);
+
+        if (keyboardHeight > 50) { // Heuristic: if keyboard is significantly up (e.g., more than 50px)
+            // Position wizard-nav right above the keyboard
+            step1WizardNav.style.bottom = keyboardHeight + 'px';
+            
+            // Adjust padding-bottom of the step content area
+            // to ensure content can scroll above the (keyboard + wizard-nav)
+            const navHeight = step1WizardNav.offsetHeight; // Get actual height of the nav bar
+            step1Element.style.paddingBottom = (keyboardHeight + navHeight + 15) + 'px'; // keyboard + nav + 15px buffer
+        } else {
+            // Keyboard is likely not up or not obscuring significantly
+            // Revert to original CSS-defined styles
+            step1WizardNav.style.bottom = ''; 
+            step1Element.style.paddingBottom = '';
+        }
+      }
+
+      if (supplierSearchField) {
+        supplierSearchField.addEventListener('focus', onSupplierSearchFocus);
+        supplierSearchField.addEventListener('blur', onSupplierSearchBlur);
+      }
+      // ----- END: Keyboard adjustment logic -----
+
     })();
   </script>
 </main>
@@ -1685,8 +1762,8 @@ function toggleStep2Next() {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
-  display: none;               /* caché par défaut */
-  overflow: hidden;            /* empêche le scroll du fond */
+  display: none;            /* caché par défaut */
+  overflow: hidden;         /* empêche le scroll du fond */
   height: 100vh; /* Full viewport height */
   width: 100vw;  /* Full viewport width */
   align-items: center; /* Center vertically */
@@ -1696,7 +1773,7 @@ function toggleStep2Next() {
 
 /* quand on veut l’afficher */
 #add-book-modal.modal-overlay.visible {
-  display: flex;               /* on passe en flex (centrage) */
+  display: flex;            /* on passe en flex (centrage) */
 }
 
 /* le conteneur interne */
@@ -1797,22 +1874,22 @@ body.keyboard-visible #add-book-modal .modal {
       <button class="modal-close" aria-label="Fermer">&times;</button>
     </header>
     <div class="modal-content"> <form id="form-add-book">
-          <div class="form-group">
-            <label for="new-book-title">Titre du livre</label>
-            <input
-              type="search" /* Changed to search for better mobile keyboard */
-              id="new-book-title"
-              placeholder="Ex: Le Petit Prince"
-              autocomplete="off"
-              autocorrect="off"
-              autocapitalize="sentences" /* Sensible for titles */
-              enterkeyhint="done" 
-              spellcheck="false"
-              required
-            >
-          </div>
-          <button type="submit">Enregistrer le livre</button>
-        </form>
+        <div class="form-group">
+          <label for="new-book-title">Titre du livre</label>
+          <input
+            type="search" /* Changed to search for better mobile keyboard */
+            id="new-book-title"
+            placeholder="Ex: Le Petit Prince"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="sentences" /* Sensible for titles */
+            enterkeyhint="done" 
+            spellcheck="false"
+            required
+          >
+        </div>
+        <button type="submit">Enregistrer le livre</button>
+      </form>
     </div>
   </div>
 </main>
@@ -1885,38 +1962,46 @@ body.keyboard-visible #add-book-modal .modal {
     const modalContentEl = document.querySelector('#add-book-modal .modal');
     if (!modalContentEl) return;
 
-    const initialViewportHeight = window.innerHeight;
+    let initialViewportHeight = window.innerHeight; // Let, so it can be updated on resize
     let isKeyboardLikelyVisible = false;
 
     const inputs = modalContentEl.querySelectorAll('input, textarea');
     inputs.forEach(input => {
         input.addEventListener('focus', () => {
+            initialViewportHeight = window.innerHeight; // Capture current height before keyboard
             // Heuristic: if viewport height significantly reduces, keyboard is up
-            if (window.innerHeight < initialViewportHeight * 0.8) {
+            // This check will be more effective inside a resize listener triggered after focus
+            // For now, we set a flag and let resize handle it.
+            isKeyboardLikelyVisible = true; 
+            // A slight delay to allow keyboard to animate and viewport to resize
+            setTimeout(() => {
+              if (window.innerHeight < initialViewportHeight * 0.85) { // Check after delay
                 document.body.classList.add('keyboard-visible');
-                isKeyboardLikelyVisible = true;
-            }
+              }
+            }, 100);
         });
         input.addEventListener('blur', () => {
+            isKeyboardLikelyVisible = false;
             // Delay a bit before removing class, as focus might shift to another input
+            // or keyboard might take time to dismiss.
             setTimeout(() => {
                 const activeEl = document.activeElement;
-                if (!modalContentEl.contains(activeEl) || activeEl.tagName !== 'INPUT' && activeEl.tagName !== 'TEXTAREA') {
+                // If no input in the modal is active, assume keyboard is gone or going.
+                if (!modalContentEl.contains(activeEl) || (activeEl.tagName !== 'INPUT' && activeEl.tagName !== 'TEXTAREA')) {
                     document.body.classList.remove('keyboard-visible');
-                    isKeyboardLikelyVisible = false;
                 }
-            }, 100);
+            }, 150);
         });
     });
      // Fallback with resize event (less reliable for keyboard but good for orientation changes)
     window.addEventListener('resize', () => {
-        if (isKeyboardLikelyVisible && window.innerHeight >= initialViewportHeight * 0.9) {
-             // Keyboard likely closed if height restored
-            document.body.classList.remove('keyboard-visible');
-            isKeyboardLikelyVisible = false;
-        } else if (window.innerHeight < initialViewportHeight * 0.8 && document.activeElement && modalContentEl.contains(document.activeElement) && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
-            document.body.classList.add('keyboard-visible');
-            isKeyboardLikelyVisible = true;
+        if (isKeyboardLikelyVisible) { // Only adjust if an input was recently focused
+            if (window.innerHeight < initialViewportHeight * 0.85) {
+                 document.body.classList.add('keyboard-visible');
+            } else if (window.innerHeight >= initialViewportHeight * 0.95) { // Keyboard likely closed if height restored
+                document.body.classList.remove('keyboard-visible');
+                // isKeyboardLikelyVisible = false; // Reset flag if keyboard is confirmed down
+            }
         }
     });
 
@@ -2019,9 +2104,9 @@ body.keyboard-visible #add-book-modal .modal {
   border: 1px solid #ddd;
   border-radius: 0.5rem;
   padding: 1rem;
-  margin: 1rem;        /* aligne à gauche dans le flow */
-  max-width: none;       /* pleine largeur possible */
-  box-shadow: none;        /* comme les autres cadres */
+  margin: 1rem;       /* aligne à gauche dans le flow */
+  max-width: none;      /* pleine largeur possible */
+  box-shadow: none;       /* comme les autres cadres */
 }
 
 /* avatar à gauche, sans centrage */
@@ -2141,7 +2226,7 @@ body.keyboard-visible #add-book-modal .modal {
     }
     /* #account .menu-item:last-child {
       border-bottom: none; /* Keep border for consistency if list might grow */
-  
+    
     #account .menu-item .item-content {
       display: flex;
       align-items: center;
@@ -2368,7 +2453,7 @@ body.keyboard-visible #add-book-modal .modal {
         if (filteredBooks.length === 0 && allBooks.length > 0) {
              booksListEl.innerHTML = `<p style="text-align:center; padding:1rem; color:var(--secondary-text);">Aucun livre ne correspond à "${searchInputEl.value}".</p>`;
         } else if (allBooks.length === 0 && !searchTerm) {
-             // This case is handled by the onSnapshot empty check
+            // This case is handled by the onSnapshot empty check
         }
 
 
@@ -2681,13 +2766,13 @@ if (btnActivate) {
             if (newSW) {
                 newSW.addEventListener('statechange', () => {
                 if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('[App] Nouvelle version disponible → rechargement...');
-                  // Optional: Show a toast to user "New version available, reloading..."
-                  window.location.reload();
+                    console.log('[App] Nouvelle version disponible → rechargement...');
+                    // Optional: Show a toast to user "New version available, reloading..."
+                    window.location.reload();
                 }
-              });
+                });
             }
-          });
+            });
         })
         .catch(err => console.error('[App] Échec enregistrement SW :', err));
     });
@@ -2780,9 +2865,9 @@ window.addEventListener('appinstalled', () => {
     
     async function route() {
       if (!currentAuthUser) { // Still waiting for auth state
-          document.body.style.visibility = 'hidden'; // Keep body hidden
-          // Optionally show a global loading spinner here
-          return;
+         document.body.style.visibility = 'hidden'; // Keep body hidden
+         // Optionally show a global loading spinner here
+         return;
       }
       document.body.style.visibility = 'visible'; // Auth state known, show body
 
@@ -2795,9 +2880,9 @@ window.addEventListener('appinstalled', () => {
         return;
       }
       if (userActivated && hashKey === 'activation') { // If activated and trying to go to activation, redirect to home
-          location.hash = '#home';
-          showOnlyPage('home');
-          return;
+         location.hash = '#home';
+         showOnlyPage('home');
+         return;
       }
       
       showOnlyPage(hashKey);
@@ -2861,9 +2946,9 @@ window.addEventListener('appinstalled', () => {
       }
       // Only change hash if it's different, to avoid redundant route() calls if already on page
       if (location.hash !== '#' + dataHashElement.dataset.hash) {
-          location.hash = dataHashElement.dataset.hash;
+         location.hash = dataHashElement.dataset.hash;
       } else { // If hash is the same, but page might not be visible (e.g. after programmatic change)
-          route(); // Re-run route to ensure correct page is visible
+         route(); // Re-run route to ensure correct page is visible
       }
     });
 
