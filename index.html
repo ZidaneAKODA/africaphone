@@ -1019,7 +1019,7 @@ main.page {
       </div>
       <input type="number" class="line-qty"  min="1" value="1">
       <input type="number" class="line-cost" step="0.01" value="0.00">
-      <div class="line-total">€0.00</div>
+      <div class="line-total">XOF0.00</div>
       <button type="button" class="remove-line" aria-label="Supprimer">×</button>
     </div>
   </template>
@@ -1053,7 +1053,7 @@ main.page {
     <h2>Allocation du coût d’achat</h2>
 
     <div class="form-group">
-      <label for="additional-cost">Coût supplémentaire (€)</label>
+      <label for="additional-cost">Coût supplémentaire (XOF)</label>
       <input
         id="additional-cost"
         type="number"
@@ -1162,7 +1162,7 @@ main.page {
         function updateLine(){
           const q=parseInt(qtyI.value,10)||0;
           const c=parseFloat(costI.value)||0;
-          total.textContent='€'+(q*c).toFixed(2);
+          total.textContent='XOF'+(q*c).toFixed(2);
           updateSummary();
         }
         qtyI.addEventListener('input',updateLine);
@@ -1214,7 +1214,7 @@ additionalCostI.addEventListener('input', () => {
     // c) mise à jour des champs UI
     costInput.value = newUnitCost.toFixed(2);
     r.querySelector('.line-total')
-     .textContent = '€' + (qty * newUnitCost).toFixed(2);
+     .textContent = 'XOF' + (qty * newUnitCost).toFixed(2);
 
     // d) affichage de la ligne d’allocation (montant total ajouté pour cette ligne)
     const extraTotal = qty * unitExtra;
@@ -1223,7 +1223,7 @@ additionalCostI.addEventListener('input', () => {
     div.className    = 'allocation-item';
     div.innerHTML    = `
       <div class="item-label">${title}</div>
-      <div class="item-cost">+€${extraTotal.toFixed(2)}</div>
+      <div class="item-cost">+XOF${extraTotal.toFixed(2)}</div>
     `;
     allocationList.appendChild(div);
   });
@@ -1266,7 +1266,7 @@ function updateSummary() {
       <div class="line">
         <div class="left">
           <i class="bi bi-currency-euro icon"></i>
-          <span class="label">PU (€)</span>
+          <span class="label">PU (XOF)</span>
         </div>
         <span class="value">${unitCost.toFixed(2)}</span>
       </div>
@@ -1280,7 +1280,7 @@ function updateSummary() {
       <div class="line">
         <div class="left">
           <i class="bi bi-plus-circle icon accent"></i>
-          <span class="label">€ supp.</span>
+          <span class="label">XOF supp.</span>
         </div>
         <span class="value accent">+${extraLineTotal.toFixed(2)}</span>
       </div>
@@ -1289,7 +1289,7 @@ function updateSummary() {
           <i class="bi bi-check-circle icon accent"></i>
           <span class="label">Total</span>
         </div>
-        <span class="value accent">€${lineTotal.toFixed(2)}</span>
+        <span class="value accent">XOF${lineTotal.toFixed(2)}</span>
       </div>
     `;
     cardsContainer.appendChild(card);
@@ -1318,8 +1318,8 @@ function toggleStep2Next() {
           quantity:parseInt(r.querySelector('.line-qty').value,10),
           unitCost:parseFloat(r.querySelector('.line-cost').value)
         }));
-        const totalQ=parseInt(sumQtyEl.textContent,10);
-        const totalC=parseFloat(sumCostEl.textContent.replace('€',''));
+        const totalQ = lines.reduce((sum, ln) => sum + ln.quantity, 0);
+        const totalC = lines.reduce((sum, ln) => sum + ln.quantity * ln.unitCost, 0);
         const batch=db.batch();
         const supplyRef=db.collection('users').doc(user.uid).collection('supplies').doc();
         batch.set(supplyRef,{supplierId:sup.id,supplierName:sup.name,
@@ -1448,7 +1448,7 @@ const snap = await userBooksRef
             div.style.cursor = 'pointer';
             div.innerHTML = `
               <h4 class="book-title">${b.title}</h4>
-              <p class="book-price">€${(b.price||0).toFixed(2)}</p>
+              <p class="book-price">XOF${(b.price||0).toFixed(2)}</p>
               <p class="book-quantity">Quantité: ${b.quantity || 0}</p>
             `;
             // Quand on clique sur un résultat, remplir l’input d’origine
@@ -2023,7 +2023,7 @@ await userBooksRef.add({
       <div class="info-label">Total de livres</div>
     </div>
     <div class="info-card">
-      <div class="info-number" id="total-value">€0</div>
+      <div class="info-number" id="total-value">XOF0</div>
       <div class="info-label">Valeur totale</div>
     </div>
   </div>
@@ -2077,14 +2077,14 @@ await userBooksRef.add({
           card.className = 'book-card';
           card.innerHTML = `
             <h4 class="book-title">${title}</h4>
-            <p class="book-price">€${price.toFixed(2)}</p>
+            <p class="book-price">XOF${price.toFixed(2)}</p>
             <p class="book-quantity">Quantité : ${quantity}</p>
           `;
           booksList.appendChild(card);
         });
 
         totalBooksEl.textContent = count.toLocaleString();
-        totalValueEl.textContent = '€' + value.toFixed(2);
+        totalValueEl.textContent = 'XOF' + value.toFixed(2);
       }, err => {
         console.error('Erreur Firestore catalog :', err);
       });
