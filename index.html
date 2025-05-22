@@ -879,6 +879,61 @@ main.page {
   caret-color:transparent;
 }
 
+/* === Étape 3 : Allocation du coût d’achat === */
+.step[data-step="3"] {
+  display: none;
+  flex-direction: column;
+  padding: 1rem;
+}
+.step[data-step="3"].active {
+  display: flex;
+}
+.step[data-step="3"] h2 {
+  font-size: 1.3rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.step[data-step="3"] .form-group {
+  margin-bottom: 1.5rem;
+}
+.step[data-step="3"] .form-group label {
+  font-size: 0.9rem;
+  color: var(--secondary);
+  margin-bottom: 0.3rem;
+  display: block;
+}
+.step[data-step="3"] .form-group input {
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.step[data-step="3"] .cost-allocation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.step[data-step="3"] .allocation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9f9f9;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+}
+.step[data-step="3"] .allocation-item .item-label {
+  font-size: 0.95rem;
+  flex: 1;
+}
+.step[data-step="3"] .allocation-item .item-cost {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+
   </style>
 
   <!-- ◉ TEMPLATE ligne -->
@@ -925,13 +980,64 @@ main.page {
     </div>
   </div>
 
-  <!-- ◉ ÉTAPE 3 : Résumé -->
+    <!-- ◉ ÉTAPE 3 : Allocation du coût d’achat -->
   <div class="step" data-step="3">
+    <h2>Allocation du coût d’achat</h2>
+
+    <div class="form-group">
+      <label for="additional-cost">Coût supplémentaire (€)</label>
+      <input
+        id="additional-cost"
+        type="number"
+        step="0.01"
+        min="0"
+        placeholder="0.00"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck="false"
+      >
+    </div>
+
+    <div class="cost-allocation-list">
+      <!-- Les allocations seront injectées ici -->
+    </div>
+
+    <div class="wizard-nav">
+      <button class="btn secondary" data-prev>← Précédent</button>
+      <button class="btn primary" data-next disabled>Suivant →</button>
+    </div>
+  </div>
+
+    <!-- ◉ ÉTAPE 4 : Résumé -->
+  <div class="step" data-step="4">
     <h2>Résumé</h2>
     <div class="summary">
-      <div>Total quantités : <span id="sum-qty">0</span></div>
-      <div>Coût total : <span id="sum-cost">€0.00</span></div>
-    </div>
+  <table class="summary-table" style="width:100%; border-collapse:collapse; margin-bottom:1rem;">
+    <thead>
+      <tr>
+        <th style="text-align:left; padding:0.5rem; border-bottom:1px solid #ddd;">Article</th>
+        <th style="text-align:right; padding:0.5rem; border-bottom:1px solid #ddd;">PU (€)</th>
+        <th style="text-align:right; padding:0.5rem; border-bottom:1px solid #ddd;">Qté</th>
+        <th style="text-align:right; padding:0.5rem; border-bottom:1px solid #ddd;">€ supp.</th>
+        <th style="text-align:right; padding:0.5rem; border-bottom:1px solid #ddd;">Total (€)</th>
+      </tr>
+    </thead>
+    <tbody id="summary-lines">
+      <!-- injecté par JS -->
+    </tbody>
+    <tfoot>
+      <tr>
+        <td style="padding:0.5rem; font-weight:600; border-top:1px solid #ddd;">Totaux</td>
+        <td></td>
+        <td style="text-align:right; padding:0.5rem; font-weight:600; border-top:1px solid #ddd;" id="sum-qty">0</td>
+        <td></td>
+        <td style="text-align:right; padding:0.5rem; font-weight:600; border-top:1px solid #ddd;" id="sum-cost">€0,00</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
     <div class="wizard-nav">
       <button class="btn secondary" data-prev>← Précédent</button>
       <button id="submit-supply" class="btn primary" disabled>Valider & envoyer</button>
@@ -953,6 +1059,11 @@ main.page {
       const steps     = [...main.querySelectorAll('.step')];
       const supplierI = main.querySelector('#supplier-search');
       const linesC    = main.querySelector('#lines-container');
+            // ───────── Références DOM pour l’étape 3 & 4 ─────────
+      const additionalCostI = main.querySelector('#additional-cost');
+      const allocationList  = main.querySelector('.cost-allocation-list');
+
+    
       const tmplLine  = document.getElementById('tmpl-line').content;
       const sumQtyEl  = main.querySelector('#sum-qty');
       const sumCostEl = main.querySelector('#sum-cost');
@@ -963,7 +1074,12 @@ main.page {
       let step=1;
       function showStep(n){steps.forEach(s=>s.classList.toggle('active',+s.dataset.step===n))}
       main.addEventListener('click',e=>{
-        if(e.target.matches('[data-next]:not([disabled])')){step++;if(step===3)updateSummary();showStep(step)}
+        if (e.target.matches('[data-next]:not([disabled])')) {
+    step++;
+    // si on atteint la 4ᵉ étape, on reconstruit le résumé
+    if (step === 4) updateSummary();
+    showStep(step);
+  }
         if(e.target.matches('[data-prev]')){step--;showStep(step)}
       });
       showStep(step);
@@ -1016,22 +1132,117 @@ main.page {
       }
 
 
+additionalCostI.addEventListener('input', () => {
+  // 1) lecture du coût supplémentaire
+  const addCost = parseFloat(additionalCostI.value) || 0;
+
+  // 2) récupération des lignes
+  const rows = [...linesC.children];
+
+  // 3) calcul de la quantité totale de tous les livres
+  const totalQty = rows.reduce((sum, r) => {
+    const q = parseInt(r.querySelector('.line-qty').value, 10) || 0;
+    return sum + q;
+  }, 0);
+
+  // 4) calcul du coût supplémentaire **par unité**
+  const unitExtra = totalQty > 0 ? addCost / totalQty : 0;
+
+  // 5) on vide la liste d’affichage des allocations
+  allocationList.innerHTML = '';
+
+  // 6) pour chaque ligne, on met à jour le coût unitaire et le total ligne
+  rows.forEach(r => {
+    const qty       = parseInt(r.querySelector('.line-qty').value, 10) || 0;
+    const costInput = r.querySelector('.line-cost');
+
+    // a) on stocke **une seule fois** le coût de base
+    if (!costInput.dataset.baseCost) {
+      costInput.dataset.baseCost = costInput.value;
+    }
+    const base = parseFloat(costInput.dataset.baseCost) || 0;
+
+    // b) nouveau coût unitaire = coût de base + part unitaire du coût supp
+    const newUnitCost = base + unitExtra;
+
+    // c) mise à jour des champs UI
+    costInput.value = newUnitCost.toFixed(2);
+    r.querySelector('.line-total')
+     .textContent = '€' + (qty * newUnitCost).toFixed(2);
+
+    // d) affichage de la ligne d’allocation (montant total ajouté pour cette ligne)
+    const extraTotal = qty * unitExtra;
+    const title      = r.querySelector('.book-search').value || '–';
+    const div        = document.createElement('div');
+    div.className    = 'allocation-item';
+    div.innerHTML    = `
+      <div class="item-label">${title}</div>
+      <div class="item-cost">+€${extraTotal.toFixed(2)}</div>
+    `;
+    allocationList.appendChild(div);
+  });
+
+  // 7) activation du bouton “Suivant” si la saisie est valide
+  main
+    .querySelector('[data-step="3"] [data-next]')
+    .disabled = addCost < 0;
+});
+
+
+
 
       /*────────── RÉSUMÉ & VALIDATION ──────────*/
-      function updateSummary(){
-        let sumQ=0,sumC=0;
-        [...linesC.children].forEach(r=>{
-          const q=parseInt(r.querySelector('.line-qty').value,10)||0;
-          const c=parseFloat(r.querySelector('.line-cost').value)||0;
-          sumQ+=q;sumC+=q*c;
-        });
-        sumQtyEl.textContent=sumQ;
-        sumCostEl.textContent='€'+sumC.toFixed(2);
-        submitBtn.disabled=!(sumQ>0&&supplierI.value.trim());
-      }
-      function toggleStep2Next(){
-        main.querySelector('[data-step="2"] [data-next]').disabled=!linesC.children.length;
-      }
+      function updateSummary() {
+  const rows = [...linesC.children];
+  const tbody = document.getElementById('summary-lines');
+  tbody.innerHTML = '';
+
+  let grandQty = 0;
+  let grandTotal = 0;
+
+  // Récupère le coût supplémentaire total par ligne
+  const totalAdditionnel = parseFloat(additionalCostI.value) || 0;
+  // quantité totale pour répartir
+  const totalQty = rows.reduce((s, r) => s + (parseInt(r.querySelector('.line-qty').value,10)||0), 0);
+  const unitExtra = totalQty > 0 ? totalAdditionnel / totalQty : 0;
+
+  rows.forEach(r => {
+    const title = r.querySelector('.book-search').value || '–';
+    const qty   = parseInt(r.querySelector('.line-qty').value, 10) || 0;
+    const base  = parseFloat(r.querySelector('.line-cost').dataset.baseCost) || parseFloat(r.querySelector('.line-cost').value) || 0;
+    // À ce stade, r.querySelector('.line-cost').value === base + unitExtra
+    const pu    = base + unitExtra;
+    const extraLine = (unitExtra * qty);
+    const totalLine = pu * qty;
+
+    grandQty   += qty;
+    grandTotal += totalLine;
+
+    // création d’une ligne de tableau
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="padding:0.5rem; border-bottom:1px solid #f0f0f0;">${title}</td>
+      <td style="text-align:right; padding:0.5rem; border-bottom:1px solid #f0f0f0;">€${pu.toFixed(2)}</td>
+      <td style="text-align:right; padding:0.5rem; border-bottom:1px solid #f0f0f0;">${qty}</td>
+      <td style="text-align:right; padding:0.5rem; border-bottom:1px solid #f0f0f0;">+€${extraLine.toFixed(2)}</td>
+      <td style="text-align:right; padding:0.5rem; border-bottom:1px solid #f0f0f0;">€${totalLine.toFixed(2)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Met à jour les totaux du pied de tableau
+  document.getElementById('sum-qty').textContent  = grandQty;
+  document.getElementById('sum-cost').textContent = '€' + grandTotal.toFixed(2);
+
+  // Activation du bouton Valider
+  submitBtn.disabled = grandQty === 0;
+}
+
+function toggleStep2Next() {
+  // active “Suivant →” dans l’étape 2 si on a au moins 1 ligne
+  main.querySelector('[data-step="2"] [data-next]').disabled =
+    linesC.children.length === 0;
+}
 
       /*────────── ENVOI FIRESTORE ──────────*/
       submitBtn.addEventListener('click',async()=>{
@@ -2115,9 +2326,5 @@ window.addEventListener('appinstalled', () => {
   </script>
 
 </body>
-<!--
-  📱 Application Mobile-First 100 % – Optimisée UNIQUEMENT pour smartphones.
-  🎨 Style ultra-professionnel exigé à CHAQUE modification.
-  🤖 je m'adresse a toi CHATGPT
--->
+
 </html>
