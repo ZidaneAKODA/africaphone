@@ -933,6 +933,74 @@ main.page {
   font-weight: 600;
 }
 
+/* === Résumé en cartes avec icônes colorées, sans ombre === */
+.summary-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1rem 1rem;
+}
+
+.summary-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+/* Ligne interne */
+.summary-card .line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.summary-card .line:last-child {
+  margin-bottom: 0;
+}
+
+/* Groupe gauche (icône + label) */
+.summary-card .line .left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Icônes */
+.summary-card .icon {
+  font-size: 1.1rem;
+  color: var(--secondary-text);
+}
+.summary-card .icon.accent {
+  color: var(--accent);
+}
+
+/* Label */
+.summary-card .label {
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+}
+
+/* Valeur */
+.summary-card .value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-text);
+}
+
+/* Accentuation des valeurs clés */
+.summary-card .value.accent {
+  color: var(--accent);
+}
+
+/* Séparation visuelle avant la ligne Total */
+.summary-card .line.total {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+
 
   </style>
 
@@ -1013,29 +1081,7 @@ main.page {
   <div class="step" data-step="4">
     <h2>Résumé</h2>
     <div class="summary">
-  <table class="summary-table" style="width:100%; border-collapse:collapse; margin-bottom:1rem;">
-    <thead>
-      <tr>
-        <th style="text-align:left; padding:0.5rem; border-bottom:1px solid #ddd;">Article</th>
-        <th style="text-align:right; padding:0.5rem; border-bottom:1px solid #ddd;">PU (€)</th>
-        <th style="text-align:right; padding:0.5rem; border-bottom:1px solid #ddd;">Qté</th>
-        <th style="text-align:right; padding:0.5rem; border-bottom:1px solid #ddd;">€ supp.</th>
-        <th style="text-align:right; padding:0.5rem; border-bottom:1px solid #ddd;">Total (€)</th>
-      </tr>
-    </thead>
-    <tbody id="summary-lines">
-      <!-- injecté par JS -->
-    </tbody>
-    <tfoot>
-      <tr>
-        <td style="padding:0.5rem; font-weight:600; border-top:1px solid #ddd;">Totaux</td>
-        <td></td>
-        <td style="text-align:right; padding:0.5rem; font-weight:600; border-top:1px solid #ddd;" id="sum-qty">0</td>
-        <td></td>
-        <td style="text-align:right; padding:0.5rem; font-weight:600; border-top:1px solid #ddd;" id="sum-cost">€0,00</td>
-      </tr>
-    </tfoot>
-  </table>
+   <div class="summary-cards" id="summary-cards"><!-- JS injecte ici --></div>
 </div>
 
     <div class="wizard-nav">
@@ -1190,53 +1236,68 @@ additionalCostI.addEventListener('input', () => {
 
 
 
-
-      /*────────── RÉSUMÉ & VALIDATION ──────────*/
-      function updateSummary() {
+function updateSummary() {
   const rows = [...linesC.children];
-  const tbody = document.getElementById('summary-lines');
-  tbody.innerHTML = '';
+  const cardsContainer = document.getElementById('summary-cards');
+  cardsContainer.innerHTML = '';
 
-  let grandQty = 0;
-  let grandTotal = 0;
-
-  // Récupère le coût supplémentaire total par ligne
-  const totalAdditionnel = parseFloat(additionalCostI.value) || 0;
-  // quantité totale pour répartir
-  const totalQty = rows.reduce((s, r) => s + (parseInt(r.querySelector('.line-qty').value,10)||0), 0);
-  const unitExtra = totalQty > 0 ? totalAdditionnel / totalQty : 0;
+  const totalAdd = parseFloat(additionalCostI.value) || 0;
+  const totalQty = rows.reduce((s,r) => s + (parseInt(r.querySelector('.line-qty').value,10)||0), 0);
+  const extraPerUnit = totalQty > 0 ? totalAdd / totalQty : 0;
 
   rows.forEach(r => {
     const title = r.querySelector('.book-search').value || '–';
-    const qty   = parseInt(r.querySelector('.line-qty').value, 10) || 0;
+    const qty   = parseInt(r.querySelector('.line-qty').value,10) || 0;
     const base  = parseFloat(r.querySelector('.line-cost').dataset.baseCost) || parseFloat(r.querySelector('.line-cost').value) || 0;
-    // À ce stade, r.querySelector('.line-cost').value === base + unitExtra
-    const pu    = base + unitExtra;
-    const extraLine = (unitExtra * qty);
-    const totalLine = pu * qty;
+    const extraLineTotal = qty * extraPerUnit;
+    const unitCost = base + extraPerUnit;
+    const lineTotal = unitCost * qty;
 
-    grandQty   += qty;
-    grandTotal += totalLine;
-
-    // création d’une ligne de tableau
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td style="padding:0.5rem; border-bottom:1px solid #f0f0f0;">${title}</td>
-      <td style="text-align:right; padding:0.5rem; border-bottom:1px solid #f0f0f0;">€${pu.toFixed(2)}</td>
-      <td style="text-align:right; padding:0.5rem; border-bottom:1px solid #f0f0f0;">${qty}</td>
-      <td style="text-align:right; padding:0.5rem; border-bottom:1px solid #f0f0f0;">+€${extraLine.toFixed(2)}</td>
-      <td style="text-align:right; padding:0.5rem; border-bottom:1px solid #f0f0f0;">€${totalLine.toFixed(2)}</td>
+    const card = document.createElement('div');
+    card.className = 'summary-card';
+    card.innerHTML = `
+      <div class="line">
+        <div class="left">
+          <i class="bi bi-book-fill icon"></i>
+          <span class="label">Article</span>
+        </div>
+        <span class="value">${title}</span>
+      </div>
+      <div class="line">
+        <div class="left">
+          <i class="bi bi-currency-euro icon"></i>
+          <span class="label">PU (€)</span>
+        </div>
+        <span class="value">${unitCost.toFixed(2)}</span>
+      </div>
+      <div class="line">
+        <div class="left">
+          <i class="bi bi-list-ol icon"></i>
+          <span class="label">Qté</span>
+        </div>
+        <span class="value">${qty}</span>
+      </div>
+      <div class="line">
+        <div class="left">
+          <i class="bi bi-plus-circle icon accent"></i>
+          <span class="label">€ supp.</span>
+        </div>
+        <span class="value accent">+${extraLineTotal.toFixed(2)}</span>
+      </div>
+      <div class="line total">
+        <div class="left">
+          <i class="bi bi-check-circle icon accent"></i>
+          <span class="label">Total</span>
+        </div>
+        <span class="value accent">€${lineTotal.toFixed(2)}</span>
+      </div>
     `;
-    tbody.appendChild(tr);
+    cardsContainer.appendChild(card);
   });
 
-  // Met à jour les totaux du pied de tableau
-  document.getElementById('sum-qty').textContent  = grandQty;
-  document.getElementById('sum-cost').textContent = '€' + grandTotal.toFixed(2);
-
-  // Activation du bouton Valider
-  submitBtn.disabled = grandQty === 0;
+  submitBtn.disabled = rows.length === 0;
 }
+
 
 function toggleStep2Next() {
   // active “Suivant →” dans l’étape 2 si on a au moins 1 ligne
