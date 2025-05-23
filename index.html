@@ -3682,428 +3682,573 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
 </main>
 
 <main id="reports" class="page">
-    <header id="reports-header">
-        <h2>Rapports et Analyses</h2>
-    </header>
-    <div class="reports-content">
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <div class="kpi-value revenue" id="kpi-total-revenue">XOF 0</div>
-                <div class="kpi-label">Chiffre d'Affaires Total</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-value cogs" id="kpi-total-cogs">XOF 0</div>
-                <div class="kpi-label">Coût Marchandises Vendues</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-value profit" id="kpi-total-profit">XOF 0</div>
-                <div class="kpi-label">Profit Total</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-value" id="kpi-total-sales-count">0</div>
-                <div class="kpi-label">Nombre de Ventes</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-value" id="kpi-total-items-sold">0</div>
-                <div class="kpi-label">Articles Vendus</div>
-            </div>
-             <div class="kpi-card">
-                <div class="kpi-value" id="kpi-avg-profit-margin">0%</div>
-                <div class="kpi-label">Marge Brute Moyenne</div>
-            </div>
-        </div>
+  <style>
+    /* === Styles pour la page Rapports (main#reports) === */
+    main#reports header#reports-header {
+      padding: 1rem;
+      background: #fff;
+      border-bottom: 1px solid var(--border-color);
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      z-index: 15;
+    }
+    main#reports header#reports-header h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--primary-text);
+    }
+    main#reports .reports-content {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+    .kpi-card {
+      background-color: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-card);
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .kpi-card .kpi-value {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+      line-height: 1.2;
+    }
+    .kpi-card .kpi-value.profit { color: var(--chart-profit-color); }
+    .kpi-card .kpi-value.revenue { color: var(--chart-sales-color); }
+    .kpi-card .kpi-value.cogs { color: var(--chart-cogs-color); }
 
-        <div class="chart-container">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-              <h3>Ventes et Profits (Période)</h3>
-              <div class="date-filter-reports">
-                  <label for="reports-date-range" style="margin-right: 0.5rem;">Période:</label>
-                  <select id="reports-date-range">
-                      <option value="last7days">7 derniers jours</option>
-                      <option value="last30days" selected>30 derniers jours</option>
-                      <option value="thisMonth">Ce mois-ci</option>
-                      <option value="lastMonth">Mois dernier</option>
-                      </select>
-                  <!-- <input type="date" id="reports-custom-start" style="display:none;">
-                  <input type="date" id="reports-custom-end" style="display:none;"> -->
-              </div>
-            </div>
-            <canvas id="salesProfitChart"></canvas>
-            <div id="salesProfitChartLoading" class="chart-loading-message" style="display:none;">Chargement des données du graphique...</div>
-            <div id="salesProfitChartError" class="chart-error-message" style="display:none;">Erreur de chargement des données.</div>
-            <div id="salesProfitChartNoData" class="chart-no-data-message" style="display:none;">Aucune donnée de vente pour cette période.</div>
-        </div>
+    .kpi-card .kpi-label {
+      font-size: 0.9rem;
+      color: var(--secondary-text);
+    }
+    .chart-container {
+      background-color: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-card);
+      padding: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      /* MODIFICATION: Ajout d'une hauteur et position relative */
+      height: 400px; /* Vous pouvez ajuster cette valeur */
+      position: relative;
+    }
+    .chart-container h3 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .chart-loading-message, .chart-error-message, .chart-no-data-message {
+      text-align: center;
+      padding: 2rem;
+      color: var(--secondary-text);
+      font-style: italic;
+      /* Ces messages s'afficheront si le canvas n'a pas de données */
+      /* S'assurer qu'ils n'interfèrent pas avec un canvas de hauteur 0 */
+      position: absolute; /* Pour les superposer au canvas si besoin, ou les centrer */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(100% - 2rem); /* Occuper l'espace du padding du parent */
+    }
+    .chart-error-message { color: var(--ebay-red); }
 
-        <div class="chart-container">
-            <h3>Top 5 Livres les Plus Vendus (par Quantité)</h3>
-            <canvas id="topSellingBooksChart"></canvas>
-            <div id="topSellingBooksChartLoading" class="chart-loading-message" style="display:none;">Chargement des données du graphique...</div>
-            <div id="topSellingBooksChartError" class="chart-error-message" style="display:none;">Erreur de chargement des données.</div>
-            <div id="topSellingBooksChartNoData" class="chart-no-data-message" style="display:none;">Aucune donnée de vente disponible.</div>
-        </div>
+    .date-filter-reports {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      /* margin-bottom: 0.5rem; retiré car le titre du graphique est maintenant flex */
+      /* padding: 0.5rem; retiré */
+      /* background-color: #f8f9fa; retiré */
+      /* border-radius: var(--border-radius-pill); retiré */
+    }
+    .date-filter-reports label {
+      font-size: 0.9rem;
+      color: var(--secondary-text);
+    }
+    .date-filter-reports select, .date-filter-reports input[type="date"] {
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-card);
+      font-size: 0.9rem;
+      background-color: #fff;
+    }
+  </style>
+
+  <header id="reports-header">
+    <h2>Rapports et Analyses</h2>
+  </header>
+  <div class="reports-content">
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-value revenue" id="kpi-total-revenue">XOF 0</div>
+        <div class="kpi-label">Chiffre d'Affaires Total</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value cogs" id="kpi-total-cogs">XOF 0</div>
+        <div class="kpi-label">Coût Marchandises Vendues</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value profit" id="kpi-total-profit">XOF 0</div>
+        <div class="kpi-label">Profit Total</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-total-sales-count">0</div>
+        <div class="kpi-label">Nombre de Ventes</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-total-items-sold">0</div>
+        <div class="kpi-label">Articles Vendus</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-avg-profit-margin">0%</div>
+        <div class="kpi-label">Marge Brute Moyenne</div>
+      </div>
     </div>
-    <script>
-    // Script for Reports Page
-    (function() {
-        const reportsPage = document.getElementById('reports');
-        if (!reportsPage) return;
 
-        // KPI Elements
-        const kpiTotalRevenueEl = document.getElementById('kpi-total-revenue');
-        const kpiTotalCogsEl = document.getElementById('kpi-total-cogs');
-        const kpiTotalProfitEl = document.getElementById('kpi-total-profit');
-        const kpiTotalSalesCountEl = document.getElementById('kpi-total-sales-count');
-        const kpiTotalItemsSoldEl = document.getElementById('kpi-total-items-sold');
-        const kpiAvgProfitMarginEl = document.getElementById('kpi-avg-profit-margin');
+    <div class="chart-container">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>Ventes et Profits (Période)</h3>
+        <div class="date-filter-reports">
+          <label for="reports-date-range" style="margin-right: 0.5rem;">Période:</label>
+          <select id="reports-date-range">
+            <option value="last7days">7 derniers jours</option>
+            <option value="last30days" selected>30 derniers jours</option>
+            <option value="thisMonth">Ce mois-ci</option>
+            <option value="lastMonth">Mois dernier</option>
+            </select>
+          </div>
+      </div>
+      <canvas id="salesProfitChart"></canvas>
+      <div id="salesProfitChartLoading" class="chart-loading-message" style="display:none;">Chargement des données du graphique...</div>
+      <div id="salesProfitChartError" class="chart-error-message" style="display:none;">Erreur de chargement des données.</div>
+      <div id="salesProfitChartNoData" class="chart-no-data-message" style="display:none;">Aucune donnée de vente pour cette période.</div>
+    </div>
 
+    <div class="chart-container">
+      <h3>Top 5 Livres les Plus Vendus (par Quantité)</h3>
+      <canvas id="topSellingBooksChart"></canvas>
+      <div id="topSellingBooksChartLoading" class="chart-loading-message" style="display:none;">Chargement des données du graphique...</div>
+      <div id="topSellingBooksChartError" class="chart-error-message" style="display:none;">Erreur de chargement des données.</div>
+      <div id="topSellingBooksChartNoData" class="chart-no-data-message" style="display:none;">Aucune donnée de vente disponible.</div>
+    </div>
+  </div>
+  <script>
+  // Script for Reports Page
+  (function() {
+      const reportsPage = document.getElementById('reports');
+      if (!reportsPage) return;
 
-        // Chart Elements
-        const salesProfitChartCtx = document.getElementById('salesProfitChart')?.getContext('2d');
-        const topSellingBooksChartCtx = document.getElementById('topSellingBooksChart')?.getContext('2d');
-        const salesProfitChartLoadingEl = document.getElementById('salesProfitChartLoading');
-        const salesProfitChartErrorEl = document.getElementById('salesProfitChartError');
-        const salesProfitChartNoDataEl = document.getElementById('salesProfitChartNoData');
-        const topSellingBooksChartLoadingEl = document.getElementById('topSellingBooksChartLoading');
-        const topSellingBooksChartErrorEl = document.getElementById('topSellingBooksChartError');
-        const topSellingBooksChartNoDataEl = document.getElementById('topSellingBooksChartNoData');
-        const dateRangeSelectorEl = document.getElementById('reports-date-range');
-
-
-        let salesProfitChartInstance = null;
-        let topSellingBooksChartInstance = null;
-        let allBooksDataCache = {}; // Cache for book details { bookId: { lastPurchasePrice, title } }
-
-        async function fetchAllBooksDetails() {
-            if (!auth.currentUser) return {};
-            try {
-                const booksSnapshot = await db.collection('users').doc(auth.currentUser.uid).collection('books').get();
-                const booksDetails = {};
-                booksSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    booksDetails[doc.id] = {
-                        lastPurchasePrice: data.lastPurchasePrice || 0,
-                        title: data.title || 'Titre Inconnu'
-                    };
-                });
-                allBooksDataCache = booksDetails;
-                return booksDetails;
-            } catch (error) {
-                console.error("Error fetching book details for reports:", error);
-                return {};
-            }
-        }
-        
-        function getChartDateRange() {
-            const selectedRange = dateRangeSelectorEl.value;
-            const endDate = new Date(); // Today
-            let startDate = new Date();
-
-            switch (selectedRange) {
-                case 'last7days':
-                    startDate.setDate(endDate.getDate() - 7);
-                    break;
-                case 'last30days':
-                    startDate.setDate(endDate.getDate() - 30);
-                    break;
-                case 'thisMonth':
-                    startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
-                    break;
-                case 'lastMonth':
-                    startDate = new Date(endDate.getFullYear(), endDate.getMonth() - 1, 1);
-                    endDate.setDate(0); // End of last month
-                    endDate.setMonth(startDate.getMonth());
-                    endDate.setFullYear(startDate.getFullYear());
-                    break;
-                default: // last30days
-                    startDate.setDate(endDate.getDate() - 30);
-            }
-            startDate.setHours(0,0,0,0);
-            endDate.setHours(23,59,59,999);
-            return { startDate, endDate };
-        }
+      // KPI Elements
+      const kpiTotalRevenueEl = document.getElementById('kpi-total-revenue');
+      const kpiTotalCogsEl = document.getElementById('kpi-total-cogs');
+      const kpiTotalProfitEl = document.getElementById('kpi-total-profit');
+      const kpiTotalSalesCountEl = document.getElementById('kpi-total-sales-count');
+      const kpiTotalItemsSoldEl = document.getElementById('kpi-total-items-sold');
+      const kpiAvgProfitMarginEl = document.getElementById('kpi-avg-profit-margin');
 
 
-        async function loadReportData() {
-            if (!auth.currentUser || !salesProfitChartCtx || !topSellingBooksChartCtx) {
-                if(salesProfitChartErrorEl) salesProfitChartErrorEl.style.display = 'block';
-                if(topSellingBooksChartErrorEl) topSellingBooksChartErrorEl.style.display = 'block';
-                return;
-            }
-
-            // Show loading messages
-            if(salesProfitChartLoadingEl) salesProfitChartLoadingEl.style.display = 'block';
-            if(salesProfitChartErrorEl) salesProfitChartErrorEl.style.display = 'none';
-            if(salesProfitChartNoDataEl) salesProfitChartNoDataEl.style.display = 'none';
-            if(topSellingBooksChartLoadingEl) topSellingBooksChartLoadingEl.style.display = 'block';
-            if(topSellingBooksChartErrorEl) topSellingBooksChartErrorEl.style.display = 'none';
-            if(topSellingBooksChartNoDataEl) topSellingBooksChartNoDataEl.style.display = 'none';
+      // Chart Elements
+      const salesProfitChartCtx = document.getElementById('salesProfitChart')?.getContext('2d');
+      const topSellingBooksChartCtx = document.getElementById('topSellingBooksChart')?.getContext('2d');
+      const salesProfitChartLoadingEl = document.getElementById('salesProfitChartLoading');
+      const salesProfitChartErrorEl = document.getElementById('salesProfitChartError');
+      const salesProfitChartNoDataEl = document.getElementById('salesProfitChartNoData');
+      const topSellingBooksChartLoadingEl = document.getElementById('topSellingBooksChartLoading');
+      const topSellingBooksChartErrorEl = document.getElementById('topSellingBooksChartError');
+      const topSellingBooksChartNoDataEl = document.getElementById('topSellingBooksChartNoData');
+      const dateRangeSelectorEl = document.getElementById('reports-date-range');
 
 
-            await fetchAllBooksDetails(); // Ensure book details are cached
+      let salesProfitChartInstance = null;
+      let topSellingBooksChartInstance = null;
+      let allBooksDataCache = {}; // Cache for book details { bookId: { lastPurchasePrice, title } }
 
-            const { startDate, endDate } = getChartDateRange();
+      async function fetchAllBooksDetails() {
+          if (!auth.currentUser) return {};
+          try {
+              const booksSnapshot = await db.collection('users').doc(auth.currentUser.uid).collection('books').get();
+              const booksDetails = {};
+              booksSnapshot.forEach(doc => {
+                  const data = doc.data();
+                  booksDetails[doc.id] = {
+                      // IMPORTANT: Pour un calcul de COGS précis, cette `lastPurchasePrice`
+                      // devrait être celle au moment de la vente, stockée avec la vente.
+                      // Si vous ne stockez pas le coût historique avec la vente,
+                      // ce `lastPurchasePrice` actuel sera utilisé, ce qui peut être inexact pour les rapports.
+                      lastPurchasePrice: data.lastPurchasePrice || 0,
+                      title: data.title || 'Titre Inconnu'
+                  };
+              });
+              allBooksDataCache = booksDetails;
+              return booksDetails;
+          } catch (error) {
+              console.error("Error fetching book details for reports:", error);
+              return {};
+          }
+      }
+      
+      function getChartDateRange() {
+          const selectedRange = dateRangeSelectorEl.value;
+          const today = new Date();
+          let endDate = new Date(today); // Clone today
+          let startDate = new Date(today); // Clone today
 
-            try {
-                const salesQuery = db.collection('users').doc(auth.currentUser.uid).collection('sales')
-                                     .where('timestamp', '>=', firebase.firestore.Timestamp.fromDate(startDate))
-                                     .where('timestamp', '<=', firebase.firestore.Timestamp.fromDate(endDate))
-                                     .orderBy('timestamp', 'asc');
-                const salesSnapshot = await salesQuery.get();
-
-                let totalRevenue = 0;
-                let totalCogs = 0;
-                let totalSalesCount = salesSnapshot.size;
-                let totalItemsSoldCount = 0;
-                const dailyData = {}; // { 'YYYY-MM-DD': { sales: 0, profit: 0 } }
-                const bookSalesCount = {}; // { bookId: quantity }
-                const bookProfit = {}; // { bookId: profit }
-
-
-                salesSnapshot.forEach(doc => {
-                    const sale = doc.data();
-                    totalRevenue += sale.grandTotalAmount || 0;
-                    totalItemsSoldCount += sale.totalItemsSold || 0;
-                    
-                    const saleDate = sale.timestamp.toDate();
-                    const dateString = saleDate.toISOString().split('T')[0]; // YYYY-MM-DD
-
-                    if (!dailyData[dateString]) {
-                        dailyData[dateString] = { sales: 0, profit: 0, cogs: 0 };
-                    }
-                    dailyData[dateString].sales += sale.grandTotalAmount || 0;
-
-                    sale.items.forEach(item => {
-                        const bookDetail = allBooksDataCache[item.bookId];
-                        const purchasePrice = bookDetail ? bookDetail.lastPurchasePrice : 0;
-                        const itemCogs = (purchasePrice || 0) * (item.quantitySold || 0);
-                        const itemProfit = (item.unitPriceSold * item.quantitySold) - itemCogs;
-                        
-                        totalCogs += itemCogs;
-                        dailyData[dateString].profit += itemProfit;
-                        dailyData[dateString].cogs += itemCogs;
-
-
-                        // For top selling books
-                        bookSalesCount[item.bookId] = (bookSalesCount[item.bookId] || 0) + item.quantitySold;
-                        bookProfit[item.bookId] = (bookProfit[item.bookId] || 0) + itemProfit;
-                    });
-                });
-
-                const totalProfit = totalRevenue - totalCogs;
-                const avgProfitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
-
-                // Update KPIs
-                if(kpiTotalRevenueEl) kpiTotalRevenueEl.textContent = totalRevenue.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
-                if(kpiTotalCogsEl) kpiTotalCogsEl.textContent = totalCogs.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
-                if(kpiTotalProfitEl) kpiTotalProfitEl.textContent = totalProfit.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
-                if(kpiTotalSalesCountEl) kpiTotalSalesCountEl.textContent = totalSalesCount.toLocaleString();
-                if(kpiTotalItemsSoldEl) kpiTotalItemsSoldEl.textContent = totalItemsSoldCount.toLocaleString();
-                if(kpiAvgProfitMarginEl) kpiAvgProfitMarginEl.textContent = avgProfitMargin.toFixed(1) + '%';
+          switch (selectedRange) {
+              case 'last7days':
+                  startDate.setDate(today.getDate() - 6); // 6 days ago to include today makes 7 days
+                  break;
+              case 'last30days':
+                  startDate.setDate(today.getDate() - 29); // 29 days ago to include today makes 30 days
+                  break;
+              case 'thisMonth':
+                  startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                  break;
+              case 'lastMonth':
+                  endDate = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of previous month
+                  startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1); // First day of previous month
+                  break;
+              default: // last30days
+                  startDate.setDate(today.getDate() - 29);
+          }
+          startDate.setHours(0,0,0,0);
+          endDate.setHours(23,59,59,999);
+          return { startDate, endDate };
+      }
 
 
-                // Prepare data for Sales/Profit Chart
-                const salesProfitLabels = [];
-                const salesDataPoints = [];
-                const profitDataPoints = [];
-                
-                // Ensure all days in the range are present for the line chart
-                let currentDate = new Date(startDate);
-                while(currentDate <= endDate) {
-                    const dateStr = currentDate.toISOString().split('T')[0];
-                    salesProfitLabels.push(dateStr);
-                    salesDataPoints.push(dailyData[dateStr]?.sales || 0);
-                    profitDataPoints.push(dailyData[dateStr]?.profit || 0);
-                    currentDate.setDate(currentDate.getDate() + 1);
-                }
+      async function loadReportData() {
+          if (!auth.currentUser || !salesProfitChartCtx || !topSellingBooksChartCtx) {
+              if(salesProfitChartErrorEl) {
+                salesProfitChartErrorEl.textContent = "Impossible de charger les graphiques.";
+                salesProfitChartErrorEl.style.display = 'block';
+              }
+              if(topSellingBooksChartErrorEl) {
+                topSellingBooksChartErrorEl.textContent = "Impossible de charger les graphiques.";
+                topSellingBooksChartErrorEl.style.display = 'block';
+              }
+              if(salesProfitChartLoadingEl) salesProfitChartLoadingEl.style.display = 'none';
+              if(topSellingBooksChartLoadingEl) topSellingBooksChartLoadingEl.style.display = 'none';
+              return;
+          }
+
+          // Show loading messages
+          if(salesProfitChartLoadingEl) salesProfitChartLoadingEl.style.display = 'block';
+          if(salesProfitChartErrorEl) salesProfitChartErrorEl.style.display = 'none';
+          if(salesProfitChartNoDataEl) salesProfitChartNoDataEl.style.display = 'none';
+          if(salesProfitChartCtx) salesProfitChartCtx.canvas.style.display = 'none'; // Hide canvas while loading
+
+          if(topSellingBooksChartLoadingEl) topSellingBooksChartLoadingEl.style.display = 'block';
+          if(topSellingBooksChartErrorEl) topSellingBooksChartErrorEl.style.display = 'none';
+          if(topSellingBooksChartNoDataEl) topSellingBooksChartNoDataEl.style.display = 'none';
+          if(topSellingBooksChartCtx) topSellingBooksChartCtx.canvas.style.display = 'none'; // Hide canvas while loading
 
 
-                if (salesProfitChartInstance) salesProfitChartInstance.destroy();
-                if (salesSnapshot.empty && salesProfitChartNoDataEl) {
-                   salesProfitChartNoDataEl.style.display = 'block';
-                } else if (salesProfitChartCtx) {
-                    salesProfitChartInstance = new Chart(salesProfitChartCtx, {
-                        type: 'line',
-                        data: {
-                            labels: salesProfitLabels,
-                            datasets: [
-                                {
-                                    label: 'Ventes Totales',
-                                    data: salesDataPoints,
-                                    borderColor: getComputedStyle(document.documentElement).getPropertyValue('--chart-sales-color').trim() || 'rgb(0, 123, 255)',
-                                    backgroundColor: Chart.helpers.color(getComputedStyle(document.documentElement).getPropertyValue('--chart-sales-color').trim() || 'rgb(0, 123, 255)').alpha(0.1).rgbString(),
-                                    tension: 0.1,
-                                    fill: true,
-                                },
-                                {
-                                    label: 'Profit Total',
-                                    data: profitDataPoints,
-                                    borderColor: getComputedStyle(document.documentElement).getPropertyValue('--chart-profit-color').trim() || 'rgb(40, 167, 69)',
-                                    backgroundColor: Chart.helpers.color(getComputedStyle(document.documentElement).getPropertyValue('--chart-profit-color').trim() || 'rgb(40, 167, 69)').alpha(0.1).rgbString(),
-                                    tension: 0.1,
-                                    fill: true,
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                x: {
-                                    type: 'time',
-                                    time: {
-                                        unit: salesProfitLabels.length > 30 ? 'week' : 'day', // Adjust unit based on range
-                                        tooltipFormat: 'dd MMM yyyy',
-                                        displayFormats: {
-                                            day: 'dd MMM',
-                                            week: 'dd MMM'
-                                        }
-                                    },
-                                    title: { display: true, text: 'Date' }
-                                },
-                                y: {
-                                    beginAtZero: true,
-                                    title: { display: true, text: 'Montant (XOF)' },
-                                    ticks: {
-                                        callback: function(value) { return value.toLocaleString('fr-FR') + ' XOF'; }
-                                    }
-                                }
-                            },
-                            plugins: {
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            let label = context.dataset.label || '';
-                                            if (label) { label += ': '; }
-                                            if (context.parsed.y !== null) {
-                                                label += context.parsed.y.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
-                                            }
-                                            return label;
-                                        }
+          // Fetch book details first (if needed for COGS or titles)
+          // Rappel : Idéalement, le COGS unitaire devrait être stocké avec chaque ligne de vente.
+          await fetchAllBooksDetails(); 
+
+          const { startDate, endDate } = getChartDateRange();
+
+          try {
+              const salesQuery = db.collection('users').doc(auth.currentUser.uid).collection('sales')
+                                      .where('timestamp', '>=', firebase.firestore.Timestamp.fromDate(startDate))
+                                      .where('timestamp', '<=', firebase.firestore.Timestamp.fromDate(endDate))
+                                      .orderBy('timestamp', 'asc');
+              const salesSnapshot = await salesQuery.get();
+
+              let totalRevenue = 0;
+              let totalCogs = 0;
+              let totalSalesCount = salesSnapshot.size;
+              let totalItemsSoldCount = 0;
+              const dailyData = {}; // { 'YYYY-MM-DD': { sales: 0, profit: 0 } }
+              const bookSalesCount = {}; // { bookId: quantity }
+              // const bookProfit = {}; // (Potentiellement pour "top profitable books" - non utilisé actuellement)
+
+
+              salesSnapshot.forEach(doc => {
+                  const sale = doc.data();
+                  totalRevenue += sale.grandTotalAmount || 0;
+                  totalItemsSoldCount += sale.totalItemsSold || 0;
+                  
+                  const saleDate = sale.timestamp.toDate();
+                  const dateString = saleDate.toISOString().split('T')[0]; // YYYY-MM-DD
+
+                  if (!dailyData[dateString]) {
+                      dailyData[dateString] = { sales: 0, profit: 0, cogs: 0 };
+                  }
+                  dailyData[dateString].sales += sale.grandTotalAmount || 0;
+
+                  sale.items.forEach(item => {
+                      // !!! IMPORTANT: Utiliser le coût stocké avec la vente si disponible !!!
+                      // const purchasePrice = item.unitCostAtTimeOfSale || allBooksDataCache[item.bookId]?.lastPurchasePrice || 0;
+                      // Pour l'instant, on utilise le lastPurchasePrice du cache, mais ce n'est pas l'idéal pour l'exactitude historique.
+                      const purchasePrice = allBooksDataCache[item.bookId]?.lastPurchasePrice || 0;
+
+                      const itemCogs = (purchasePrice) * (item.quantitySold || 0);
+                      const itemRevenue = (item.unitPriceSold * item.quantitySold);
+                      const itemProfit = itemRevenue - itemCogs;
+                      
+                      totalCogs += itemCogs;
+                      dailyData[dateString].profit += itemProfit;
+                      dailyData[dateString].cogs += itemCogs;
+
+
+                      // For top selling books
+                      bookSalesCount[item.bookId] = (bookSalesCount[item.bookId] || 0) + item.quantitySold;
+                      // bookProfit[item.bookId] = (bookProfit[item.bookId] || 0) + itemProfit;
+                  });
+              });
+
+              const totalProfit = totalRevenue - totalCogs;
+              const avgProfitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
+
+              // Update KPIs
+              if(kpiTotalRevenueEl) kpiTotalRevenueEl.textContent = totalRevenue.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
+              if(kpiTotalCogsEl) kpiTotalCogsEl.textContent = totalCogs.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
+              if(kpiTotalProfitEl) kpiTotalProfitEl.textContent = totalProfit.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
+              if(kpiTotalSalesCountEl) kpiTotalSalesCountEl.textContent = totalSalesCount.toLocaleString();
+              if(kpiTotalItemsSoldEl) kpiTotalItemsSoldEl.textContent = totalItemsSoldCount.toLocaleString();
+              if(kpiAvgProfitMarginEl) kpiAvgProfitMarginEl.textContent = avgProfitMargin.toFixed(1) + '%';
+
+
+              // Prepare data for Sales/Profit Chart
+              const salesProfitLabels = [];
+              const salesDataPoints = [];
+              const profitDataPoints = [];
+              
+              let currentDateIterator = new Date(startDate);
+              while(currentDateIterator <= endDate) {
+                  const dateStr = currentDateIterator.toISOString().split('T')[0];
+                  salesProfitLabels.push(dateStr);
+                  salesDataPoints.push(dailyData[dateStr]?.sales || 0);
+                  profitDataPoints.push(dailyData[dateStr]?.profit || 0);
+                  currentDateIterator.setDate(currentDateIterator.getDate() + 1);
+              }
+
+
+              if (salesProfitChartInstance) salesProfitChartInstance.destroy();
+              if (salesSnapshot.empty && salesProfitChartNoDataEl) {
+                 salesProfitChartNoDataEl.style.display = 'block';
+                 if(salesProfitChartCtx) salesProfitChartCtx.canvas.style.display = 'none';
+              } else if (salesProfitChartCtx) {
+                  salesProfitChartCtx.canvas.style.display = 'block';
+                  salesProfitChartInstance = new Chart(salesProfitChartCtx, {
+                      type: 'line',
+                      data: {
+                          labels: salesProfitLabels,
+                          datasets: [
+                              {
+                                  label: 'Ventes Totales',
+                                  data: salesDataPoints,
+                                  borderColor: getComputedStyle(document.documentElement).getPropertyValue('--chart-sales-color').trim() || 'rgb(0, 123, 255)',
+                                  backgroundColor: Chart.helpers.color(getComputedStyle(document.documentElement).getPropertyValue('--chart-sales-color').trim() || 'rgb(0, 123, 255)').alpha(0.1).rgbString(),
+                                  tension: 0.1,
+                                  fill: true,
+                              },
+                              {
+                                  label: 'Profit Total',
+                                  data: profitDataPoints,
+                                  borderColor: getComputedStyle(document.documentElement).getPropertyValue('--chart-profit-color').trim() || 'rgb(40, 167, 69)',
+                                  backgroundColor: Chart.helpers.color(getComputedStyle(document.documentElement).getPropertyValue('--chart-profit-color').trim() || 'rgb(40, 167, 69)').alpha(0.1).rgbString(),
+                                  tension: 0.1,
+                                  fill: true,
+                              }
+                          ]
+                      },
+                      options: {
+                          responsive: true,
+                          maintainAspectRatio: false, // La hauteur du conteneur est maintenant fixe
+                          scales: {
+                              x: {
+                                  type: 'time',
+                                  time: {
+                                      unit: salesProfitLabels.length > 45 ? 'week' : (salesProfitLabels.length > 7 ? 'day' : 'day'),
+                                      tooltipFormat: 'dd MMM yyyy', // Format pour le tooltip
+                                      displayFormats: {
+                                          day: 'dd MMM',
+                                          week: 'MMM W' // Semaine du mois
+                                      }
+                                  },
+                                  title: { display: true, text: 'Date' }
+                              },
+                              y: {
+                                  beginAtZero: true,
+                                  title: { display: true, text: 'Montant (XOF)' },
+                                  ticks: {
+                                      callback: function(value) { return value.toLocaleString('fr-FR') + ' XOF'; }
+                                  }
+                              }
+                          },
+                          plugins: {
+                              tooltip: {
+                                  callbacks: {
+                                      label: function(context) {
+                                          let label = context.dataset.label || '';
+                                          if (label) { label += ': '; }
+                                          if (context.parsed.y !== null) {
+                                              label += context.parsed.y.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
+                                          }
+                                          return label;
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  });
+              }
+
+
+              // Prepare data for Top Selling Books Chart
+              const sortedBooks = Object.entries(bookSalesCount)
+                  .map(([bookId, quantity]) => ({
+                      bookId,
+                      title: allBooksDataCache[bookId]?.title || 'Livre Inconnu',
+                      quantity
+                  }))
+                  .sort((a, b) => b.quantity - a.quantity)
+                  .slice(0, 5);
+
+              if (topSellingBooksChartInstance) topSellingBooksChartInstance.destroy();
+              if (sortedBooks.length === 0 && topSellingBooksChartNoDataEl) {
+                  topSellingBooksChartNoDataEl.style.display = 'block';
+                  if(topSellingBooksChartCtx) topSellingBooksChartCtx.canvas.style.display = 'none';
+              } else if (topSellingBooksChartCtx) {
+                  topSellingBooksChartCtx.canvas.style.display = 'block';
+                  topSellingBooksChartInstance = new Chart(topSellingBooksChartCtx, {
+                      type: 'bar',
+                      data: {
+                          labels: sortedBooks.map(b => b.title.length > 25 ? b.title.substring(0,22)+'...' : b.title), // Truncate long titles for labels
+                          datasets: [{
+                              label: 'Quantité Vendue',
+                              data: sortedBooks.map(b => b.quantity),
+                              backgroundColor: [
+                                  Chart.helpers.color(getComputedStyle(document.documentElement).getPropertyValue('--chart-primary-color').trim()).alpha(0.7).rgbString(),
+                                  Chart.helpers.color(getComputedStyle(document.documentElement).getPropertyValue('--chart-secondary-color').trim()).alpha(0.7).rgbString(),
+                                  Chart.helpers.color(getComputedStyle(document.documentElement).getPropertyValue('--ebay-yellow').trim()).alpha(0.7).rgbString(),
+                                  Chart.helpers.color(getComputedStyle(document.documentElement).getPropertyValue('--ebay-red').trim()).alpha(0.7).rgbString(),
+                                  Chart.helpers.color('#6c757d').alpha(0.7).rgbString(), // A neutral color
+                              ],
+                              borderColor: [
+                                  getComputedStyle(document.documentElement).getPropertyValue('--chart-primary-color').trim(),
+                                  getComputedStyle(document.documentElement).getPropertyValue('--chart-secondary-color').trim(),
+                                  getComputedStyle(document.documentElement).getPropertyValue('--ebay-yellow').trim(),
+                                  getComputedStyle(document.documentElement).getPropertyValue('--ebay-red').trim(),
+                                  '#6c757d',
+                              ],
+                              borderWidth: 1
+                          }]
+                      },
+                      options: {
+                          indexAxis: 'y', // Horizontal bar chart
+                          responsive: true,
+                          maintainAspectRatio: false, // La hauteur du conteneur est maintenant fixe
+                          scales: {
+                              x: { beginAtZero: true, title: { display: true, text: 'Quantité Vendue' } },
+                              y: { ticks: { autoSkip: false } } // Ensure all labels are shown
+                          },
+                          plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(tooltipItems) { // Afficher le titre complet dans le tooltip
+                                        const index = tooltipItems[0].dataIndex;
+                                        return sortedBooks[index].title;
                                     }
                                 }
                             }
-                        }
-                    });
-                }
+                          }
+                      }
+                  });
+              }
+
+          } catch (error) {
+              console.error("Error loading report data:", error);
+              if(salesProfitChartErrorEl) {
+                salesProfitChartErrorEl.textContent = "Erreur de chargement des données du rapport.";
+                salesProfitChartErrorEl.style.display = 'block';
+                if(salesProfitChartCtx) salesProfitChartCtx.canvas.style.display = 'none';
+              }
+              if(topSellingBooksChartErrorEl) {
+                topSellingBooksChartErrorEl.textContent = "Erreur de chargement des données du rapport.";
+                topSellingBooksChartErrorEl.style.display = 'block';
+                if(topSellingBooksChartCtx) topSellingBooksChartCtx.canvas.style.display = 'none';
+              }
+          } finally {
+              if(salesProfitChartLoadingEl) salesProfitChartLoadingEl.style.display = 'none';
+              if(topSellingBooksChartLoadingEl) topSellingBooksChartLoadingEl.style.display = 'none';
+          }
+      }
+
+      function initializeReportsPage() {
+          if (auth.currentUser) {
+              loadReportData();
+          } else {
+              // Clear KPIs
+              if(kpiTotalRevenueEl) kpiTotalRevenueEl.textContent = 'XOF 0';
+              if(kpiTotalCogsEl) kpiTotalCogsEl.textContent = 'XOF 0';
+              if(kpiTotalProfitEl) kpiTotalProfitEl.textContent = 'XOF 0';
+              if(kpiTotalSalesCountEl) kpiTotalSalesCountEl.textContent = '0';
+              if(kpiTotalItemsSoldEl) kpiTotalItemsSoldEl.textContent = '0';
+              if(kpiAvgProfitMarginEl) kpiAvgProfitMarginEl.textContent = '0%';
+
+              // Destroy charts and show login message or hide charts
+              if (salesProfitChartInstance) { salesProfitChartInstance.destroy(); salesProfitChartInstance = null; }
+              if (topSellingBooksChartInstance) { topSellingBooksChartInstance.destroy(); topSellingBooksChartInstance = null; }
+              
+              const msg = "Veuillez vous connecter pour voir les rapports.";
+              if(salesProfitChartLoadingEl) salesProfitChartLoadingEl.style.display = 'none';
+              if(salesProfitChartErrorEl) { salesProfitChartErrorEl.textContent = msg; salesProfitChartErrorEl.style.display = 'block'; }
+              if(salesProfitChartNoDataEl) salesProfitChartNoDataEl.style.display = 'none';
+              if(salesProfitChartCtx) salesProfitChartCtx.canvas.style.display = 'none';
+              
+              if(topSellingBooksChartLoadingEl) topSellingBooksChartLoadingEl.style.display = 'none';
+              if(topSellingBooksChartErrorEl) { topSellingBooksChartErrorEl.textContent = msg; topSellingBooksChartErrorEl.style.display = 'block'; }
+              if(topSellingBooksChartNoDataEl) topSellingBooksChartNoDataEl.style.display = 'none';
+              if(topSellingBooksChartCtx) topSellingBooksChartCtx.canvas.style.display = 'none';
+          }
+      }
+      
+      if(dateRangeSelectorEl) {
+          dateRangeSelectorEl.addEventListener('change', loadReportData);
+      }
 
 
-                // Prepare data for Top Selling Books Chart
-                const sortedBooks = Object.entries(bookSalesCount)
-                    .map(([bookId, quantity]) => ({
-                        bookId,
-                        title: allBooksDataCache[bookId]?.title || 'Livre Inconnu',
-                        quantity
-                    }))
-                    .sort((a, b) => b.quantity - a.quantity)
-                    .slice(0, 5);
+      // Listen for page visibility (via hash change or auth state)
+      window.addEventListener('hashchange', () => {
+          if (location.hash === '#reports') {
+              initializeReportsPage();
+          } else {
+              if (salesProfitChartInstance) { salesProfitChartInstance.destroy(); salesProfitChartInstance = null;}
+              if (topSellingBooksChartInstance) { topSellingBooksChartInstance.destroy(); topSellingBooksChartInstance = null;}
+          }
+      });
 
-                if (topSellingBooksChartInstance) topSellingBooksChartInstance.destroy();
-                 if (sortedBooks.length === 0 && topSellingBooksChartNoDataEl) {
-                    topSellingBooksChartNoDataEl.style.display = 'block';
-                } else if (topSellingBooksChartCtx) {
-                    topSellingBooksChartInstance = new Chart(topSellingBooksChartCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: sortedBooks.map(b => b.title.length > 20 ? b.title.substring(0,17)+'...' : b.title), // Truncate long titles
-                            datasets: [{
-                                label: 'Quantité Vendue',
-                                data: sortedBooks.map(b => b.quantity),
-                                backgroundColor: [
-                                    Chart.helpers.color(getComputedStyle(document.documentElement).getPropertyValue('--chart-primary-color').trim()).alpha(0.7).rgbString(),
-                                    Chart.helpers.color(getComputedStyle(document.documentElement).getPropertyValue('--chart-secondary-color').trim()).alpha(0.7).rgbString(),
-                                    Chart.helpers.color(getComputedStyle(document.documentElement).getPropertyValue('--ebay-yellow').trim()).alpha(0.7).rgbString(),
-                                    Chart.helpers.color(getComputedStyle(document.documentElement).getPropertyValue('--ebay-red').trim()).alpha(0.7).rgbString(),
-                                    Chart.helpers.color('#6c757d').alpha(0.7).rgbString(), // A neutral color
-                                ],
-                                borderColor: [
-                                    getComputedStyle(document.documentElement).getPropertyValue('--chart-primary-color').trim(),
-                                    getComputedStyle(document.documentElement).getPropertyValue('--chart-secondary-color').trim(),
-                                    getComputedStyle(document.documentElement).getPropertyValue('--ebay-yellow').trim(),
-                                    getComputedStyle(document.documentElement).getPropertyValue('--ebay-red').trim(),
-                                    '#6c757d',
-                                ],
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            indexAxis: 'y', // Horizontal bar chart
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                x: { beginAtZero: true, title: { display: true, text: 'Quantité Vendue' } },
-                                y: { ticks: { autoSkip: false } } // Ensure all labels are shown
-                            },
-                             plugins: { legend: { display: false } }
-                        }
-                    });
-                }
+      auth.onAuthStateChanged(user => {
+          if (location.hash === '#reports') { // Only if already on reports page
+              initializeReportsPage();
+          }
+      });
 
-            } catch (error) {
-                console.error("Error loading report data:", error);
-                if(salesProfitChartErrorEl) salesProfitChartErrorEl.style.display = 'block';
-                if(topSellingBooksChartErrorEl) topSellingBooksChartErrorEl.style.display = 'block';
-            } finally {
-                if(salesProfitChartLoadingEl) salesProfitChartLoadingEl.style.display = 'none';
-                if(topSellingBooksChartLoadingEl) topSellingBooksChartLoadingEl.style.display = 'none';
-            }
-        }
+      // Initial load if page starts on #reports
+      if (location.hash === '#reports') {
+          initializeReportsPage();
+      }
 
-        function initializeReportsPage() {
-            if (auth.currentUser) {
-                loadReportData();
-            } else {
-                // Clear KPIs
-                if(kpiTotalRevenueEl) kpiTotalRevenueEl.textContent = 'XOF 0';
-                if(kpiTotalCogsEl) kpiTotalCogsEl.textContent = 'XOF 0';
-                if(kpiTotalProfitEl) kpiTotalProfitEl.textContent = 'XOF 0';
-                if(kpiTotalSalesCountEl) kpiTotalSalesCountEl.textContent = '0';
-                if(kpiTotalItemsSoldEl) kpiTotalItemsSoldEl.textContent = '0';
-                if(kpiAvgProfitMarginEl) kpiAvgProfitMarginEl.textContent = '0%';
-
-                // Destroy charts and show login message or hide charts
-                if (salesProfitChartInstance) salesProfitChartInstance.destroy();
-                if (topSellingBooksChartInstance) topSellingBooksChartInstance.destroy();
-                if(salesProfitChartErrorEl) {
-                    salesProfitChartErrorEl.textContent = "Veuillez vous connecter pour voir les rapports.";
-                    salesProfitChartErrorEl.style.display = 'block';
-                }
-                 if(topSellingBooksChartErrorEl) {
-                    topSellingBooksChartErrorEl.textContent = "Veuillez vous connecter pour voir les rapports.";
-                    topSellingBooksChartErrorEl.style.display = 'block';
-                }
-            }
-        }
-        
-        if(dateRangeSelectorEl) {
-            dateRangeSelectorEl.addEventListener('change', loadReportData);
-        }
-
-
-        // Listen for page visibility (via hash change or auth state)
-        window.addEventListener('hashchange', () => {
-            if (location.hash === '#reports') {
-                initializeReportsPage();
-            } else {
-                if (salesProfitChartInstance) salesProfitChartInstance.destroy();
-                if (topSellingBooksChartInstance) topSellingBooksChartInstance.destroy();
-            }
-        });
-
-        auth.onAuthStateChanged(user => {
-            if (location.hash === '#reports') { // Only if already on reports page
-                initializeReportsPage();
-            }
-        });
-
-        // Initial load if page starts on #reports
-        if (location.hash === '#reports') {
-            initializeReportsPage();
-        }
-
-    })();
-    </script>
+  })();
+  </script>
 </main>
-
 
 <main id="activation" class="page">
   <style>
