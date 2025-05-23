@@ -479,6 +479,7 @@
       Installer l’application
     </button>
   </main>
+  
 <main id="sell" class="page">
   <style>
 
@@ -546,17 +547,41 @@
     }
     /* Style pour les titres des étapes */
     .sell-step h3.step-title {
-        padding: 1rem 1rem 0.5rem;
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin: 0;
-        background-color: #fff; /* Pour cacher le contenu qui scrolle derrière */
-        border-bottom: 1px solid var(--border-color);
-        position: -webkit-sticky;
-        position: sticky;
-        top: 0; /* Se colle sous le header principal si header principal existe pour l'étape */
-        z-index: 14; /* En dessous du header principal, au-dessus du contenu */
-    }
+    /* Styles existants (assurez-vous qu'ils sont là ou copiez-les depuis votre code actuel) */
+    padding: 1rem 1rem 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    background-color: #fff; /* Pour cacher le contenu qui scrolle derrière */
+    border-bottom: 1px solid var(--border-color);
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0; /* Se colle sous le header principal si header principal existe pour l'étape */
+    z-index: 14; /* En dessous du header principal, au-dessus du contenu */
+
+    /* === AJOUTS/MODIFICATIONS CI-DESSOUS === */
+    display: flex;                 /* Pour aligner le titre et le bouton sur la même ligne */
+    align-items: center;           /* Pour centrer verticalement les éléments */
+    justify-content: space-between; /* Pour pousser le bouton vers la droite */
+}
+
+/* Styles pour le bouton "Vider le panier" DANS le titre h3 */
+.sell-step h3.step-title #btn-clear-sell-cart-step2 {
+    background: none;                 /* Enlève le fond du bouton */
+    border: none;                     /* Enlève la bordure */
+    padding: 0.25rem;               /* Un peu d'espace autour de l'icône */
+    margin: 0;                      /* Enlève les marges par défaut si présentes */
+    cursor: pointer;                  /* Change le curseur en main */
+    font-size: 1.3rem;              /* Ajustez la taille de l'icône si nécessaire */
+    line-height: 1;                   /* Pour un meilleur alignement vertical de l'icône */
+    color: var(--ebay-red);           /* Assure la couleur de l'icône (même si style en ligne existe) */
+}
+
+/* Si vous voulez être sûr que l'icône hérite bien de la couleur du bouton : */
+.sell-step h3.step-title #btn-clear-sell-cart-step2 i {
+    color: inherit; /* Hérite la couleur de son parent bouton */
+    vertical-align: middle; /* Peut aider à mieux centrer l'icône */
+}
 
 
     /* Navigation du Wizard */
@@ -679,14 +704,7 @@
     }
     .cart-summary-section-step2 .summary-line.total span { font-weight: bold; font-size: 1.15rem; }
     .cart-summary-section-step2 .summary-line.total span:last-child { color: var(--ebay-green); }
-    #btn-clear-sell-cart-step2 {
-        width: 100%; padding: 0.8rem; font-size: 1rem; font-weight: 500;
-        border-radius: var(--border-radius-pill); border: 1px solid var(--ebay-red);
-        background-color: transparent; color: var(--ebay-red); cursor: pointer;
-        display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-        box-shadow: none; margin-top: 1rem;
-    }
-
+    
     /* Styles pour infos client (Étape 3) */
     .form-group-sell { margin-bottom: 1rem; }
     .form-group-sell label {
@@ -739,6 +757,7 @@
     }
     #sell-feedback-message.success { color: var(--ebay-green); }
     #sell-feedback-message.error { color: var(--ebay-red); }
+    
 
   </style>
 
@@ -763,8 +782,15 @@
     </div>
   </div>
 
-  <div class="sell-step" data-step="2">
-    <h3 class="step-title"><i class="bi bi-list-ul"></i> Articles pour la Vente</h3>
+  <div class="sell-step" data-step="2"> <h3 class="step-title">
+        <span style="display: flex; align-items: center; gap: 0.5em;">
+            <i class="bi bi-list-ul"></i>
+            <span>Articles pour la Vente</span>
+        </span>
+        <button id="btn-clear-sell-cart-step2" aria-label="Vider le panier">
+            <i class="bi bi-cart-x-fill" style="color:var(--ebay-red);"></i>
+        </button>
+    </h3>
     <div class="sell-step-content">
         <div id="sell-cart-items-list-step2">
             </div>
@@ -775,13 +801,12 @@
             <div class="summary-line"><span>Total Articles:</span> <span id="sell-cart-total-items-step2">0</span></div>
             <div class="summary-line total"><span>Montant Total:</span> <span id="sell-cart-grand-total-step2">XOF 0</span></div>
         </div>
-        <button id="btn-clear-sell-cart-step2"><i class="bi bi-cart-x-fill" style="color:var(--ebay-red);"></i> Vider le Panier</button>
-    </div>
+        </div>
     <div class="wizard-nav-sell">
-      <button class="btn-sell-secondary" data-target-step="1">&larr; Sélection Livres</button>
-      <button id="btn-sell-step2-next" class="btn-sell-primary" data-target-step="3" disabled>Suivant &rarr;</button>
+        <button class="btn-sell-secondary" data-target-step="1">&larr; Sélection Livres</button>
+        <button id="btn-sell-step2-next" class="btn-sell-primary" data-target-step="3" disabled>Suivant &rarr;</button>
     </div>
-  </div>
+</div>
 
   <div class="sell-step" data-step="3">
     <h3 class="step-title"><i class="bi bi-person-badge"></i> Informations Client</h3>
