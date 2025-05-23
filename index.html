@@ -234,7 +234,7 @@
       overflow-x: auto;
       transition: opacity 0.3s ease, max-height 0.3s ease, margin-bottom 0.3s ease, padding 0.3s ease;
       max-height: 200px;
-      overflow: hidden;
+      /* overflow: hidden; REMOVED - Let it scroll if content is too wide */
     }
 
     .info-card {
@@ -244,7 +244,7 @@
       border-radius: var(--border-radius-card);
       padding: 0.75rem; /* Padding interne ajusté */
       text-align: center;
-      min-width: 0;
+      min-width: 120px; /* Added min-width to prevent squishing */
       box-shadow: none; 
     }
 
@@ -429,7 +429,7 @@
         height: 150px; /* Hauteur approximative de la carte */
         animation: pulse 1.5s infinite ease-in-out;
     }
-     @keyframes pulse {
+      @keyframes pulse {
       0%   { opacity: 1; }
       50%  { opacity: 0.6; }
       100% { opacity: 1; }
@@ -451,6 +451,89 @@
       font-weight: 600;
       color: var(--primary-text);
     }
+
+    /* NOUVEAUX STYLES POUR LE FILTRE ET LE RÉSUMÉ DES VENTES */
+    #sales-summary-filter-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background-color: #f8f9fa; /* Un fond léger pour distinguer la zone */
+        border-bottom: 1px solid var(--border-color);
+        gap: 0.75rem; /* Espace entre les éléments */
+        position: -webkit-sticky;
+        position: sticky;
+        top: 57px; /* Hauteur approximative du header#sales-header */
+        z-index: 14; /* En dessous du header principal, au-dessus de la liste */
+        flex-wrap: wrap; /* Permet le retour à la ligne sur petits écrans */
+    }
+
+    #sales-summary-chip {
+        font-size: 0.85rem; /* Légèrement plus petit pour mobile */
+        font-weight: 500;
+        padding: 0.4rem 0.8rem;
+        background-color: var(--ebay-blue);
+        color: white;
+        border-radius: var(--border-radius-pill);
+        white-space: nowrap;
+        flex-shrink: 0; /* Empêche le chip de rétrécir excessivement */
+    }
+
+    #sales-date-filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem; /* Espace entre le texte de la date et le bouton */
+        flex-grow: 1; /* Permet au groupe de prendre l'espace restant */
+        justify-content: flex-end; /* Aligne à droite */
+    }
+
+    #sales-selected-date-display {
+        font-size: 0.85rem;
+        color: var(--secondary-text);
+        font-weight: 500;
+        text-align: right;
+    }
+
+    #sales-date-filter-btn {
+        background-color: #fff;
+        border: 1px solid var(--border-color);
+        color: var(--primary-text);
+        border-radius: 50%;
+        width: 32px; /* Taille ajustée pour mobile */
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem; /* Taille de l'icône ajustée */
+        cursor: pointer;
+        box-shadow: none;
+        padding:0;
+        flex-shrink: 0;
+    }
+    #sales-date-filter-btn:active {
+        background-color: #e9ecef; /* Feedback visuel plus subtil */
+    }
+    #sales-date-filter-btn i {
+        line-height: 1; /* Assure un bon centrage de l'icône */
+    }
+
+    /* Input date caché, activé par JS */
+    #sales-date-picker {
+        /* display: none; -- Géré par JS pour l'accessibilité */
+        position: absolute;
+        opacity: 0;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+        padding: 0;
+        margin: -1px;
+    }
+    /* FIN NOUVEAUX STYLES */
+
+
     main#sales .sales-list { /* This is #sales-list */
         display: flex;
         flex-direction: column;
@@ -479,8 +562,9 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid #efefef;
+        padding: 0; /* Retiré padding-bottom, géré par gap du parent .sale-card */
+        border-bottom: 1px solid #efefef; 
+        padding-bottom: 0.5rem; /* Remis pour la ligne de séparation */
     }
     main#sales .sale-card header .sale-info {
         flex-grow: 1;
@@ -508,7 +592,7 @@
         color: var(--ebay-green);
         display: block;
     }
-     main#sales .sale-card header .sale-meta .sale-total-items { /* Total items */
+      main#sales .sale-card header .sale-meta .sale-total-items { /* Total items */
         font-size: 0.85rem;
         color: var(--secondary-text);
         display: block;
@@ -1280,7 +1364,7 @@
         if (item) showFeedback(`"${item.title}" retiré du panier.`, false, 1500);
        
         renderSalesCartForStep2(); // OK ici, la perte de focus n'est pas un enjeu pour une suppression.
-                                    // Et la gestion des index DOM est simplifiée.
+                                        // Et la gestion des index DOM est simplifiée.
        
         step1NextBtn.disabled = salesCart.length === 0; 
         const searchResultButton = searchResultsContainerEl.querySelector(`.btn-add-to-sell-cart[data-book-id="${item.bookId}"]`);
@@ -1870,7 +1954,7 @@
         <input type="text"
                class="book-search"
                placeholder="Choisir un livre"
-               readonly   
+               readonly  
                autocomplete="off"
                autocorrect="off"
                autocapitalize="none"
@@ -2443,8 +2527,8 @@
         return;
     }
     // if (searchTerm.length < 2 && searchTerm.length > 0) { 
-    //     resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Continuez à taper...</p>';
-    //     return;
+    //    resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Continuez à taper...</p>';
+    //    return;
     // }
 
     debounceTimer = setTimeout(async () => {
@@ -2528,7 +2612,7 @@
                   costInput.dataset.baseCost = purchasePrice.toFixed(0); 
                 }
                 // if (qtyInput && (!qtyInput.value || qtyInput.value === "0") ) { 
-                //     qtyInput.value = 1;
+                //    qtyInput.value = 1;
                 // }
                 // Trigger events after setting values
                 window.currentBookInput.dispatchEvent(new Event('change', { bubbles:true })); // Use 'change' as value is set programmatically
@@ -2654,8 +2738,8 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
   function closeAddBookModal() { // This function might be called by router when navigating away
     const modalEl = document.getElementById('add-book-modal');
     // if (modalEl) {
-    //     modalEl.classList.remove('visible');
-    //     modalEl.setAttribute('aria-hidden', 'true');
+    //    modalEl.classList.remove('visible');
+    //    modalEl.setAttribute('aria-hidden', 'true');
     // }
     // document.body.style.overflow = ''; 
     // document.body.classList.remove('keyboard-visible'); 
@@ -2832,103 +2916,165 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
   <header id="sales-header">
     <h2>Historique des Ventes</h2>
   </header>
+  <div id="sales-summary-filter-container">
+    <span id="sales-summary-chip">0 livre(s) vendu(s)</span>
+    <div id="sales-date-filter-group">
+        <span id="sales-selected-date-display">Aujourd'hui</span>
+        <button id="sales-date-filter-btn" aria-label="Choisir une date">
+            <i class="bi bi-calendar3"></i>
+        </button>
+        <input type="date" id="sales-date-picker">
+    </div>
+  </div>
   <div id="sales-list" class="sales-list">
     </div>
   <script>
     // Script for Sales History Page
     (function() {
       const salesListEl = document.getElementById('sales-list');
-      let unsubscribeSales = null;
+      // NOUVEAUX ÉLÉMENTS DOM
+      const salesSummaryChipEl = document.getElementById('sales-summary-chip');
+      const salesSelectedDateDisplayEl = document.getElementById('sales-selected-date-display');
+      const salesDateFilterBtnEl = document.getElementById('sales-date-filter-btn');
+      const salesDatePickerEl = document.getElementById('sales-date-picker');
 
-      function setupSalesListener() {
-        if (unsubscribeSales) unsubscribeSales(); // Unsubscribe from previous listener
+      let unsubscribeSales = null;
+      let selectedSalesDate = new Date(); // Par défaut à aujourd'hui
+
+      // Fonction pour formater la date pour l'affichage (JJ/MM/AAAA)
+      function formatDateForDisplay(date) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Mois est 0-indexé
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+      
+      // Fonction pour mettre à jour l'affichage de la date sélectionnée
+      function updateSelectedDateDisplay(date) {
+          const today = new Date();
+          if (date.toDateString() === today.toDateString()) {
+              salesSelectedDateDisplayEl.textContent = "Aujourd'hui";
+          } else {
+              salesSelectedDateDisplayEl.textContent = formatDateForDisplay(date);
+          }
+          // Mettre à jour la valeur du date picker (format YYYY-MM-DD)
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          salesDatePickerEl.value = `${year}-${month}-${day}`;
+      }
+
+
+      // Fonctions pour obtenir le début et la fin du jour pour Firestore
+      function getStartOfDayTimestamp(date) {
+          const start = new Date(date);
+          start.setHours(0, 0, 0, 0);
+          return firebase.firestore.Timestamp.fromDate(start);
+      }
+
+      function getEndOfDayTimestamp(date) {
+          const end = new Date(date);
+          end.setHours(23, 59, 59, 999);
+          return firebase.firestore.Timestamp.fromDate(end);
+      }
+
+      function setupSalesListener(filterDate) {
+        if (unsubscribeSales) unsubscribeSales(); 
         if (!auth.currentUser) {
           if(salesListEl) salesListEl.innerHTML = '<p style="padding:1rem;color:#555;text-align:center;">Veuillez vous connecter pour voir l\'historique.</p>';
+          if(salesSummaryChipEl) salesSummaryChipEl.textContent = '0 livre(s) vendu(s)';
           return;
         }
+
+        const startOfDay = getStartOfDayTimestamp(filterDate);
+        const endOfDay = getEndOfDayTimestamp(filterDate);
 
         const salesRef = db
           .collection('users')
           .doc(auth.currentUser.uid)
           .collection('sales')
-          .orderBy('timestamp', 'desc'); // Get newest sales first
+          .where('timestamp', '>=', startOfDay)
+          .where('timestamp', '<=', endOfDay)
+          .orderBy('timestamp', 'desc'); 
 
         if(salesListEl) {
-            salesListEl.innerHTML = Array(3) // Show 3 skeleton cards while loading
+            salesListEl.innerHTML = Array(3) 
             .fill('')
             .map(() => '<div class="skeleton-sale-card"></div>')
             .join('');
         }
+        if(salesSummaryChipEl) salesSummaryChipEl.textContent = 'Chargement...';
 
 
         unsubscribeSales = salesRef.onSnapshot(snapshot => {
           if(!salesListEl) return;
-          salesListEl.innerHTML = ''; // Clear current list (skeletons or old data)
+          salesListEl.innerHTML = ''; 
+
+          let totalBooksSoldOnDate = 0;
 
           if (snapshot.empty) {
-            salesListEl.innerHTML = '<p style="padding:1rem;color:#555;text-align:center;">Aucune vente enregistrée pour l’instant.</p>';
-            return;
-          }
+            salesListEl.innerHTML = `<p style="padding:1rem;color:#555;text-align:center;">Aucune vente enregistrée pour le ${formatDateForDisplay(filterDate)}.</p>`;
+          } else {
+            snapshot.forEach(doc => {
+              const sale = doc.data();
+              const saleId = doc.id;
+              const dateObj = sale.timestamp?.toDate() || new Date(); 
+              const dateStr = dateObj.toLocaleDateString('fr-FR', {
+                day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+              });
 
-          snapshot.forEach(doc => {
-            const sale = doc.data();
-            const saleId = doc.id;
-            const dateObj = sale.timestamp?.toDate() || new Date(); // Use server timestamp
-            const dateStr = dateObj.toLocaleDateString('fr-FR', {
-              day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-            });
+              const totalSaleAmount = sale.grandTotalAmount || 0;
+              const totalItemsInThisSale = sale.totalItemsSold || 0;
+              totalBooksSoldOnDate += totalItemsInThisSale;
 
-            const totalSaleAmount = sale.grandTotalAmount || 0;
-            const totalItems = sale.totalItemsSold || 0;
+              const saleCard = document.createElement('div');
+              saleCard.className = 'sale-card'; 
+              saleCard.dataset.saleId = saleId;
 
-            const saleCard = document.createElement('div');
-            saleCard.className = 'sale-card'; // Using a new class for sales, can be styled like supply-batch-card
-            saleCard.dataset.saleId = saleId;
+              let customerDisplayName = sale.customerName || 'Client Anonyme';
+              if (customerDisplayName.length > 25) {
+                  customerDisplayName = customerDisplayName.substring(0, 22) + '...';
+              }
 
-            // Truncate long customer names
-            let customerDisplayName = sale.customerName || 'Client Anonyme';
-            if (customerDisplayName.length > 25) {
-                customerDisplayName = customerDisplayName.substring(0, 22) + '...';
-            }
-
-
-            saleCard.innerHTML = `
-              <header>
-                <div class="sale-info">
-                  <strong title="${sale.customerName || 'Client Anonyme'}">${customerDisplayName}</strong>
-                  <small>${dateStr}</small>
-                </div>
-                <div class="sale-meta">
-                  <span class="sale-total-amount">${totalSaleAmount.toLocaleString('fr-FR', {
-                    style: 'currency', currency: 'XOF', minimumFractionDigits: 0
-                  })}</span>
-                  <span class="sale-total-items">Articles: ${totalItems}</span>
-                </div>
-              </header>
-              ${sale.items && sale.items.length > 0 ? `
-                <ul style="list-style:none; padding-left:0; margin-top:0.5rem; font-size:0.85rem;">
-                  ${sale.items.slice(0, 2).map(item => `
-                    <li style="display:flex; justify-content:space-between; padding:0.1rem 0;">
-                      <span style="flex-grow:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-right:0.5rem;" title="${item.title || 'Article inconnu'}">${item.title || 'Article inconnu'}</span>
-                      <span style="flex-shrink:0;">x ${item.quantitySold || 0}</span>
-                    </li>
-                  `).join('')}
-                  ${sale.items.length > 2 ? `<li style="text-align:right; color:var(--secondary-text); font-style:italic;">et ${sale.items.length - 2} autre(s)...</li>` : ''}
-                </ul>` : '<p style="font-size:0.85rem; color:var(--secondary-text); margin-top:0.5rem;">Aucun détail d\'article disponible.</p>'}
-            `;
-            // Placeholder for click to see full details
-            saleCard.addEventListener('click', () => {
-                // TODO: Implement a modal or an expansion to show full sale details
-                // For now, just log to console
+              saleCard.innerHTML = `
+                <header>
+                  <div class="sale-info">
+                    <strong title="${sale.customerName || 'Client Anonyme'}">${customerDisplayName}</strong>
+                    <small>${dateStr}</small>
+                  </div>
+                  <div class="sale-meta">
+                    <span class="sale-total-amount">${totalSaleAmount.toLocaleString('fr-FR', {
+                      style: 'currency', currency: 'XOF', minimumFractionDigits: 0
+                    })}</span>
+                    <span class="sale-total-items">Articles: ${totalItemsInThisSale}</span>
+                  </div>
+                </header>
+                ${sale.items && sale.items.length > 0 ? `
+                  <ul style="list-style:none; padding-left:0; margin-top:0.5rem; font-size:0.85rem;">
+                    ${sale.items.slice(0, 2).map(item => `
+                      <li style="display:flex; justify-content:space-between; padding:0.1rem 0;">
+                        <span style="flex-grow:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-right:0.5rem;" title="${item.title || 'Article inconnu'}">${item.title || 'Article inconnu'}</span>
+                        <span style="flex-shrink:0;">x ${item.quantitySold || 0}</span>
+                      </li>
+                    `).join('')}
+                    ${sale.items.length > 2 ? `<li style="text-align:right; color:var(--secondary-text); font-style:italic;">et ${sale.items.length - 2} autre(s)...</li>` : ''}
+                  </ul>` : '<p style="font-size:0.85rem; color:var(--secondary-text); margin-top:0.5rem;">Aucun détail d\'article disponible.</p>'}
+              `;
+              saleCard.addEventListener('click', () => {
                 console.log("Clicked sale:", saleId, sale);
                 alert(`Détails pour la vente ID: ${saleId} (à implémenter) \nClient: ${sale.customerName || 'N/A'} \nTotal: ${totalSaleAmount.toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0})}`);
-            });
+              });
 
-            salesListEl.appendChild(saleCard);
-          });
+              salesListEl.appendChild(saleCard);
+            });
+          }
+          // Mettre à jour la chip de résumé
+          if(salesSummaryChipEl) salesSummaryChipEl.textContent = `${totalBooksSoldOnDate} livre(s) vendu(s)`;
+
         }, err => {
           console.error('Erreur Firestore (sales):', err);
           if(salesListEl) salesListEl.innerHTML = '<p style="padding:1rem;color:var(--ebay-red);text-align:center;">Erreur de chargement des ventes.</p>';
+          if(salesSummaryChipEl) salesSummaryChipEl.textContent = 'Erreur';
         });
       }
 
@@ -2938,30 +3084,66 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
           unsubscribeSales = null;
         }
       }
+      
+      // Écouteur pour le bouton de filtre de date
+      if (salesDateFilterBtnEl) {
+          salesDateFilterBtnEl.addEventListener('click', () => {
+              try {
+                  salesDatePickerEl.showPicker(); // Méthode standard pour afficher le sélecteur de date
+              } catch (error) {
+                  // Fallback pour les navigateurs qui ne supportent pas showPicker()
+                  // ou si l'input est d'un type qui ne le supporte pas (peu probable pour type="date")
+                  salesDatePickerEl.focus(); // Tenter de focaliser peut ouvrir le picker sur certains navigateurs
+                  salesDatePickerEl.click(); // Tenter un clic peut aussi aider
+                  console.warn("salesDatePickerEl.showPicker() non supporté ou a échoué, tentative de fallback.", error);
+              }
+          });
+      }
 
-      // Listen to hash changes to setup/cleanup listener
+      // Écouteur pour le changement de date dans le picker
+      if (salesDatePickerEl) {
+          salesDatePickerEl.addEventListener('change', (event) => {
+              const newDate = new Date(event.target.value + 'T00:00:00'); // Assurer que la date est interprétée localement
+              if (!isNaN(newDate.getTime())) { // Vérifier si la date est valide
+                  selectedSalesDate = newDate;
+                  updateSelectedDateDisplay(selectedSalesDate);
+                  setupSalesListener(selectedSalesDate);
+              }
+          });
+      }
+
+
+      // Initialisation et gestion des changements de hash/auth
+      function initializeSalesPage() {
+          selectedSalesDate = new Date(); // Réinitialiser à aujourd'hui
+          updateSelectedDateDisplay(selectedSalesDate);
+          if (auth.currentUser) {
+              setupSalesListener(selectedSalesDate);
+          } else {
+              cleanupSalesListener();
+              if(salesListEl) salesListEl.innerHTML = '<p style="padding:1rem;color:#555;text-align:center;">Veuillez vous connecter pour voir l\'historique.</p>';
+              if(salesSummaryChipEl) salesSummaryChipEl.textContent = '0 livre(s) vendu(s)';
+          }
+      }
+      
       window.addEventListener('hashchange', () => {
         if (location.hash === '#sales') {
-          if (auth.currentUser) setupSalesListener();
+          initializeSalesPage();
         } else {
           cleanupSalesListener();
         }
       });
 
-      // Initial check if page loads on #sales
-      if (location.hash === '#sales') {
-        if (auth.currentUser) setupSalesListener();
-      }
-      
-      // Also setup listener if auth state changes and we are on the sales page
       auth.onAuthStateChanged(user => {
-        if (user && location.hash === '#sales') {
-            setupSalesListener();
-        } else if (!user && location.hash === '#sales') {
-            cleanupSalesListener();
-             if(salesListEl) salesListEl.innerHTML = '<p style="padding:1rem;color:#555;text-align:center;">Veuillez vous connecter pour voir l\'historique.</p>';
+        if (location.hash === '#sales') { // Seulement si on est déjà sur la page des ventes
+            initializeSalesPage();
         }
       });
+
+      // Initial check if page loads on #sales
+      if (location.hash === '#sales') {
+        initializeSalesPage();
+      }
     })();
   </script>
 </main>
@@ -3264,7 +3446,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
                 // Future: Show confirmation and delete bookId
                 // Remplacer confirm par une modale custom
                 // if(confirm(`Êtes-vous sûr de vouloir supprimer ce livre (ID: ${bookId}) ?`)){
-                //     console.log("Suppression confirmée pour", bookId);
+                //    console.log("Suppression confirmée pour", bookId);
                 // }
                 alert(`Action "Supprimer" pour livre ID: ${bookId} (à implémenter avec confirmation)`);
             });
