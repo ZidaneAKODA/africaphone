@@ -290,7 +290,7 @@
     main#catalog .search-wrapper {
       margin-top: 0; 
     }
-    
+   
     /* Liste des livres dans le catalogue */
     #catalog-results-main .books-list {
       display: flex;
@@ -343,7 +343,7 @@
       margin-bottom: 0.25rem;
       line-height: 1.3;
     }
-    
+   
     .book-card-main-info p, .book-card-secondary-info p {
       font-size: 0.9rem;
       color: var(--secondary-text);
@@ -435,6 +435,92 @@
       100% { opacity: 1; }
     }
 
+    /* === Styles pour la page Historique des Ventes (main#sales) === */
+    header#sales-header {
+      padding: 1rem;
+      background: #fff;
+      border-bottom: 1px solid var(--border-color);
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      z-index: 15;
+    }
+    header#sales-header h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--primary-text);
+    }
+    main#sales .sales-list { /* This is #sales-list */
+        display: flex;
+        flex-direction: column;
+        gap: 1rem; /* Space between cards */
+        padding: 1rem; /* Padding around the entire list */
+    }
+    main#sales .skeleton-sale-card { /* Skeleton for sales */
+        background: #f9f9f9;
+        height: 100px; /* Adjusted height */
+        margin: 0;
+        border-radius: var(--border-radius-card);
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+    main#sales .sale-card { /* Individual sale card */
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-card);
+        margin: 0;
+        padding: 1rem;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    main#sales .sale-card header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #efefef;
+    }
+    main#sales .sale-card header .sale-info {
+        flex-grow: 1;
+        margin-right: 0.75rem;
+    }
+    main#sales .sale-card header .sale-info strong { /* Customer Name */
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--primary-text);
+        display: block;
+        margin-bottom: 0.2rem;
+    }
+    main#sales .sale-card header .sale-info small { /* Date */
+        font-size: 0.8rem;
+        color: var(--secondary-text);
+        display: block;
+    }
+    main#sales .sale-card header .sale-meta {
+        text-align: right;
+        flex-shrink: 0;
+    }
+    main#sales .sale-card header .sale-meta .sale-total-amount { /* Total XOF */
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--ebay-green);
+        display: block;
+    }
+     main#sales .sale-card header .sale-meta .sale-total-items { /* Total items */
+        font-size: 0.85rem;
+        color: var(--secondary-text);
+        display: block;
+        margin-top: 0.1rem;
+    }
+    main#sales .sale-card .sale-items-summary { /* Optional: for a brief summary of items if not expanding */
+        font-size: 0.85rem;
+        color: var(--secondary-text);
+        padding-top: 0.5rem;
+    }
+    /* End Sales History Styles */
+
   </style>
 </head>
 
@@ -479,7 +565,7 @@
       Installer l’application
     </button>
   </main>
-  
+ 
 <main id="sell" class="page">
   <style>
 
@@ -560,21 +646,21 @@
     z-index: 14; /* En dessous du header principal, au-dessus du contenu */
 
     /* === AJOUTS/MODIFICATIONS CI-DESSOUS === */
-    display: flex;                 /* Pour aligner le titre et le bouton sur la même ligne */
-    align-items: center;           /* Pour centrer verticalement les éléments */
+    display: flex;              /* Pour aligner le titre et le bouton sur la même ligne */
+    align-items: center;        /* Pour centrer verticalement les éléments */
     justify-content: space-between; /* Pour pousser le bouton vers la droite */
 }
 
 /* Styles pour le bouton "Vider le panier" DANS le titre h3 */
 .sell-step h3.step-title #btn-clear-sell-cart-step2 {
-    background: none;                 /* Enlève le fond du bouton */
-    border: none;                     /* Enlève la bordure */
-    padding: 0.25rem;               /* Un peu d'espace autour de l'icône */
-    margin: 0;                      /* Enlève les marges par défaut si présentes */
-    cursor: pointer;                  /* Change le curseur en main */
-    font-size: 1.3rem;              /* Ajustez la taille de l'icône si nécessaire */
-    line-height: 1;                   /* Pour un meilleur alignement vertical de l'icône */
-    color: var(--ebay-red);           /* Assure la couleur de l'icône (même si style en ligne existe) */
+    background: none;             /* Enlève le fond du bouton */
+    border: none;                 /* Enlève la bordure */
+    padding: 0.25rem;             /* Un peu d'espace autour de l'icône */
+    margin: 0;                    /* Enlève les marges par défaut si présentes */
+    cursor: pointer;              /* Change le curseur en main */
+    font-size: 1.3rem;            /* Ajustez la taille de l'icône si nécessaire */
+    line-height: 1;               /* Pour un meilleur alignement vertical de l'icône */
+    color: var(--ebay-red);       /* Assure la couleur de l'icône (même si style en ligne existe) */
 }
 
 /* Si vous voulez être sûr que l'icône hérite bien de la couleur du bouton : */
@@ -704,7 +790,7 @@
     }
     .cart-summary-section-step2 .summary-line.total span { font-weight: bold; font-size: 1.15rem; }
     .cart-summary-section-step2 .summary-line.total span:last-child { color: var(--ebay-green); }
-    
+   
     /* Styles pour infos client (Étape 3) */
     .form-group-sell { margin-bottom: 1rem; }
     .form-group-sell label {
@@ -757,7 +843,7 @@
     }
     #sell-feedback-message.success { color: var(--ebay-green); }
     #sell-feedback-message.error { color: var(--ebay-red); }
-    
+   
 
   </style>
 
@@ -1118,7 +1204,7 @@
             validatedQuantity = item.stock;
             showFeedback(`Stock maximum pour "${item.title}" est ${item.stock}.`, true, 2000);
         }
-        
+       
         const quantityInputEl = cartItemsListStep2El.querySelector(`input.quantity[data-index="${index}"]`);
         // Vérifier si une mise à jour est réellement nécessaire pour éviter des opérations DOM inutiles
         if (item.quantity === validatedQuantity && quantityInputEl && parseInt(quantityInputEl.value) === validatedQuantity) {
@@ -1130,7 +1216,7 @@
         if (quantityInputEl && parseInt(quantityInputEl.value) !== validatedQuantity) {
              quantityInputEl.value = validatedQuantity; 
         }
-        
+       
         const subtotalEl = cartItemsListStep2El.querySelector(`span.subtotal[data-index="${index}"]`);
         if (subtotalEl) {
             subtotalEl.textContent = (item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
@@ -1149,7 +1235,7 @@
         if (isNaN(validatedPrice) || validatedPrice < 0) {
             validatedPrice = 0;
         }
-        
+       
         const priceInputEl = cartItemsListStep2El.querySelector(`input.price[data-index="${index}"]`);
         // Vérifier si une mise à jour est réellement nécessaire
         if (item.unitPrice === validatedPrice && priceInputEl && parseFloat(priceInputEl.value) === validatedPrice) {
@@ -1159,21 +1245,21 @@
         }
 
         item.unitPrice = validatedPrice;
-        
+       
         // Si l'input contenait qqch qui n'est pas un nombre (ex: "abc", parseFloat donne NaN, validatedPrice devient 0)
         // ou si l'input était un nombre invalide (ex: négatif), on le corrige.
         if (priceInputEl) {
             const currentInputValue = parseFloat(priceInputEl.value);
             if (isNaN(currentInputValue) || currentInputValue < 0 || currentInputValue.toFixed(0) !== validatedPrice.toFixed(0) ) {
-                 // On ne met à jour l'input que s'il est invalide ou si la valeur validée est différente
-                 // pour ne pas perturber la saisie en cours (ex: 15 vs 150)
-                 // Si l'utilisateur efface le champ, parseFloat(e.target.value) sera NaN, et validatedPrice 0.
-                 // Il est souhaitable de mettre à jour l'input à '0' dans ce cas.
-                 if (isNaN(currentInputValue) || currentInputValue < 0) {
+                // On ne met à jour l'input que s'il est invalide ou si la valeur validée est différente
+                // pour ne pas perturber la saisie en cours (ex: 15 vs 150)
+                // Si l'utilisateur efface le champ, parseFloat(e.target.value) sera NaN, et validatedPrice 0.
+                // Il est souhaitable de mettre à jour l'input à '0' dans ce cas.
+                if (isNaN(currentInputValue) || currentInputValue < 0) {
                     priceInputEl.value = validatedPrice.toFixed(0);
-                 }
-                 // Si on veut que le formatage toFixed(0) se fasse toujours, même pour 150 -> 150:
-                 // priceInputEl.value = validatedPrice.toFixed(0); 
+                }
+                // Si on veut que le formatage toFixed(0) se fasse toujours, même pour 150 -> 150:
+                // priceInputEl.value = validatedPrice.toFixed(0); 
             }
         }
 
@@ -1181,7 +1267,7 @@
         if (subtotalEl) {
             subtotalEl.textContent = (item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
         }
-        
+       
         updateCartSummaryForStep2();
         renderStep1CartSummary();
     }
@@ -1192,10 +1278,10 @@
 
         salesCart.splice(index, 1);
         if (item) showFeedback(`"${item.title}" retiré du panier.`, false, 1500);
-        
+       
         renderSalesCartForStep2(); // OK ici, la perte de focus n'est pas un enjeu pour une suppression.
-                                   // Et la gestion des index DOM est simplifiée.
-        
+                                    // Et la gestion des index DOM est simplifiée.
+       
         step1NextBtn.disabled = salesCart.length === 0; 
         const searchResultButton = searchResultsContainerEl.querySelector(`.btn-add-to-sell-cart[data-book-id="${item.bookId}"]`);
         if (searchResultButton) {
@@ -1313,8 +1399,8 @@
             loadUserBooks(); 
             const closeBtn = sellPageEl.querySelector('.btn-close-sell');
             if (closeBtn) {
-                 // Simuler un clic pour que le routeur global gère la navigation vers "home"
-                 // et que l'observer sur #sell fasse le reset.
+                // Simuler un clic pour que le routeur global gère la navigation vers "home"
+                // et que l'observer sur #sell fasse le reset.
                 closeBtn.click();
             } else { // Fallback si le bouton n'est pas trouvé pour une raison quelconque
                 resetSellPage();
@@ -1600,7 +1686,7 @@
             const totalBatch = supply.lines.reduce((sum, l) => sum + (l.quantity * l.unitCost), 0);
             const batchCard = document.createElement('div');
             batchCard.className = 'supply-batch-card';
-            
+           
             batchCard.innerHTML = `
               <header>
                 <div class="supplier-info">
@@ -1634,7 +1720,7 @@
           supplyListEl.innerHTML = '<p style="padding:1rem;color:#e53238;text-align:center;">Erreur de chargement des approvisionnements.</p>';
         });
     }
-    
+   
     // Function to cleanup listener
     function cleanupSupplyListener() {
         if (unsubscribeSupplies) {
@@ -1784,7 +1870,7 @@
         <input type="text"
                class="book-search"
                placeholder="Choisir un livre"
-               readonly    
+               readonly   
                autocomplete="off"
                autocorrect="off"
                autocapitalize="none"
@@ -1871,7 +1957,7 @@
         if (activeStepEl) {
             const firstInput = activeStepEl.querySelector('input:not([type=hidden]):not([readonly]), textarea, select');
             if (firstInput) {
-                 setTimeout(() => firstInput.focus(), 50); 
+                setTimeout(() => firstInput.focus(), 50); 
             }
         }
       }
@@ -1881,7 +1967,7 @@
           currentStep++;
           if (currentStep === 3) { 
             if (!additionalCostI.value) {
-                 additionalCostI.value = "0";
+                additionalCostI.value = "0";
             }
             additionalCostI.dispatchEvent(new Event('input', { bubbles: true }));
             const step3NextBtn = main.querySelector('[data-step="3"] [data-next]');
@@ -1899,7 +1985,7 @@
 
       let lineIdCounter=0; 
       addLineBtn.addEventListener('click',()=>addLine());
-      
+     
       function addLine(data={}){
         lineIdCounter++;
         const row = document.importNode(tmplLine,true).firstElementChild;
@@ -2004,7 +2090,7 @@
 
       const supplierName = supplierI.value.trim() || 'Non spécifié';
       const additionalCostTotal = parseFloat(additionalCostI.value) || 0;
-      
+     
       let grandTotalQty = 0;
 
       const generalInfoCard = document.createElement('div');
@@ -2061,7 +2147,7 @@
         `;
         summaryCardsContainer.appendChild(card);
       });
-      
+     
       const finalTotalCard = document.createElement('div');
       finalTotalCard.className = 'summary-card';
       const actualGrandTotalCost = rows.reduce((sum, r) => {
@@ -2110,7 +2196,7 @@
         }
 
         const supplierNameValue=supplierI.value.trim();
-        
+       
         const supplyLinesData=[...linesC.children].map(r=>({
           title:r.querySelector('.book-search').value,
           quantity:parseInt(r.querySelector('.line-qty').value,10) || 0,
@@ -2132,14 +2218,14 @@
             totalCost:totalCostFinal, 
             additionalCostApplied: additionalCostOverall
         });
-        
+       
         const uid = auth.currentUser.uid;
         const userBooksRef = db.collection('users').doc(uid).collection('books');
 
         for(const ln of supplyLinesData){
           if (!ln.title) continue; 
           const snap = await userBooksRef.where('title','==', ln.title).limit(1).get();
-          
+         
           if (!snap.empty) { 
             const bookDocRef = snap.docs[0].ref;
             batch.update(bookDocRef, {
@@ -2190,7 +2276,7 @@
             submitBtn.textContent = 'Valider & envoyer';
         }
       });
-    
+     
       const supplierSearchField = main.querySelector('#supplier-search'); 
       const step1Element = main.querySelector('.step[data-step="1"]');
       const step1WizardNav = step1Element ? step1Element.querySelector('.wizard-nav') : null;
@@ -2369,12 +2455,12 @@
         }
         const uid = auth.currentUser.uid;
         const userBooksRef = db.collection('users').doc(uid).collection('books');
-        
+       
         // Client-side filtering for simplicity with small datasets
         // For larger datasets, use Firestore queries with indexing (e.g., Algolia for complex search)
         const snapshot = await userBooksRef.orderBy('title').get();
         const allUserBooks = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-        
+       
         const searchTermLower = searchTerm.toLowerCase();
         const filteredBooks = allUserBooks.filter(book => 
             book.title.toLowerCase().includes(searchTermLower)
@@ -2540,11 +2626,11 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
   function openAddBookModal(defaultTitle = '') {
     const modalEl = document.getElementById('add-book-modal');
     if (!modalEl) return console.error('Modal #add-book-modal introuvable');
-    
+   
     // modalEl.classList.add('visible'); // Router handles visibility
     // modalEl.setAttribute('aria-hidden', 'false');
     location.hash = 'add-book-modal'; // Let router show the modal "page"
-    
+   
     const titleInputEl = document.getElementById('new-book-title');
     if (titleInputEl) {
         titleInputEl.value = defaultTitle; 
@@ -2556,7 +2642,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
   document.addEventListener('click', e => {
     const chip = e.target.closest('#add-book-chip'); 
     if (!chip) return;
-    
+   
     // let suggestedTitle = chip.textContent.trim();
     // suggestedTitle = suggestedTitle.replace(/^Ajouter\s*«\s*/, '').replace(/\s*»(\s*<i.*)?$/, ''); 
     const strongTitleEl = chip.querySelector('#chip-book-title');
@@ -2654,14 +2740,14 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
     e.preventDefault();
     const titleInputEl = document.getElementById('new-book-title');
     const newTitle = titleInputEl.value.trim();
-    
+   
     if (!newTitle) {
       titleInputEl.style.borderColor = 'var(--ebay-red)';
       setTimeout(() => titleInputEl.style.borderColor = '', 2000);
       titleInputEl.focus();
       return;
     }
-    
+   
     const submitButton = formAddBookEl.querySelector('button[type="submit"]');
     submitButton.disabled = true;
     submitButton.textContent = 'Enregistrement...';
@@ -2696,7 +2782,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
           // location.hash = 'new-supply';  // Already handled by select-book logic on item click
           window.currentBookInput.value = newTitle;
           window.currentBookInput.dispatchEvent(new Event('change', { bubbles: true }));
-          
+         
           const lineRow = window.currentBookInput.closest('.line-row');
           if (lineRow) {
               const costInput = lineRow.querySelector('.line-cost');
@@ -2741,6 +2827,144 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
     <header><h2 style="padding:1rem">My Orders</h2></header>
     <p style="padding:0 1rem 6rem; text-align:center;">Your recent orders will appear here…</p>
   </main>
+
+  <main id="sales" class="page">
+  <header id="sales-header">
+    <h2>Historique des Ventes</h2>
+  </header>
+  <div id="sales-list" class="sales-list">
+    </div>
+  <script>
+    // Script for Sales History Page
+    (function() {
+      const salesListEl = document.getElementById('sales-list');
+      let unsubscribeSales = null;
+
+      function setupSalesListener() {
+        if (unsubscribeSales) unsubscribeSales(); // Unsubscribe from previous listener
+        if (!auth.currentUser) {
+          if(salesListEl) salesListEl.innerHTML = '<p style="padding:1rem;color:#555;text-align:center;">Veuillez vous connecter pour voir l\'historique.</p>';
+          return;
+        }
+
+        const salesRef = db
+          .collection('users')
+          .doc(auth.currentUser.uid)
+          .collection('sales')
+          .orderBy('timestamp', 'desc'); // Get newest sales first
+
+        if(salesListEl) {
+            salesListEl.innerHTML = Array(3) // Show 3 skeleton cards while loading
+            .fill('')
+            .map(() => '<div class="skeleton-sale-card"></div>')
+            .join('');
+        }
+
+
+        unsubscribeSales = salesRef.onSnapshot(snapshot => {
+          if(!salesListEl) return;
+          salesListEl.innerHTML = ''; // Clear current list (skeletons or old data)
+
+          if (snapshot.empty) {
+            salesListEl.innerHTML = '<p style="padding:1rem;color:#555;text-align:center;">Aucune vente enregistrée pour l’instant.</p>';
+            return;
+          }
+
+          snapshot.forEach(doc => {
+            const sale = doc.data();
+            const saleId = doc.id;
+            const dateObj = sale.timestamp?.toDate() || new Date(); // Use server timestamp
+            const dateStr = dateObj.toLocaleDateString('fr-FR', {
+              day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            const totalSaleAmount = sale.grandTotalAmount || 0;
+            const totalItems = sale.totalItemsSold || 0;
+
+            const saleCard = document.createElement('div');
+            saleCard.className = 'sale-card'; // Using a new class for sales, can be styled like supply-batch-card
+            saleCard.dataset.saleId = saleId;
+
+            // Truncate long customer names
+            let customerDisplayName = sale.customerName || 'Client Anonyme';
+            if (customerDisplayName.length > 25) {
+                customerDisplayName = customerDisplayName.substring(0, 22) + '...';
+            }
+
+
+            saleCard.innerHTML = `
+              <header>
+                <div class="sale-info">
+                  <strong title="${sale.customerName || 'Client Anonyme'}">${customerDisplayName}</strong>
+                  <small>${dateStr}</small>
+                </div>
+                <div class="sale-meta">
+                  <span class="sale-total-amount">${totalSaleAmount.toLocaleString('fr-FR', {
+                    style: 'currency', currency: 'XOF', minimumFractionDigits: 0
+                  })}</span>
+                  <span class="sale-total-items">Articles: ${totalItems}</span>
+                </div>
+              </header>
+              ${sale.items && sale.items.length > 0 ? `
+                <ul style="list-style:none; padding-left:0; margin-top:0.5rem; font-size:0.85rem;">
+                  ${sale.items.slice(0, 2).map(item => `
+                    <li style="display:flex; justify-content:space-between; padding:0.1rem 0;">
+                      <span style="flex-grow:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-right:0.5rem;" title="${item.title || 'Article inconnu'}">${item.title || 'Article inconnu'}</span>
+                      <span style="flex-shrink:0;">x ${item.quantitySold || 0}</span>
+                    </li>
+                  `).join('')}
+                  ${sale.items.length > 2 ? `<li style="text-align:right; color:var(--secondary-text); font-style:italic;">et ${sale.items.length - 2} autre(s)...</li>` : ''}
+                </ul>` : '<p style="font-size:0.85rem; color:var(--secondary-text); margin-top:0.5rem;">Aucun détail d\'article disponible.</p>'}
+            `;
+            // Placeholder for click to see full details
+            saleCard.addEventListener('click', () => {
+                // TODO: Implement a modal or an expansion to show full sale details
+                // For now, just log to console
+                console.log("Clicked sale:", saleId, sale);
+                alert(`Détails pour la vente ID: ${saleId} (à implémenter) \nClient: ${sale.customerName || 'N/A'} \nTotal: ${totalSaleAmount.toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0})}`);
+            });
+
+            salesListEl.appendChild(saleCard);
+          });
+        }, err => {
+          console.error('Erreur Firestore (sales):', err);
+          if(salesListEl) salesListEl.innerHTML = '<p style="padding:1rem;color:var(--ebay-red);text-align:center;">Erreur de chargement des ventes.</p>';
+        });
+      }
+
+      function cleanupSalesListener() {
+        if (unsubscribeSales) {
+          unsubscribeSales();
+          unsubscribeSales = null;
+        }
+      }
+
+      // Listen to hash changes to setup/cleanup listener
+      window.addEventListener('hashchange', () => {
+        if (location.hash === '#sales') {
+          if (auth.currentUser) setupSalesListener();
+        } else {
+          cleanupSalesListener();
+        }
+      });
+
+      // Initial check if page loads on #sales
+      if (location.hash === '#sales') {
+        if (auth.currentUser) setupSalesListener();
+      }
+      
+      // Also setup listener if auth state changes and we are on the sales page
+      auth.onAuthStateChanged(user => {
+        if (user && location.hash === '#sales') {
+            setupSalesListener();
+        } else if (!user && location.hash === '#sales') {
+            cleanupSalesListener();
+             if(salesListEl) salesListEl.innerHTML = '<p style="padding:1rem;color:#555;text-align:center;">Veuillez vous connecter pour voir l\'historique.</p>';
+        }
+      });
+    })();
+  </script>
+</main>
 
   <main id="cart" class="page">
     <header><h2 style="padding:1rem">Panier</h2></header>
@@ -2976,7 +3200,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
         } else if (allBooksCache.length === 0 && !searchTerm) {
             // This case is handled by the onSnapshot empty check below
         }
-        
+       
         filteredBooks.forEach(book => {
             const card = document.createElement('div');
             card.className = 'book-card-catalog'; 
@@ -2984,7 +3208,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
 
             const formattedPriceSell = (book.price || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0});
             const formattedPricePurchase = (book.lastPurchasePrice || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0});
-            
+           
             let stockClass = 'stock-normal';
             if (book.quantity <= 0) {
                 stockClass = 'stock-out';
@@ -3077,7 +3301,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             totalCount += quantity;
             totalPurchaseValue += (bookData.lastPurchasePrice || 0) * quantity; // Use lastPurchasePrice for value
           });
-          
+         
           if (allBooksCache.length === 0) {
                booksListEl.innerHTML = '<p style="text-align:center; padding:1rem; color:var(--secondary-text);">Votre catalogue est vide. Commencez par ajouter des livres via un approvisionnement.</p>';
           } else {
@@ -3103,7 +3327,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
         if (totalBooksEl) totalBooksEl.textContent = '0';
         if (totalValueEl) totalValueEl.textContent = 'XOF 0';
     }
-    
+   
     auth.onAuthStateChanged(user => {
         if (user) {
             // If the catalog page is already visible, set up the listener
@@ -3138,10 +3362,10 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
   <nav aria-label="Main navigation">
     <div class="nav-inner">
       <a href="#home"    data-hash="home"    class="nav-link active" aria-label="Home">
-        <i class="bi bi-house-door-fill"></i><span>Home</span> </a>
+        <i class="bi bi-house-door-fill"></i><span>Accueil</span> </a>
       <a href="#catalog" data-hash="catalog" class="nav-link" aria-label="Catalog">
         <i class="bi bi-journal-richtext"></i><span>Catalogue</span> </a>
-      <a href="#cart"    data-hash="cart"    class="nav-link" aria-label="Cart"> <i class="bi bi-cart-fill"></i><span>Panier</span> </a>
+      <a href="#sales"   data-hash="sales"   class="nav-link" aria-label="Sales History"> <i class="bi bi-receipt"></i><span>Ventes</span> </a>
       <a href="#account" data-hash="account" class="nav-link" aria-label="Account">
         <i class="bi bi-person-fill"></i><span>Compte</span> </a>
     </div>
@@ -3223,7 +3447,7 @@ if (btnActivate) {
         activationCodeInput.focus();
         return;
       }
-      
+     
       btnActivate.disabled = true;
       btnActivate.textContent = 'Vérification...';
       activationMessageEl.textContent = '';
@@ -3339,6 +3563,8 @@ window.addEventListener('appinstalled', () => {
               // The catalog's own script will handle setup via hashchange/authstatechange
             } else if (p.id === 'supply' && auth.currentUser) {
               // The supply page's own script will handle setup
+            } else if (p.id === 'sales' && auth.currentUser) { // ADDED FOR SALES
+              // The sales page's own script will handle setup
             } else if (p.id === 'sell' && auth.currentUser) {
               // The sell page's own script (MutationObserver or similar) handles setup
             } else if (p.id === 'add-book-modal') { // Handle modal "page"
@@ -3350,6 +3576,8 @@ window.addEventListener('appinstalled', () => {
               // The catalog's own script will handle cleanup via hashchange
             } else if (p.id === 'supply') {
               // The supply page's own script will handle cleanup
+            } else if (p.id === 'sales') { // ADDED FOR SALES
+              // The sales page's own script will handle cleanup
             } else if (p.id === 'add-book-modal') {
                 // document.body.style.overflow = ''; // Restore body scroll
                 // document.body.classList.remove('keyboard-visible');
@@ -3362,7 +3590,7 @@ window.addEventListener('appinstalled', () => {
         location.hash = '#home'; 
         return; 
       }
-      
+     
       const pagesWithoutNav = ['activation','sell','new-supply','select-book', 'add-book-modal']; 
       if (mainNav) { // Check if mainNav exists
         if (pagesWithoutNav.includes(pageIdToShow)) { 
@@ -3382,7 +3610,7 @@ window.addEventListener('appinstalled', () => {
         activePageElement.scrollTop = 0;
       }
     }
-    
+   
     async function route() {
       if (currentAuthUser === undefined) { // Auth state not yet determined
         document.body.style.visibility = 'hidden'; 
@@ -3431,7 +3659,7 @@ window.addEventListener('appinstalled', () => {
          showOnlyPage('home');
          return;
       }
-      
+     
       showOnlyPage(hashKey);
     }
 
@@ -3462,7 +3690,7 @@ window.addEventListener('appinstalled', () => {
         // If critical error, might sign out or show error page
         // For now, assume not activated and let logic proceed to activation page if needed
       }
-      
+     
       route(); // Call route after auth state and claims are processed
     });
 
@@ -3480,10 +3708,10 @@ window.addEventListener('appinstalled', () => {
         rippleSpan.style.width = rippleSpan.style.height = rippleSize + 'px';
         rippleSpan.style.left = (e.clientX - rect.left - rippleSize/2) + 'px';
         rippleSpan.style.top  = (e.clientY - rect.top  - rippleSize/2) + 'px';
-        
+       
         const existingRipple = dataHashElement.querySelector('.ripple');
         if (existingRipple) existingRipple.remove();
-        
+       
         dataHashElement.appendChild(rippleSpan);
         rippleSpan.addEventListener('animationend', () => rippleSpan.remove(), {once: true});
       }
@@ -3506,4 +3734,3 @@ window.addEventListener('appinstalled', () => {
 
 </body>
 </html>
-
