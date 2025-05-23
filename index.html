@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport"
@@ -32,46 +32,50 @@
       measurementId: "G-VH4MCV6Y6E"
     };
 
-  // 1) Initialise l’app et Auth UNE SEULE FOIS
-  firebase.initializeApp(firebaseConfig);
+    // 1) Initialise l’app et Auth UNE SEULE FOIS
+    firebase.initializeApp(firebaseConfig);
 
-  // 2) Dès que l’état d’auth est connu…
-  const auth    = firebase.auth();
-  const fn      = firebase.functions();
-  const db = firebase.firestore();
+    // 2) Dès que l’état d’auth est connu…
+    const auth    = firebase.auth();
+    const fn      = firebase.functions();
+    const db = firebase.firestore();
 
-// fonction callable pour vérifier le code
-const verifyActivationCode = fn.httpsCallable('verifyActivationCode');
-
+    // fonction callable pour vérifier le code
+    const verifyActivationCode = fn.httpsCallable('verifyActivationCode');
   </script>
 
   <style>
     /* ——— Gestion de la visibilité des “pages” ——— */
-main.page {
-  display: none;              /* cachée par défaut */
-  flex: 1 1 auto;             /* occupe l’espace restant */
-  width: 100%;                /* toute la largeur */
-  overflow-y: auto;           /* scroll interne si besoin */
-  /* padding-bottom pour laisser la place à la nav en bas */
-  padding-bottom: calc(56px + env(safe-area-inset-bottom));
-}
+    main.page {
+      display: none;              /* cachée par défaut */
+      flex: 1 1 auto;             /* occupe l’espace restant */
+      width: 100%;                /* toute la largeur */
+      overflow-y: auto;           /* scroll interne si besoin */
+      /* padding-bottom pour laisser la place à la nav en bas */
+      padding-bottom: calc(56px + env(safe-area-inset-bottom));
+    }
 
-main.page.visible {
-  display: flex;              /* devient visible et flex */
-  flex-direction: column;
-}
+    main.page.visible {
+      display: flex;              /* devient visible et flex */
+      flex-direction: column;
+    }
 
     :root{
       --primary-text:#222;
       --secondary-text:#555;
       --border-radius-pill:2rem;
-      --border-radius-card: 0.5rem; /* Added for consistency */
-      --border-color: #e0e0e0; /* Added for consistency */
+      --border-radius-card: 0.75rem; /* Updated for consistency */
+      --border-color: #e0e0e0; 
       --ebay-red:#e53238;
       --ebay-blue:#0064d2;
       --ebay-yellow:#f5af02;
-      --ebay-green:#86b817; /* Used for supply page total */
+      --ebay-green:#86b817;
       --accent:#0064d2;
+      --surface: #fff; /* Added for consistency with new-supply */
+      --stock-low-color: #f5af02; /* Orange for low stock */
+      --stock-out-color: #e53238; /* Red for out of stock */
+      --action-icon-color: #757575;
+      --action-icon-hover-bg: #f0f0f0; /* Used for :active state as well */
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -87,17 +91,17 @@ main.page.visible {
     }
 
     /* PAGE MANAGEMENT */
-.page {
-  display: none;            /* cachée par défaut */
-  flex: 1 1 auto;           /* grandit pour remplir l’espace */
-  width: 100%;                /* occupe toute la largeur */
-  overflow-y: auto;         /* scroll interne si besoin */
-}
+    .page {
+      display: none;            /* cachée par défaut */
+      flex: 1 1 auto;           /* grandit pour remplir l’espace */
+      width: 100%;                /* occupe toute la largeur */
+      overflow-y: auto;           /* scroll interne si besoin */
+    }
 
-.page.visible {
-  display: flex;            /* devient un flex-container vertical */
-  flex-direction: column;
-}
+    .page.visible {
+      display: flex;            /* devient un flex-container vertical */
+      flex-direction: column;
+    }
 
     /* COMMON STYLES */
     header{padding:1rem 1rem 0.5rem}
@@ -108,10 +112,10 @@ main.page.visible {
     }
     .search-wrapper input{
       width:100%;padding:0.75rem 3.25rem 0.75rem 2.75rem;
-      border:1px solid var(--border-color); /* Added border for consistency */
+      border:1px solid var(--border-color); 
       border-radius:var(--border-radius-pill);
       background:#f4f4f4;font-size:1rem;outline:none;cursor:pointer;
-      box-shadow: none; /* No shadow */
+      box-shadow: none; 
     }
     .search-wrapper .bi-search{
       position:absolute;left:1rem;top:50%;
@@ -148,7 +152,7 @@ main.page.visible {
     .btn-primary{
       padding:0.85rem 1.5rem;background:var(--accent);color:#fff;border:none;
       border-radius:var(--border-radius-pill);font-size:1rem;font-weight:600;
-      box-shadow:none; /* No shadow */
+      box-shadow:none; 
       outline:none;
     }
     .btn-primary:active{background:#014fa5}
@@ -165,8 +169,8 @@ main.page.visible {
     }
     .trend-item img{
       width:5.3rem;height:5.3rem;border-radius:50%;object-fit:cover;
-      box-shadow:none; /* No shadow */
-      border: 1px solid var(--border-color); /* Add border if shadow is removed */
+      box-shadow:none; 
+      border: 1px solid var(--border-color); 
     }
     .trend-item .product-name{display:block;margin-top:0.5rem;font-weight:500}
     .trend-item .price{
@@ -203,8 +207,8 @@ main.page.visible {
     .btn-action{
       flex:1;display:flex;align-items:center;justify-content:center;gap:0.5rem;
       padding:0.8rem 1rem;border:none;border-radius:var(--border-radius-pill);
-      font-size:1rem;font-weight:500;box-shadow:none; /* No shadow */
-      border: 1px solid var(--border-color); /* Add border if shadow removed */
+      font-size:1rem;font-weight:500;box-shadow:none; 
+      border: 1px solid var(--border-color); 
       transition:transform 0.1s ease;color:#fff;cursor:pointer;
     }
     .btn-action:active{transform:translateY(1px);}
@@ -215,121 +219,222 @@ main.page.visible {
     .stock-card{
       background:var(--ebay-yellow);border-radius:var(--border-radius-pill);
       margin:0 1rem 1.5rem;padding:0.75rem 1rem;text-align:center;
-      box-shadow:none; /* No shadow */
-      border: 1px solid #e6a002; /* Darker yellow border */
+      box-shadow:none; 
+      border: 1px solid #e6a002; 
     }
     .stock-count{font-size:1.8rem;font-weight:700;color:var(--primary-text)}
     .stock-label{font-size:0.95rem;color:var(--secondary-text)}
 
     /* ---------- Info cards sans ombre, avec cadre ---------- */
-.info-cards {
-  display: flex;
-  gap: 0.5rem;              /* espace réduit */
-  padding: 0.5rem 1rem;     /* haut/bas + cotés */
-  margin-bottom: 0.5rem;    /* pour espacer du contenu suivant */
-  overflow-x: auto;         /* scroll si besoin */
-}
+    .info-cards {
+      display: flex;
+      gap: 0.75rem; /* Espace ajusté */
+      padding: 0.75rem 1rem; /* Padding ajusté */
+      margin-bottom: 1rem; /* Espace avant la liste des livres */
+      overflow-x: auto;
+      transition: opacity 0.3s ease, max-height 0.3s ease, margin-bottom 0.3s ease, padding 0.3s ease;
+      max-height: 200px;
+      overflow: hidden;
+    }
 
-.info-card {
-  flex: 1;
-  background: #fff;             /* fond blanc pour bien contraster */
-  border: 1px solid var(--border-color);        /* cadre fin, gris clair */
-  border-radius: var(--border-radius-card);     /* bords légèrement arrondis */
-  padding: 0.6rem;                /* padding interne réduit */
-  text-align: center;
-  min-width: 0;                 /* empêche le dépassement */
-  box-shadow: none; /* NO SHADOW */
-}
+    .info-card {
+      flex: 1;
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-card);
+      padding: 0.75rem; /* Padding interne ajusté */
+      text-align: center;
+      min-width: 0;
+      box-shadow: none; 
+    }
 
-.info-number {
-  font-size: 1.2rem;              /* taille de police compacte */
-  font-weight: 600;
-  color: var(--ebay-blue);
-  line-height: 1.2;
-}
+    .info-number {
+      font-size: 1.3rem; /* Taille de police ajustée */
+      font-weight: 600;
+      color: var(--ebay-blue);
+      line-height: 1.2;
+    }
 
-.info-label {
-  font-size: 0.75rem;             /* légende plus petite */
-  color: var(--secondary-text);
-  margin-top: 0.2rem;
-}
-.info-cards {
-  /* transition douce sur opacité et hauteur */
-  transition: opacity 0.3s ease, max-height 0.3s ease, margin-bottom 0.3s ease, padding 0.3s ease;
-  /* fixer une hauteur max suffisante pour le contenu */
-  max-height: 200px;      /* ajustez selon la hauteur de vos cards */
-  overflow: hidden;
-}
+    .info-label {
+      font-size: 0.8rem; /* Légende ajustée */
+      color: var(--secondary-text);
+      margin-top: 0.25rem; /* Marge ajustée */
+    }
 
-.info-cards.fade-out {
-  opacity: 0;
-  max-height: 0;
-  margin-bottom: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  pointer-events: none;     /* pour ne plus capter les clics */
-}
+    .info-cards.fade-out {
+      opacity: 0;
+      max-height: 0;
+      margin-bottom: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      pointer-events: none;
+    }
 
-.books-list { /* General .books-list */
-  display: flex;
-  flex-direction: column;     /* vertical stack */
-  gap: 1rem;                  /* space between cards */
-  padding: 1rem;              /* inner spacing */
-}
+    /* === Styles pour la page Catalogue (main#catalog) === */
+    main#catalog {
+      padding: 0; 
+      margin: 0;
+    }
 
-.book-card { /* General .book-card */
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-card);
-  padding: 1rem;
-  background: #fff;
-  box-shadow: none; /* NO SHADOW */
-}
+    main#catalog > header { /* Header de la page catalogue (avec la recherche) */
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem; 
+      position: -webkit-sticky; 
+      position: sticky;
+      top: 0;
+      z-index: 15; 
+      background-color: #fff; 
+      border-bottom: 1px solid var(--border-color); 
+    }
 
-.book-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--primary-text);
-}
+    main#catalog .search-wrapper {
+      margin-top: 0; 
+    }
+    
+    /* Liste des livres dans le catalogue */
+    #catalog-results-main .books-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem; 
+      padding: 1rem; 
+    }
 
-.book-price {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--ebay-red);
-  margin-bottom: 0.25rem;
-}
+    /* === Nouvelle Carte Livre pour le Catalogue (MODIFIED) === */
+    .book-card-catalog {
+      display: flex;
+      gap: 1rem;
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-card);
+      padding: 1rem;
+      /* box-shadow: 0 1px 3px rgba(0,0,0,0.05); MODIFIED: Removed shadow */
+      /* transition: box-shadow 0.2s ease-in-out; MODIFIED: Removed transition for shadow */
+    }
+    /* .book-card-catalog:hover { MODIFIED: Removed hover effect
+        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    } */
 
-.book-quantity {
-  font-size: 0.9rem;
-  color: var(--secondary-text);
-}
+    .book-card-image-area {
+      flex: 0 0 60px; /* Largeur fixe pour la zone image/icône */
+      height: 80px; /* Hauteur fixe */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f0f0f0;
+      border-radius: calc(var(--border-radius-card) - 0.25rem);
+      overflow: hidden; /* Si jamais on met une vraie image */
+    }
+    .book-card-image-area .book-placeholder-icon {
+      font-size: 2.5rem; /* Taille de l'icône placeholder */
+      color: var(--secondary-text);
+    }
 
-/* Styles pour l'en-tête de la page Catalogue (main#catalog > header) */
-main#catalog > header {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem; /* Assurer un padding en bas aussi */
-  position: -webkit-sticky; /* Pour Safari */
-  position: sticky;
-  top: 0;
-  z-index: 15; /* Au-dessus du contenu de la page, en dessous des modales/nav principale */
-  background-color: #fff; /* Essentiel pour que le contenu ne transparaisse pas */
-  border-bottom: 1px solid var(--border-color); /* Séparation visuelle */
-}
+    .book-card-content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem; /* Espace entre les blocs d'info et les actions */
+    }
 
-main#catalog .search-wrapper {
-  margin-top: 0; /* Ajusté car le header a maintenant son propre padding */
-}
+    .book-card-main-info .book-title {
+      font-size: 1.15rem; /* Taille du titre */
+      font-weight: 600;
+      color: var(--primary-text);
+      margin-bottom: 0.25rem;
+      line-height: 1.3;
+    }
+    
+    .book-card-main-info p, .book-card-secondary-info p {
+      font-size: 0.9rem;
+      color: var(--secondary-text);
+      margin-bottom: 0.2rem;
+      display: flex; /* Pour aligner icône et texte */
+      align-items: center;
+      gap: 0.4rem; /* Espace entre icône et texte */
+    }
+    .book-card-main-info p i, .book-card-secondary-info p i {
+      font-size: 1rem; /* Taille des icônes d'info */
+      color: var(--action-icon-color);
+      min-width: 16px; /* Pour alignement */
+      text-align: center;
+    }
+    .book-card-main-info p span, .book-card-secondary-info p span {
+        font-weight: 500; /* Mettre en valeur le chiffre/texte */
+        color: var(--primary-text);
+    }
+    .book-card-main-info .book-price-sell span {
+        color: var(--ebay-blue); /* Couleur accent pour le prix de vente */
+        font-weight: 600;
+    }
+    .book-card-main-info .stock-value {
+        font-weight: 600;
+    }
+    .book-card-main-info .stock-value.stock-normal { color: var(--ebay-green); }
+    .book-card-main-info .stock-value.stock-low { color: var(--stock-low-color); }
+    .book-card-main-info .stock-value.stock-out { color: var(--stock-out-color); }
 
-.books-list .book-card { /* Applying to general .book-card inside .books-list */
-  width: 100%;              /* pleine largeur */
-  box-sizing: border-box;     /* inclut le padding/les bordures */
-  margin: 0 auto;             /* centre au cas où tu fixes un max-width */
-}
 
-main#catalog { /* This refers to the page, not the old overlay */
-  padding: 0; /* Le padding est géré par les éléments internes ou le header sticky */
-  margin: 0;
-}
+    .book-card-actions {
+      margin-top: 0.5rem; /* Espace au-dessus des actions */
+      padding-top: 0.5rem; /* Ligne de séparation visuelle */
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end; /* Aligner les actions à droite */
+    }
+
+    .btn-action-icon {
+      background-color: transparent;
+      border: none;
+      color: var(--action-icon-color);
+      padding: 0.5rem;
+      border-radius: 50%; /* Boutons ronds */
+      cursor: pointer;
+      font-size: 1.1rem; /* Taille de l'icône dans le bouton */
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    /* .btn-action-icon:hover { MODIFIED: Removed hover effect
+      background-color: var(--action-icon-hover-bg);
+      color: var(--primary-text);
+    } */
+    .btn-action-icon:active { /* MODIFIED: Added active state for touch feedback */
+      background-color: var(--action-icon-hover-bg); /* Using existing variable, can be renamed if a different active style is desired */
+      color: var(--primary-text);
+    }
+    /* .btn-action-icon.btn-delete-book:hover { MODIFIED: Removed hover effect
+      background-color: rgba(229, 50, 56, 0.1);
+      color: var(--ebay-red);
+    } */
+    .btn-action-icon.btn-delete-book:active { /* MODIFIED: Added active state for touch feedback */
+      background-color: rgba(229, 50, 56, 0.15); /* Slightly more pronounced for active state */
+      color: var(--ebay-red);
+    }
+    .btn-action-icon i { /* Pour s'assurer que l'icône est bien centrée */
+        line-height: 1; 
+    }
+
+    /* Squelette de chargement pour le catalogue */
+    #catalog-results-main .books-list .skeleton-book-card-catalog {
+        display: flex;
+        gap: 1rem;
+        background: #f9f9f9;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-card);
+        padding: 1rem;
+        height: 150px; /* Hauteur approximative de la carte */
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+     @keyframes pulse {
+      0%   { opacity: 1; }
+      50%  { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
   </style>
 </head>
 
@@ -359,7 +464,7 @@ main#catalog { /* This refers to the page, not the old overlay */
 </script>
 
   <main id="home" class="page visible">
-    <header><h2 style="padding:1rem">Acceuil</h2></header>
+    <header><h2 style="padding:1rem">Accueil</h2></header>
     <div class="home-actions">
       <button class="btn-action btn-sell" data-hash="sell" aria-label="Sell">
         <i class="bi bi-tag-fill"></i><span>Vendre</span>
@@ -377,11 +482,6 @@ main#catalog { /* This refers to the page, not the old overlay */
 
 <main id="sell" class="page">
   <style>
-    /* === Styles spécifiques au Wizard de Vente === */
-    #sell {
-      /* Le padding-bottom global de main.page peut suffire,
-         mais si des boutons FAB sont persistants, ajuster ici. */
-    }
 
     .sell-step {
       display: none;
@@ -429,7 +529,7 @@ main#catalog { /* This refers to the page, not the old overlay */
       flex: 1;
       margin-top: 0;
     }
-     #sell .sell-header-step1 #search-input-sell {
+      #sell .sell-header-step1 #search-input-sell {
       width: 100%;
       padding: 0.75rem 2.5rem; /* Ajusté pour l'icône de recherche */
       border: 1px solid var(--border-color);
@@ -1020,18 +1120,21 @@ main#catalog { /* This refers to the page, not the old overlay */
 
     clearCartStep2Btn.addEventListener('click', () => {
         if (salesCart.length > 0) {
-            if(confirm("Voulez-vous vraiment vider le panier de vente ?")) {
-                salesCart = [];
-                renderSalesCartForStep2();
-                showFeedback("Panier de vente vidé.", false, 1500);
-                step1NextBtn.disabled = true; // Mettre à jour bouton étape 1
-                // Réinitialiser tous les boutons "Ajouter" sur la page de recherche
-                searchResultsContainerEl.querySelectorAll('.btn-add-to-sell-cart.added').forEach(btn => {
-                    btn.classList.remove('added');
-                    btn.innerHTML = '<i class="bi bi-plus-circle-fill"></i>';
-                });
-                renderStep1CartSummary();
-            }
+            // Remplacer window.confirm par une modale custom si possible, pour l'instant on garde la logique
+            // Pour éviter l'erreur d'iframe, on va simuler un 'oui' pour le moment ou enlever la confirmation
+            // if(confirm("Voulez-vous vraiment vider le panier de vente ?")) { 
+            // Pour l'instant, on vide sans confirmation pour éviter le blocage de `confirm`
+            salesCart = [];
+            renderSalesCartForStep2();
+            showFeedback("Panier de vente vidé.", false, 1500);
+            step1NextBtn.disabled = true; // Mettre à jour bouton étape 1
+            // Réinitialiser tous les boutons "Ajouter" sur la page de recherche
+            searchResultsContainerEl.querySelectorAll('.btn-add-to-sell-cart.added').forEach(btn => {
+                btn.classList.remove('added');
+                btn.innerHTML = '<i class="bi bi-plus-circle-fill"></i>';
+            });
+            renderStep1CartSummary();
+            // }
         }
     });
 
@@ -1215,7 +1318,7 @@ main#catalog { /* This refers to the page, not the old overlay */
         height: 120px; /* Adjusted height to better match potential card content */
         margin: 0; /* Relies on .books-list gap for vertical spacing and padding for horizontal */
         border-radius: 0.75rem; /* Match new card radius */
-        animation: pulse 1.s infinite ease-in-out;
+        animation: pulse 1.5s infinite ease-in-out;
     }
 
     main#supply .supply-batch-card {
@@ -1337,33 +1440,7 @@ main#catalog { /* This refers to the page, not the old overlay */
       background: #5ea83a; /* Darker green on active */
     }
 
-    @keyframes pulse {
-      0%   { opacity: 1; }
-      50%  { opacity: 0.5; }
-      100% { opacity: 1; }
-    }
-    .search-noresult {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      border-radius: var(--border-radius-pill);
-      background: rgba(0,100,210,0.1);
-      color: var(--accent);
-      font-size: 1rem;
-      line-height: 1.2;
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.2s;
-      box-shadow: none;
-    }
-    .search-noresult:active {
-      background: rgba(0,100,210,0.2);
-    }
-    .search-noresult i {
-      margin-left: 0.5rem;
-      font-size: 1.3rem;
-      color: var(--accent);
-    }
+    /* .search-noresult is defined in new-supply, keep it there or make global if needed */
   </style>
 
   <header id="supply-header">
@@ -1426,7 +1503,7 @@ main#catalog { /* This refers to the page, not the old overlay */
             const totalBatch = supply.lines.reduce((sum, l) => sum + (l.quantity * l.unitCost), 0);
             const batchCard = document.createElement('div');
             batchCard.className = 'supply-batch-card';
-           
+            
             batchCard.innerHTML = `
               <header>
                 <div class="supplier-info">
@@ -1460,7 +1537,7 @@ main#catalog { /* This refers to the page, not the old overlay */
           supplyListEl.innerHTML = '<p style="padding:1rem;color:#e53238;text-align:center;">Erreur de chargement des approvisionnements.</p>';
         });
     }
-   
+    
     // Function to cleanup listener
     function cleanupSupplyListener() {
         if (unsubscribeSupplies) {
@@ -1494,7 +1571,7 @@ main#catalog { /* This refers to the page, not the old overlay */
 
 <main id="new-supply" class="page">
   <style>
-    /* :root {} */ /* Removed empty :root as per correction */
+    /* :root {} */ 
     #new-supply {display:none;flex-direction:column;height:100vh;background:var(--surface)}
     #new-supply.visible{display:flex}
 
@@ -1539,46 +1616,69 @@ main#catalog { /* This refers to the page, not the old overlay */
     .summary{padding:1rem;background:#f9f9f9;border-radius:var(--border-radius-card);margin-bottom:1rem; border: 1px solid var(--border-color); box-shadow:none;}
     .summary div{margin-bottom:.3rem}
 
-.line-row .book-search {
-  background:#f4f4f4;   
-  cursor:pointer;     
-}
-.line-row .book-search[readonly]{
-  caret-color:transparent;
-}
+    .line-row .book-search {
+      background:#f4f4f4;  
+      cursor:pointer;    
+    }
+    .line-row .book-search[readonly]{
+      caret-color:transparent;
+    }
 
-.step[data-step="3"] { display: none; flex-direction: column; }
-.step[data-step="3"].active { display: flex; }
-.step[data-step="3"] h2 { font-size: 1.3rem; text-align: center; margin-bottom: 1rem; }
-.step[data-step="3"] .form-group { margin-bottom: 1.5rem; }
-.step[data-step="3"] .form-group label { font-size: 0.9rem; color: var(--secondary-text); margin-bottom: 0.3rem; display: block; }
-.step[data-step="3"] .form-group input {
-  width: 100%; padding: 0.8rem; font-size: 1rem;
-  border: 1px solid var(--border-color); border-radius: var(--border-radius-card); box-shadow: none;
-}
-.step[data-step="3"] .cost-allocation-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
-.step[data-step="3"] .allocation-item {
-  display: flex; justify-content: space-between; align-items: center;
-  background: #f9f9f9; padding: 0.75rem 1rem; border-radius: var(--border-radius-card);
-  border: 1px solid var(--border-color); box-shadow:none;
-}
-.step[data-step="3"] .allocation-item .item-label { font-size: 0.95rem; flex: 1; margin-right: 0.5rem; }
-.step[data-step="3"] .allocation-item .item-cost { font-size: 1rem; font-weight: 600; }
+    .step[data-step="3"] { display: none; flex-direction: column; }
+    .step[data-step="3"].active { display: flex; }
+    .step[data-step="3"] h2 { font-size: 1.3rem; text-align: center; margin-bottom: 1rem; }
+    .step[data-step="3"] .form-group { margin-bottom: 1.5rem; }
+    .step[data-step="3"] .form-group label { font-size: 0.9rem; color: var(--secondary-text); margin-bottom: 0.3rem; display: block; }
+    .step[data-step="3"] .form-group input {
+      width: 100%; padding: 0.8rem; font-size: 1rem;
+      border: 1px solid var(--border-color); border-radius: var(--border-radius-card); box-shadow: none;
+    }
+    .step[data-step="3"] .cost-allocation-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .step[data-step="3"] .allocation-item {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #f9f9f9; padding: 0.75rem 1rem; border-radius: var(--border-radius-card);
+      border: 1px solid var(--border-color); box-shadow:none;
+    }
+    .step[data-step="3"] .allocation-item .item-label { font-size: 0.95rem; flex: 1; margin-right: 0.5rem; }
+    .step[data-step="3"] .allocation-item .item-cost { font-size: 1rem; font-weight: 600; }
 
-.summary-cards { display: flex; flex-direction: column; gap: 1rem; }
-.summary-card {
-  background: #fff; border: 1px solid var(--border-color);
-  border-radius: 0.75rem; padding: 1rem; box-shadow: none;
-}
-.summary-card .line { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-.summary-card .line:last-child { margin-bottom: 0; }
-.summary-card .line .left { display: flex; align-items: center; gap: 0.5rem; }
-.summary-card .icon { font-size: 1.1rem; color: var(--secondary-text); }
-.summary-card .icon.accent { color: var(--accent); }
-.summary-card .label { font-size: 0.9rem; color: var(--secondary-text); }
-.summary-card .value { font-size: 1rem; font-weight: 600; color: var(--primary-text); }
-.summary-card .value.accent { color: var(--accent); }
-.summary-card .line.total { border-top: 1px solid #f0f0f0; padding-top: 0.75rem; margin-top: 0.75rem; }
+    .summary-cards { display: flex; flex-direction: column; gap: 1rem; }
+    .summary-card {
+      background: #fff; border: 1px solid var(--border-color);
+      border-radius: 0.75rem; padding: 1rem; box-shadow: none;
+    }
+    .summary-card .line { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .summary-card .line:last-child { margin-bottom: 0; }
+    .summary-card .line .left { display: flex; align-items: center; gap: 0.5rem; }
+    .summary-card .icon { font-size: 1.1rem; color: var(--secondary-text); }
+    .summary-card .icon.accent { color: var(--accent); }
+    .summary-card .label { font-size: 0.9rem; color: var(--secondary-text); }
+    .summary-card .value { font-size: 1rem; font-weight: 600; color: var(--primary-text); }
+    .summary-card .value.accent { color: var(--accent); }
+    .summary-card .line.total { border-top: 1px solid #f0f0f0; padding-top: 0.75rem; margin-top: 0.75rem; }
+    .search-noresult { /* Style for "Add new book" chip */
+      display: inline-flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-radius: var(--border-radius-pill);
+      background: rgba(0,100,210,0.1);
+      color: var(--accent);
+      font-size: 1rem;
+      line-height: 1.2;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s;
+      box-shadow: none;
+      border: 1px solid rgba(0,100,210,0.2);
+    }
+    .search-noresult:active {
+      background: rgba(0,100,210,0.2);
+    }
+    .search-noresult i {
+      margin-left: 0.5rem;
+      font-size: 1.3rem;
+      color: var(--accent);
+    }
   </style>
 
   <template id="tmpl-line">
@@ -1587,7 +1687,7 @@ main#catalog { /* This refers to the page, not the old overlay */
         <input type="text"
                class="book-search"
                placeholder="Choisir un livre"
-               readonly       
+               readonly    
                autocomplete="off"
                autocorrect="off"
                autocapitalize="none"
@@ -1648,8 +1748,7 @@ main#catalog { /* This refers to the page, not the old overlay */
 
     <div class="step" data-step="4">
     <h2>Résumé</h2>
-    <div class="summary-cards" id="summary-cards" style="flex-grow: 1; overflow-y: auto;">
-        </div>
+    <div class="summary-cards" id="summary-cards-new-supply" style="flex-grow: 1; overflow-y: auto;"> </div>
     <div class="wizard-nav">
       <button class="btn secondary" data-prev>← Précédent</button>
       <button id="submit-supply" class="btn primary" disabled>Valider & envoyer</button>
@@ -1685,7 +1784,7 @@ main#catalog { /* This refers to the page, not the old overlay */
           currentStep++;
           if (currentStep === 3) { 
             if (!additionalCostI.value) {
-                additionalCostI.value = "0";
+                 additionalCostI.value = "0";
             }
             additionalCostI.dispatchEvent(new Event('input', { bubbles: true }));
             const step3NextBtn = main.querySelector('[data-step="3"] [data-next]');
@@ -1703,7 +1802,7 @@ main#catalog { /* This refers to the page, not the old overlay */
 
       let lineIdCounter=0; 
       addLineBtn.addEventListener('click',()=>addLine());
-     
+      
       function addLine(data={}){
         lineIdCounter++;
         const row = document.importNode(tmplLine,true).firstElementChild;
@@ -1756,159 +1855,165 @@ main#catalog { /* This refers to the page, not the old overlay */
       }
 
 
-additionalCostI.addEventListener('input', () => {
-  const addCost = parseFloat(additionalCostI.value) || 0;
-  const rows = [...linesC.children];
-  const totalQtyAllBooks = rows.reduce((sum, r) => {
-    const q = parseInt(r.querySelector('.line-qty').value, 10) || 0;
-    return sum + q;
-  }, 0);
+    additionalCostI.addEventListener('input', () => {
+      const addCost = parseFloat(additionalCostI.value) || 0;
+      const rows = [...linesC.children];
+      const totalQtyAllBooks = rows.reduce((sum, r) => {
+        const q = parseInt(r.querySelector('.line-qty').value, 10) || 0;
+        return sum + q;
+      }, 0);
 
-  const unitExtraCost = totalQtyAllBooks > 0 ? addCost / totalQtyAllBooks : 0;
-  allocationList.innerHTML = ''; 
+      const unitExtraCost = totalQtyAllBooks > 0 ? addCost / totalQtyAllBooks : 0;
+      allocationList.innerHTML = ''; 
 
-  rows.forEach(r => {
-    const qtyInput      = r.querySelector('.line-qty');
-    const costInput     = r.querySelector('.line-cost');
-    const lineTotalEl = r.querySelector('.line-total');
-    const bookSearchInput = r.querySelector('.book-search');
+      rows.forEach(r => {
+        const qtyInput      = r.querySelector('.line-qty');
+        const costInput     = r.querySelector('.line-cost');
+        const lineTotalEl = r.querySelector('.line-total');
+        const bookSearchInput = r.querySelector('.book-search');
 
-    const currentQty  = parseInt(qtyInput.value, 10) || 0;
+        const currentQty  = parseInt(qtyInput.value, 10) || 0;
 
-    if (!costInput.dataset.baseCost) { 
-      costInput.dataset.baseCost = costInput.value || "0";
-    }
-    const baseUnitCost = parseFloat(costInput.dataset.baseCost) || 0;
-    const newUnitCostWithExtra = baseUnitCost + unitExtraCost;
+        if (!costInput.dataset.baseCost) { 
+          costInput.dataset.baseCost = costInput.value || "0";
+        }
+        const baseUnitCost = parseFloat(costInput.dataset.baseCost) || 0;
+        const newUnitCostWithExtra = baseUnitCost + unitExtraCost;
 
-    costInput.value = newUnitCostWithExtra.toFixed(0); // XOF no decimals for PU
-    lineTotalEl.textContent = 'XOF ' + (currentQty * newUnitCostWithExtra).toLocaleString('fr-FR', {minimumFractionDigits:0});
+        costInput.value = newUnitCostWithExtra.toFixed(0); // XOF no decimals for PU
+        lineTotalEl.textContent = 'XOF ' + (currentQty * newUnitCostWithExtra).toLocaleString('fr-FR', {minimumFractionDigits:0});
 
-    const extraCostForThisLineItem = currentQty * unitExtraCost;
-    const title = bookSearchInput.value || 'Livre non spécifié';
-    const div = document.createElement('div');
-    div.className = 'allocation-item';
-    div.innerHTML = `
-      <div class="item-label">${title} (Qté: ${currentQty})</div>
-      <div class="item-cost">+ ${extraCostForThisLineItem.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</div>
-    `;
-    allocationList.appendChild(div);
-  });
+        const extraCostForThisLineItem = currentQty * unitExtraCost;
+        const title = bookSearchInput.value || 'Livre non spécifié';
+        const div = document.createElement('div');
+        div.className = 'allocation-item';
+        div.innerHTML = `
+          <div class="item-label">${title} (Qté: ${currentQty})</div>
+          <div class="item-cost">+ ${extraCostForThisLineItem.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</div>
+        `;
+        allocationList.appendChild(div);
+      });
 
-  main.querySelector('[data-step="3"] [data-next]').disabled = addCost < 0 || rows.length === 0;
-  if (rows.length > 0 && addCost >= 0) {
-     updateSummary(); 
-  }
-});
+      main.querySelector('[data-step="3"] [data-next]').disabled = addCost < 0 || rows.length === 0;
+      if (rows.length > 0 && addCost >= 0) {
+         updateSummary(); 
+      }
+    });
 
-function updateSummary() {
-  const rows = [...linesC.children];
-  const summaryCardsContainer = document.getElementById('summary-cards');
-  summaryCardsContainer.innerHTML = ''; 
+    function updateSummary() {
+      const rows = [...linesC.children];
+      const summaryCardsContainer = document.getElementById('summary-cards-new-supply'); // Use updated ID
+      summaryCardsContainer.innerHTML = ''; 
 
-  const supplierName = supplierI.value.trim() || 'Non spécifié';
-  const additionalCostTotal = parseFloat(additionalCostI.value) || 0;
- 
-  let grandTotalQty = 0;
+      const supplierName = supplierI.value.trim() || 'Non spécifié';
+      const additionalCostTotal = parseFloat(additionalCostI.value) || 0;
+      
+      let grandTotalQty = 0;
 
-  const generalInfoCard = document.createElement('div');
-  generalInfoCard.className = 'summary-card';
-  generalInfoCard.innerHTML = `
-    <div class="line">
-        <div class="left"><i class="bi bi-person-fill icon"></i><span class="label">Fournisseur</span></div>
-        <span class="value">${supplierName}</span>
-    </div>
-    <div class="line">
-        <div class="left"><i class="bi bi-cash-stack icon accent"></i><span class="label">Coût Supp. Total</span></div>
-        <span class="value accent">${additionalCostTotal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
-    </div>
-  `;
-  summaryCardsContainer.appendChild(generalInfoCard);
-
-  rows.forEach(r => {
-    const title = r.querySelector('.book-search').value || 'Livre N/A';
-    const qty   = parseInt(r.querySelector('.line-qty').value,10) || 0;
-    const unitCostFinal = parseFloat(r.querySelector('.line-cost').value) || 0;  
-    const lineTotal = unitCostFinal * qty;
-
-    grandTotalQty += qty;
-    const baseUnitCost = parseFloat(r.querySelector('.line-cost').dataset.baseCost || "0");
-    const extraPerUnitForThisItem = unitCostFinal - baseUnitCost;
-
-    const card = document.createElement('div');
-    card.className = 'summary-card';
-    card.innerHTML = `
-      <div class="line">
-        <div class="left"><i class="bi bi-book-fill icon"></i><span class="label">Article</span></div>
-        <span class="value" style="text-align: right;">${title}</span>
-      </div>
-      <div class="line">
-        <div class="left"><i class="bi bi-tags-fill icon"></i><span class="label">PU de base</span></div>
-        <span class="value">${baseUnitCost.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
-      </div>
-      <div class="line">
-        <div class="left"><i class="bi bi-plus-slash-minus icon"></i><span class="label">Part Coût Supp./Unité</span></div>
-        <span class="value">${extraPerUnitForThisItem.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
-      </div>
+      const generalInfoCard = document.createElement('div');
+      generalInfoCard.className = 'summary-card';
+      generalInfoCard.innerHTML = `
         <div class="line">
-        <div class="left"><i class="bi bi-currency-exchange icon accent"></i><span class="label">PU Final</span></div>
-        <span class="value accent">${unitCostFinal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
-      </div>
-      <div class="line">
-        <div class="left"><i class="bi bi-list-ol icon"></i><span class="label">Qté</span></div>
-        <span class="value">${qty}</span>
-      </div>
-      <div class="line total">
-        <div class="left"><i class="bi bi-check-circle-fill icon accent"></i><span class="label">Total Ligne</span></div>
-        <span class="value accent">${lineTotal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
-      </div>
-    `;
-    summaryCardsContainer.appendChild(card);
-  });
- 
-  const finalTotalCard = document.createElement('div');
-  finalTotalCard.className = 'summary-card';
-  const actualGrandTotalCost = rows.reduce((sum, r) => {
-      const qty = parseInt(r.querySelector('.line-qty').value,10) || 0;
-      const finalPU = parseFloat(r.querySelector('.line-cost').value) || 0;
-      return sum + (qty * finalPU);
-  },0);
+            <div class="left"><i class="bi bi-person-fill icon"></i><span class="label">Fournisseur</span></div>
+            <span class="value">${supplierName}</span>
+        </div>
+        <div class="line">
+            <div class="left"><i class="bi bi-cash-stack icon accent"></i><span class="label">Coût Supp. Total</span></div>
+            <span class="value accent">${additionalCostTotal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
+        </div>
+      `;
+      summaryCardsContainer.appendChild(generalInfoCard);
 
-  finalTotalCard.innerHTML = `
-    <div class="line" style="border-top: 1px solid #ccc; padding-top: 0.5rem; margin-top:0.5rem;">
-        <div class="left"><i class="bi bi-calculator-fill icon"></i><span class="label">Quantité Totale d'articles</span></div>
-        <span class="value" style="font-weight: bold;">${grandTotalQty}</span>
-    </div>
-    <div class="line total">
-        <div class="left"><i class="bi bi-receipt-cutoff icon accent"></i><span class="label">Coût Total Appro.</span></div>
-        <span class="value accent" style="font-size: 1.2rem; font-weight: bold;">${actualGrandTotalCost.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
-    </div>
-  `;
-  summaryCardsContainer.appendChild(finalTotalCard);
-  submitBtn.disabled = rows.length === 0 || !supplierI.value.trim();
-}
+      rows.forEach(r => {
+        const title = r.querySelector('.book-search').value || 'Livre N/A';
+        const qty   = parseInt(r.querySelector('.line-qty').value,10) || 0;
+        const unitCostFinal = parseFloat(r.querySelector('.line-cost').value) || 0;  
+        const lineTotal = unitCostFinal * qty;
 
-function toggleStep2Next() {
-  const step2NextBtn = main.querySelector('[data-step="2"] [data-next]');
-  if(step2NextBtn) {
-      step2NextBtn.disabled = linesC.children.length === 0 || 
-          [...linesC.children].some(row => !row.querySelector('.book-search').value.trim());
-  }
-}
+        grandTotalQty += qty;
+        const baseUnitCost = parseFloat(r.querySelector('.line-cost').dataset.baseCost || "0");
+        const extraPerUnitForThisItem = unitCostFinal - baseUnitCost;
+
+        const card = document.createElement('div');
+        card.className = 'summary-card';
+        card.innerHTML = `
+          <div class="line">
+            <div class="left"><i class="bi bi-book-fill icon"></i><span class="label">Article</span></div>
+            <span class="value" style="text-align: right;">${title}</span>
+          </div>
+          <div class="line">
+            <div class="left"><i class="bi bi-tags-fill icon"></i><span class="label">PU de base</span></div>
+            <span class="value">${baseUnitCost.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
+          </div>
+          <div class="line">
+            <div class="left"><i class="bi bi-plus-slash-minus icon"></i><span class="label">Part Coût Supp./Unité</span></div>
+            <span class="value">${extraPerUnitForThisItem.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
+          </div>
+            <div class="line">
+            <div class="left"><i class="bi bi-currency-exchange icon accent"></i><span class="label">PU Final</span></div>
+            <span class="value accent">${unitCostFinal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
+          </div>
+          <div class="line">
+            <div class="left"><i class="bi bi-list-ol icon"></i><span class="label">Qté</span></div>
+            <span class="value">${qty}</span>
+          </div>
+          <div class="line total">
+            <div class="left"><i class="bi bi-check-circle-fill icon accent"></i><span class="label">Total Ligne</span></div>
+            <span class="value accent">${lineTotal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
+          </div>
+        `;
+        summaryCardsContainer.appendChild(card);
+      });
+      
+      const finalTotalCard = document.createElement('div');
+      finalTotalCard.className = 'summary-card';
+      const actualGrandTotalCost = rows.reduce((sum, r) => {
+          const qty = parseInt(r.querySelector('.line-qty').value,10) || 0;
+          const finalPU = parseFloat(r.querySelector('.line-cost').value) || 0;
+          return sum + (qty * finalPU);
+      },0);
+
+      finalTotalCard.innerHTML = `
+        <div class="line" style="border-top: 1px solid #ccc; padding-top: 0.5rem; margin-top:0.5rem;">
+            <div class="left"><i class="bi bi-calculator-fill icon"></i><span class="label">Quantité Totale d'articles</span></div>
+            <span class="value" style="font-weight: bold;">${grandTotalQty}</span>
+        </div>
+        <div class="line total">
+            <div class="left"><i class="bi bi-receipt-cutoff icon accent"></i><span class="label">Coût Total Appro.</span></div>
+            <span class="value accent" style="font-size: 1.2rem; font-weight: bold;">${actualGrandTotalCost.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
+        </div>
+      `;
+      summaryCardsContainer.appendChild(finalTotalCard);
+      submitBtn.disabled = rows.length === 0 || !supplierI.value.trim();
+    }
+
+    function toggleStep2Next() {
+      const step2NextBtn = main.querySelector('[data-step="2"] [data-next]');
+      if(step2NextBtn) {
+          step2NextBtn.disabled = linesC.children.length === 0 || 
+            [...linesC.children].some(row => !row.querySelector('.book-search').value.trim());
+      }
+    }
 
       submitBtn.addEventListener('click',async()=>{
         submitBtn.disabled=true;
         submitBtn.textContent = 'Envoi en cours...';
         const user=auth.currentUser;
         if (!user) {
-            alert("Utilisateur non connecté. Veuillez vous reconnecter.");
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Valider & envoyer';
-            return;
+          // Remplacer alert par une modale custom ou un message dans l'UI
+          console.error("Utilisateur non connecté. Veuillez vous reconnecter.");
+          // alert("Utilisateur non connecté. Veuillez vous reconnecter."); 
+          const toast=document.createElement('div');
+          toast.className='toast error';toast.textContent='Utilisateur non connecté.';
+          Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
+          document.body.append(toast);setTimeout(()=>toast.remove(),3000);
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Valider & envoyer';
+          return;
         }
 
         const supplierNameValue=supplierI.value.trim();
-       
+        
         const supplyLinesData=[...linesC.children].map(r=>({
           title:r.querySelector('.book-search').value,
           quantity:parseInt(r.querySelector('.line-qty').value,10) || 0,
@@ -1930,14 +2035,14 @@ function toggleStep2Next() {
             totalCost:totalCostFinal, 
             additionalCostApplied: additionalCostOverall
         });
-       
+        
         const uid = auth.currentUser.uid;
         const userBooksRef = db.collection('users').doc(uid).collection('books');
 
         for(const ln of supplyLinesData){
           if (!ln.title) continue; 
           const snap = await userBooksRef.where('title','==', ln.title).limit(1).get();
-         
+          
           if (!snap.empty) { 
             const bookDocRef = snap.docs[0].ref;
             batch.update(bookDocRef, {
@@ -1947,11 +2052,11 @@ function toggleStep2Next() {
             });
           } else { 
              batch.set(userBooksRef.doc(), { 
-                title: ln.title,
-                quantity: ln.quantity,
-                price: ln.baseUnitCost, // Default selling price based on base cost
-                lastPurchasePrice: ln.unitCost,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+              title: ln.title,
+              quantity: ln.quantity,
+              price: ln.baseUnitCost, // Default selling price based on base cost
+              lastPurchasePrice: ln.unitCost,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp()
              });
           }
         }
@@ -1968,7 +2073,7 @@ function toggleStep2Next() {
             linesC.innerHTML = '';
             additionalCostI.value = '0';
             allocationList.innerHTML = '';
-            document.getElementById('summary-cards').innerHTML = '';
+            document.getElementById('summary-cards-new-supply').innerHTML = ''; // Use updated ID
             currentStep = 1;
             showStep(currentStep);
             main.querySelector('[data-step="1"] [data-next]').disabled = true;
@@ -1978,13 +2083,17 @@ function toggleStep2Next() {
 
         } catch (error) {
             console.error("Erreur lors de l'enregistrement de l'approvisionnement: ", error);
-            alert("Erreur: " + error.message);
+            // alert("Erreur: " + error.message);
+            const toast=document.createElement('div');
+            toast.className='toast error';toast.textContent="Erreur: " + error.message;
+            Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
+            document.body.append(toast);setTimeout(()=>toast.remove(),3000);
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Valider & envoyer';
         }
       });
-   
+    
       const supplierSearchField = main.querySelector('#supplier-search'); 
       const step1Element = main.querySelector('.step[data-step="1"]');
       const step1WizardNav = step1Element ? step1Element.querySelector('.wizard-nav') : null;
@@ -2015,8 +2124,8 @@ function toggleStep2Next() {
       function adjustLayoutForKeyboard(stepEl, wizardNavEl, focusedInput) {
         if (!wizardNavEl || !stepEl || document.activeElement !== focusedInput) {
           if (window.visualViewport && document.activeElement !== focusedInput) {
-              if (wizardNavEl) wizardNavEl.style.bottom = '';
-              if (stepEl) stepEl.style.paddingBottom = '';
+             if (wizardNavEl) wizardNavEl.style.bottom = '';
+             if (stepEl) stepEl.style.paddingBottom = '';
           }
           return;
         }
@@ -2044,14 +2153,16 @@ function toggleStep2Next() {
 
 <main id="select-book" class="page">
   <style>
-    /* Ensure sell-header styles apply if not globally available or specific enough */
-    #select-book .sell-header { /* Use existing sell-header styles */
-        /* ... styles are mostly inherited from #sell .sell-header ... */
-        /* If specific overrides needed, add here */
-    }
+
     #select-book .books-list .book-card { /* Style for clickable book cards */
         cursor: pointer;
         transition: background-color 0.15s ease-in-out;
+        /* Re-using general book-card styles from catalog, specific styling below */
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-card);
+        padding: 1rem;
+        background: #fff;
+        box-shadow: none;
     }
     #select-book .books-list .book-card:hover { /* Desktop hover */
         background-color: #f9f9f9;
@@ -2061,6 +2172,41 @@ function toggleStep2Next() {
     }
     #select-book .search-noresult-container { /* Container for the chip */
         padding: 1rem; text-align: center;
+    }
+    /* Styles for book-card content within select-book modal */
+    #select-book .book-title {
+      font-size: 1.1rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--primary-text);
+    }
+    #select-book .book-price {
+      font-size: 0.9rem; font-weight: 500; color: var(--ebay-red); margin-bottom: 0.2rem;
+    }
+    #select-book .book-quantity {
+      font-size: 0.85rem; color: var(--secondary-text);
+    }
+    /* Header for select-book page (re-using .sell-header structure) */
+    #select-book > header.sell-header { /* More specific selector */
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: #fff;
+        border-bottom: 1px solid var(--border-color);
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 15;
+    }
+    #select-book > header.sell-header .btn-close {
+        flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
+        padding: 0.5rem; background: none; border: none; font-size: 1.5rem;
+        color: var(--primary-text); margin-right: 0.75rem; cursor: pointer; outline: none;
+    }
+    #select-book > header.sell-header .search-wrapper {
+        flex: 1; margin-top: 0;
+    }
+    #select-book > header.sell-header #select-book-search {
+        width: 100%; padding: 0.75rem 2.75rem 0.75rem 2.75rem; /* Adjusted for search icon */
+        border: 1px solid var(--border-color); border-radius: var(--border-radius-pill);
+        background: #f4f4f4; font-size: 1rem; outline: none; box-shadow: none;
     }
   </style>
   <header class="sell-header"> 
@@ -2079,7 +2225,7 @@ function toggleStep2Next() {
       >
     </div>
   </header>
-  <div id="select-book-results" style="padding-bottom: 1rem;"> <div class="books-list"></div> </div>
+  <div id="select-book-results" style="padding-bottom: 1rem;"> <div class="books-list" style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem;"></div> </div>
 
   <script>
   (function() {
@@ -2126,12 +2272,12 @@ function toggleStep2Next() {
         }
         const uid = auth.currentUser.uid;
         const userBooksRef = db.collection('users').doc(uid).collection('books');
-       
+        
         // Client-side filtering for simplicity with small datasets
         // For larger datasets, use Firestore queries with indexing (e.g., Algolia for complex search)
         const snapshot = await userBooksRef.orderBy('title').get();
         const allUserBooks = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-       
+        
         const searchTermLower = searchTerm.toLowerCase();
         const filteredBooks = allUserBooks.filter(book => 
             book.title.toLowerCase().includes(searchTermLower)
@@ -2165,7 +2311,7 @@ function toggleStep2Next() {
 
   function displayResults(books, searchTerm) {
       resultListEl.innerHTML = ''; 
-      if (books.length === 0) {
+      if (books.length === 0 && searchTerm) { // Only show "add new" if there was a search term
         resultListEl.innerHTML = `
             <div class="search-noresult-container">
               <p>Aucun livre trouvé pour « ${searchTerm} ».</p>
@@ -2175,6 +2321,8 @@ function toggleStep2Next() {
               </div>
             </div>
           `;
+      } else if (books.length === 0 && !searchTerm) {
+         resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Aucun livre dans votre catalogue. Ajoutez-en via la section "Approvisionnement".</p>';
       } else {
         books.forEach(bookData => {
           const bookDiv = document.createElement('div');
@@ -2221,14 +2369,14 @@ function toggleStep2Next() {
 </script>
 </main>
 
-<main id="add-book-modal" class="modal-overlay" aria-hidden="true">
-  <style>
+<main id="add-book-modal" class="page modal-overlay" aria-hidden="true"> <style>
 #add-book-modal.modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-  display: none; overflow: hidden; height: 100vh; width: 100vw; 
+  /* display: none;  Handled by .page and .visible */
+  overflow: hidden; height: 100vh; width: 100vw; 
   align-items: center; justify-content: center; z-index: 100; 
 }
-#add-book-modal.modal-overlay.visible { display: flex; }
+/* #add-book-modal.modal-overlay.visible { display: flex; } */ /* Handled by .page.visible */
 #add-book-modal .modal {
   background: #fff; border-radius: 0.75rem; 
   width: 90%; max-width: 380px; 
@@ -2270,8 +2418,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
   <div class="modal">
     <header>
       <h3>Ajouter un nouveau livre</h3>
-      <button class="modal-close" aria-label="Fermer">&times;</button>
-    </header>
+      <button class="modal-close" data-hash="select-book" aria-label="Fermer">&times;</button> </header>
     <div class="modal-content"> <form id="form-add-book">
         <div class="form-group">
           <label for="new-book-title">Titre du livre</label>
@@ -2296,22 +2443,23 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
   function openAddBookModal(defaultTitle = '') {
     const modalEl = document.getElementById('add-book-modal');
     if (!modalEl) return console.error('Modal #add-book-modal introuvable');
-   
-    modalEl.classList.add('visible');
-    modalEl.setAttribute('aria-hidden', 'false');
-   
+    
+    // modalEl.classList.add('visible'); // Router handles visibility
+    // modalEl.setAttribute('aria-hidden', 'false');
+    location.hash = 'add-book-modal'; // Let router show the modal "page"
+    
     const titleInputEl = document.getElementById('new-book-title');
     if (titleInputEl) {
         titleInputEl.value = defaultTitle; 
-        setTimeout(() => titleInputEl.focus(), 50);  
+        setTimeout(() => titleInputEl.focus(), 100); // Increased delay for page transition
     }
-    document.body.style.overflow = 'hidden'; 
+    // document.body.style.overflow = 'hidden'; // Potentially handled by router or CSS for modal
   }
 
   document.addEventListener('click', e => {
     const chip = e.target.closest('#add-book-chip'); 
     if (!chip) return;
-   
+    
     // let suggestedTitle = chip.textContent.trim();
     // suggestedTitle = suggestedTitle.replace(/^Ajouter\s*«\s*/, '').replace(/\s*»(\s*<i.*)?$/, ''); 
     const strongTitleEl = chip.querySelector('#chip-book-title');
@@ -2320,34 +2468,38 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
     openAddBookModal(suggestedTitle);
   });
 
-  function closeAddBookModal() {
+  function closeAddBookModal() { // This function might be called by router when navigating away
     const modalEl = document.getElementById('add-book-modal');
-    if (modalEl) {
-        modalEl.classList.remove('visible');
-        modalEl.setAttribute('aria-hidden', 'true');
+    // if (modalEl) {
+    //     modalEl.classList.remove('visible');
+    //     modalEl.setAttribute('aria-hidden', 'true');
+    // }
+    // document.body.style.overflow = ''; 
+    // document.body.classList.remove('keyboard-visible'); 
+    if (location.hash === '#add-book-modal') { // If still on modal, go back to select-book
+        location.hash = 'select-book';
     }
-    document.body.style.overflow = ''; 
-    document.body.classList.remove('keyboard-visible'); 
   }
 
-  const closeBtnEl = document.querySelector('#add-book-modal .modal-close');
-  if (closeBtnEl) {
-    closeBtnEl.addEventListener('click', closeAddBookModal);
-  }
+  // Close button inside modal now uses data-hash, handled by main router
+  // const closeBtnEl = document.querySelector('#add-book-modal .modal-close');
+  // if (closeBtnEl) {
+  //  closeBtnEl.addEventListener('click', closeAddBookModal);
+  // }
 
-  const overlayEl = document.getElementById('add-book-modal');
-  if (overlayEl) {
-    overlayEl.addEventListener('click', e => {
-      if (e.target === overlayEl) { 
-        closeAddBookModal();
-      }
-    });
-  }
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && overlayEl && overlayEl.classList.contains('visible')) {
-        closeAddBookModal();
-    }
-  });
+  // const overlayEl = document.getElementById('add-book-modal');
+  // if (overlayEl) {
+  //  overlayEl.addEventListener('click', e => {
+  //    if (e.target === overlayEl) { 
+  //      closeAddBookModal();
+  //    }
+  //  });
+  // }
+  // window.addEventListener('keydown', (e) => {
+  //  if (e.key === 'Escape' && overlayEl && overlayEl.classList.contains('visible')) {
+  //      closeAddBookModal();
+  //  }
+  // });
 
   (function() {
     const modalEl = document.getElementById('add-book-modal');
@@ -2405,14 +2557,14 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
     e.preventDefault();
     const titleInputEl = document.getElementById('new-book-title');
     const newTitle = titleInputEl.value.trim();
-   
+    
     if (!newTitle) {
       titleInputEl.style.borderColor = 'var(--ebay-red)';
       setTimeout(() => titleInputEl.style.borderColor = '', 2000);
       titleInputEl.focus();
       return;
     }
-   
+    
     const submitButton = formAddBookEl.querySelector('button[type="submit"]');
     submitButton.disabled = true;
     submitButton.textContent = 'Enregistrement...';
@@ -2429,7 +2581,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
       const existingBook = querySnapshot.docs.find(doc => doc.data().title.toLowerCase() === newTitle.toLowerCase());
 
       if (existingBook) {
-          throw new Error(`Un livre intitulé "${existingBook.data().title}" existe déjà.`);
+         throw new Error(`Un livre intitulé "${existingBook.data().title}" existe déjà.`);
       }
 
       await userBooksRef.add({
@@ -2440,13 +2592,14 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
         lastPurchasePrice: 0 
       });
 
-      closeAddBookModal();
+      // closeAddBookModal(); // Router will handle navigation away
+      location.hash = 'select-book'; // Go back to select book page
 
       if (window.currentBookInput) { 
-          location.hash = 'new-supply';  
+          // location.hash = 'new-supply';  // Already handled by select-book logic on item click
           window.currentBookInput.value = newTitle;
           window.currentBookInput.dispatchEvent(new Event('change', { bubbles: true }));
-         
+          
           const lineRow = window.currentBookInput.closest('.line-row');
           if (lineRow) {
               const costInput = lineRow.querySelector('.line-cost');
@@ -2475,7 +2628,11 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
 
     } catch (err) {
       console.error(err);
-      alert("Erreur: " + err.message); 
+      // alert("Erreur: " + err.message); 
+      const toast=document.createElement('div');
+      toast.className='toast error';toast.textContent="Erreur: " + err.message;
+      Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1050, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
+      document.body.append(toast);setTimeout(()=>toast.remove(),3500);
     } finally {
         submitButton.disabled = false;
         submitButton.textContent = 'Enregistrer le livre';
@@ -2567,9 +2724,9 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
 }
 #account .btn-signout:active { background: var(--ebay-red); color: #fff; }
 #account .updates-grid .update-card.full-width { flex: 1 1 100%; max-width: 100%; }
-#btn-install { /* On home page usually, but if needed on account */
+/* #btn-install { 
   width: calc(100% - 2rem);  margin: 1rem; 
-}
+} */
   </style>
 
   <header><h2>Mon compte</h2></header>
@@ -2585,14 +2742,12 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
 
     <div class="section-title">Vos mises à jour</div>
     <div class="updates-grid">
-      <div class="update-card" onclick="location.hash='stock-alerts'"> <div>
-          <h4>Alertes de stock</h4>
+      <div class="update-card" data-hash="stock-alerts"> <div> <h4>Alertes de stock</h4>
           <p>Livres bientôt épuisés</p>
         </div>
         <i class="bi bi-chevron-right"></i>
       </div>
-      <div class="update-card full-width" onclick="location.hash='orders'"> <div>
-          <h4>Commandes récentes</h4>
+      <div class="update-card full-width" data-hash="orders"> <div> <h4>Commandes récentes</h4>
           <p>Voir vos dernières commandes</p>
         </div>
         <i class="bi bi-chevron-right"></i>
@@ -2657,7 +2812,11 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
         window.location.href = 'login.html'; 
       }).catch(error => {
         console.error("Sign out error", error);
-        alert("Erreur de déconnexion: " + error.message);
+        // alert("Erreur de déconnexion: " + error.message);
+        const toast=document.createElement('div');
+        toast.className='toast error';toast.textContent="Erreur de déconnexion: " + error.message;
+        Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
+        document.body.append(toast);setTimeout(()=>toast.remove(),3000);
       });
     });
   </script>
@@ -2691,7 +2850,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
 
   <script>
   (function() {
-    const catalogPage = document.getElementById('catalog'); // Keep reference if needed for observer
+    const catalogPage = document.getElementById('catalog'); 
     const booksListEl  = document.querySelector('#catalog-results-main .books-list');
     const totalBooksEl  = document.getElementById('total-books-catalog');
     const totalValueEl  = document.getElementById('total-value-catalog');
@@ -2709,7 +2868,10 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
     function renderBooks(searchTerm = '') {
         booksListEl.innerHTML = ''; 
         const filteredBooks = searchTerm
-            ? allBooksCache.filter(book => book.title.toLowerCase().includes(searchTerm))
+            ? allBooksCache.filter(book => 
+                (book.title && book.title.toLowerCase().includes(searchTerm)) ||
+                (book.author && book.author.toLowerCase().includes(searchTerm)) // Optional: search by author too
+              )
             : allBooksCache;
 
         if (filteredBooks.length === 0 && allBooksCache.length > 0 && searchTerm) {
@@ -2717,17 +2879,74 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
         } else if (allBooksCache.length === 0 && !searchTerm) {
             // This case is handled by the onSnapshot empty check below
         }
-       
+        
         filteredBooks.forEach(book => {
             const card = document.createElement('div');
-            card.className = 'book-card'; 
+            card.className = 'book-card-catalog'; 
+            card.dataset.bookId = book.id;
+
+            const formattedPriceSell = (book.price || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0});
+            const formattedPricePurchase = (book.lastPurchasePrice || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0});
+            
+            let stockClass = 'stock-normal';
+            if (book.quantity <= 0) {
+                stockClass = 'stock-out';
+            } else if (book.quantity <= 5) { // Example threshold for low stock
+                stockClass = 'stock-low';
+            }
+
             card.innerHTML = `
-              <h4 class="book-title">${book.title}</h4>
-              <p class="book-price">Dernier PU Achat: ${(book.lastPurchasePrice || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0})}</p>
-              <p class="book-price" style="color: var(--ebay-blue);">Prix de Vente Sugg.: ${(book.price || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0})}</p>
-              <p class="book-quantity">Quantité en stock: ${book.quantity || 0}</p>
-              `;
+              <div class="book-card-image-area">
+                  <i class="bi bi-book book-placeholder-icon"></i>
+              </div>
+              <div class="book-card-content-area">
+                  <div class="book-card-main-info">
+                      <h4 class="book-title">${book.title || 'Titre inconnu'}</h4>
+                      <p class="book-author"><i class="bi bi-person"></i> <span>${book.author || 'Auteur inconnu'}</span></p>
+                      <p class="book-price-sell"><i class="bi bi-tag-fill"></i> Prix Vente: <span>${formattedPriceSell}</span></p>
+                      <p class="book-quantity-stock"><i class="bi bi-box-seam"></i> Stock: <span class="stock-value ${stockClass}">${book.quantity || 0}</span></p>
+                  </div>
+                  <div class="book-card-secondary-info">
+                      <p class="book-price-purchase"><i class="bi bi-cart-check"></i> Dernier Coût: <span>${formattedPricePurchase}</span></p>
+                      </div>
+                  <div class="book-card-actions">
+                      <button class="btn-action-icon btn-view-details" data-book-id="${book.id}" aria-label="Voir détails" title="Voir détails"><i class="bi bi-eye-fill"></i></button>
+                      <button class="btn-action-icon btn-edit-book" data-book-id="${book.id}" aria-label="Modifier" title="Modifier"><i class="bi bi-pencil-fill"></i></button>
+                      <button class="btn-action-icon btn-delete-book" data-book-id="${book.id}" aria-label="Supprimer" title="Supprimer"><i class="bi bi-trash3-fill"></i></button>
+                  </div>
+              </div>
+            `;
             booksListEl.appendChild(card);
+        });
+
+        // Add event listeners for new action buttons (placeholder for now)
+        document.querySelectorAll('.btn-view-details').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const bookId = e.currentTarget.dataset.bookId;
+                console.log('View details for book ID:', bookId);
+                // Future: Open details modal for bookId
+                alert(`Action "Voir Détails" pour livre ID: ${bookId} (à implémenter)`);
+            });
+        });
+        document.querySelectorAll('.btn-edit-book').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const bookId = e.currentTarget.dataset.bookId;
+                console.log('Edit book ID:', bookId);
+                // Future: Open edit modal for bookId
+                alert(`Action "Modifier" pour livre ID: ${bookId} (à implémenter)`);
+            });
+        });
+        document.querySelectorAll('.btn-delete-book').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const bookId = e.currentTarget.dataset.bookId;
+                console.log('Delete book ID:', bookId);
+                // Future: Show confirmation and delete bookId
+                // Remplacer confirm par une modale custom
+                // if(confirm(`Êtes-vous sûr de vouloir supprimer ce livre (ID: ${bookId}) ?`)){
+                //     console.log("Suppression confirmée pour", bookId);
+                // }
+                alert(`Action "Supprimer" pour livre ID: ${bookId} (à implémenter avec confirmation)`);
+            });
         });
     }
 
@@ -2741,8 +2960,9 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
           .collection('books')
           .orderBy('title'); 
 
-        booksListEl.innerHTML = Array(5).fill('').map(() => `
-            <div class="book-card" style="background:#f9f9f9; height: 100px; border-radius: var(--border-radius-card); animation: pulse 1.5s infinite ease-in-out;"></div>
+        // Updated skeleton to be a bit more representative
+        booksListEl.innerHTML = Array(3).fill('').map(() => `
+            <div class="skeleton-book-card-catalog"></div>
         `).join('');
 
 
@@ -2760,11 +2980,11 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             totalCount += quantity;
             totalPurchaseValue += (bookData.lastPurchasePrice || 0) * quantity; // Use lastPurchasePrice for value
           });
-         
+          
           if (allBooksCache.length === 0) {
-              booksListEl.innerHTML = '<p style="text-align:center; padding:1rem; color:var(--secondary-text);">Votre catalogue est vide. Commencez par ajouter des livres via un approvisionnement.</p>';
+               booksListEl.innerHTML = '<p style="text-align:center; padding:1rem; color:var(--secondary-text);">Votre catalogue est vide. Commencez par ajouter des livres via un approvisionnement.</p>';
           } else {
-              renderBooks(searchInputCatalogEl.value.trim().toLowerCase()); 
+               renderBooks(searchInputCatalogEl.value.trim().toLowerCase()); 
           }
 
           totalBooksEl.textContent = totalCount.toLocaleString();
@@ -2786,7 +3006,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
         if (totalBooksEl) totalBooksEl.textContent = '0';
         if (totalValueEl) totalValueEl.textContent = 'XOF 0';
     }
-   
+    
     auth.onAuthStateChanged(user => {
         if (user) {
             // If the catalog page is already visible, set up the listener
@@ -2906,7 +3126,7 @@ if (btnActivate) {
         activationCodeInput.focus();
         return;
       }
-     
+      
       btnActivate.disabled = true;
       btnActivate.textContent = 'Vérification...';
       activationMessageEl.textContent = '';
@@ -3019,18 +3239,23 @@ window.addEventListener('appinstalled', () => {
             pageFound = true;
             // Specific actions when a page becomes visible
             if (p.id === 'catalog' && auth.currentUser) {
-                // The catalog's own script will handle setup via hashchange/authstatechange
+              // The catalog's own script will handle setup via hashchange/authstatechange
             } else if (p.id === 'supply' && auth.currentUser) {
-                // The supply page's own script will handle setup
+              // The supply page's own script will handle setup
             } else if (p.id === 'sell' && auth.currentUser) {
-                // The sell page's own script (MutationObserver or similar) handles setup
+              // The sell page's own script (MutationObserver or similar) handles setup
+            } else if (p.id === 'add-book-modal') { // Handle modal "page"
+                // document.body.style.overflow = 'hidden'; // Prevent body scroll when modal is open
             }
         } else {
              // Specific cleanup when a page is hidden
             if (p.id === 'catalog') {
-                // The catalog's own script will handle cleanup via hashchange
+              // The catalog's own script will handle cleanup via hashchange
             } else if (p.id === 'supply') {
-                // The supply page's own script will handle cleanup
+              // The supply page's own script will handle cleanup
+            } else if (p.id === 'add-book-modal') {
+                // document.body.style.overflow = ''; // Restore body scroll
+                // document.body.classList.remove('keyboard-visible');
             }
         }
       });
@@ -3040,10 +3265,10 @@ window.addEventListener('appinstalled', () => {
         location.hash = '#home'; 
         return; 
       }
-     
-      const pagesWithoutNav = ['activation','sell','new-supply','select-book', 'add-book-modal']; // add-book-modal is an overlay not a page
+      
+      const pagesWithoutNav = ['activation','sell','new-supply','select-book', 'add-book-modal']; 
       if (mainNav) { // Check if mainNav exists
-        if (pagesWithoutNav.includes(pageIdToShow) || pageIdToShow.startsWith('add-book-modal')) { // add-book-modal check might be redundant if it's an overlay
+        if (pagesWithoutNav.includes(pageIdToShow)) { 
             mainNav.style.display = 'none';
         } else {
             mainNav.style.removeProperty('display');
@@ -3056,9 +3281,11 @@ window.addEventListener('appinstalled', () => {
       );
 
       const activePageElement = document.getElementById(pageIdToShow);
-      if (activePageElement) activePageElement.scrollTop = 0;
+      if (activePageElement && pageIdToShow !== 'add-book-modal') { // Don't scroll for modal overlay
+        activePageElement.scrollTop = 0;
+      }
     }
-   
+    
     async function route() {
       if (currentAuthUser === undefined) { // Auth state not yet determined
         document.body.style.visibility = 'hidden'; 
@@ -3066,10 +3293,20 @@ window.addEventListener('appinstalled', () => {
       }
       document.body.style.visibility = 'visible';
 
-      const hashKey = location.hash.slice(1) || 'home';
+      let hashKey = location.hash.slice(1) || 'home';
+
+      // Handle modal display logic without breaking back button for non-modal pages
+      if (hashKey === 'add-book-modal') {
+          // Show the modal page, but don't necessarily hide the underlying page (e.g. select-book)
+          // The modal itself is an overlay. We make its 'main.page' container visible.
+          // The underlying page (e.g. select-book) should remain visible if it was the previous route.
+          // This simple router doesn't have a concept of "overlay" routes easily.
+          // For now, `showOnlyPage` will make `add-book-modal` the *only* visible `main.page`.
+      }
+
 
       if (!currentAuthUser) { // User is null (not logged in)
-          userActivated = false;
+          userActivated = false; 
           // Allow access only to login.html (which is not part of this SPA's routing)
           // Or, if login was a hash route like #login, handle it here.
           // Since login.html is separate, this router assumes user is logged in if not on login.html
@@ -3097,7 +3334,7 @@ window.addEventListener('appinstalled', () => {
          showOnlyPage('home');
          return;
       }
-     
+      
       showOnlyPage(hashKey);
     }
 
@@ -3128,7 +3365,7 @@ window.addEventListener('appinstalled', () => {
         // If critical error, might sign out or show error page
         // For now, assume not activated and let logic proceed to activation page if needed
       }
-     
+      
       route(); // Call route after auth state and claims are processed
     });
 
@@ -3146,10 +3383,10 @@ window.addEventListener('appinstalled', () => {
         rippleSpan.style.width = rippleSpan.style.height = rippleSize + 'px';
         rippleSpan.style.left = (e.clientX - rect.left - rippleSize/2) + 'px';
         rippleSpan.style.top  = (e.clientY - rect.top  - rippleSize/2) + 'px';
-       
+        
         const existingRipple = dataHashElement.querySelector('.ripple');
         if (existingRipple) existingRipple.remove();
-       
+        
         dataHashElement.appendChild(rippleSpan);
         rippleSpan.addEventListener('animationend', () => rippleSpan.remove(), {once: true});
       }
@@ -3157,10 +3394,13 @@ window.addEventListener('appinstalled', () => {
       if (dataHashElement.tagName === 'A' && dataHashElement.getAttribute('href')?.startsWith('#')) {
         // e.preventDefault(); // Default is already handled by browser for hash links. We just update state.
       }
+      // Only change hash if it's different, to prevent re-triggering if already on the page
+      // or if an action within the page (not a nav link) has a data-hash for other purposes.
       if (location.hash !== '#' + dataHashElement.dataset.hash) {
          location.hash = dataHashElement.dataset.hash; // This will trigger 'hashchange' and then route()
-      } else { 
-         route(); // If hash is same, ensure correct page visibility (e.g. after programmatic changes)
+      } else if (location.hash === '#' + dataHashElement.dataset.hash && dataHashElement.classList.contains('nav-link')) {
+        // If clicking the active nav link, still call route to ensure page is scrolled to top etc.
+        route();
       }
     });
 
