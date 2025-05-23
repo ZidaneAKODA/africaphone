@@ -9,7 +9,7 @@
   <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
   <style>
-    body { visibility: hidden; } /* Initially hidden until router decides */
+    body { visibility: hidden; }
   </style>
 
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -52,7 +52,6 @@
       width: 100%;                /* toute la largeur */
       overflow-y: auto;           /* scroll interne si besoin */
       /* padding-bottom pour laisser la place à la nav en bas */
-      /* This will be dynamically adjusted by JS for keyboard */
       padding-bottom: calc(56px + env(safe-area-inset-bottom));
     }
 
@@ -88,11 +87,10 @@
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
       display:flex;flex-direction:column;
-      height:100vh;height:100dvh; /* dvh for dynamic viewport height */
-      overflow: hidden; /* Prevent body scroll when keyboard is open and layout is adjusted */
+      height:100vh;height:100dvh;
     }
 
-    /* PAGE MANAGEMENT - Redundant with main.page, kept for now if specific uses */
+    /* PAGE MANAGEMENT */
     .page {
       display: none;            /* cachée par défaut */
       flex: 1 1 auto;           /* grandit pour remplir l’espace */
@@ -159,7 +157,7 @@
     }
     .btn-primary:active{background:#014fa5}
 
-    .trending{padding:0 1rem 5.5rem} /* Adjusted padding-bottom if nav is 56px */
+    .trending{padding:0 1rem 5.5rem}
     .trending h3{font-size:1.35rem;margin-bottom:0.75rem}
     .trend-list{
       display:flex;gap:1.25rem;overflow-x:auto;padding-bottom:0.5rem;
@@ -181,12 +179,9 @@
     .btn-add{font-size:0.85rem;padding:0.4rem 0.8rem}
 
     /* NAVIGATION BAR */
-    nav.global-bottom-nav { /* Added class for specific targeting */
-      position:fixed;
-      bottom:env(safe-area-inset-bottom); /* Initial position, JS will adjust */
-      left:0;width:100%;background:#fff;
-      border-top:1px solid var(--border-color);z-index:30;
-      transition: bottom 0.2s ease-out; /* Smooth transition when JS adjusts bottom */
+    nav{
+      position:fixed;bottom:0;left:0;width:100%;background:#fff;
+      border-top:1px solid var(--border-color);z-index:30
     }
     .nav-inner{display:flex;justify-content:space-evenly;align-items:center;padding:0.4rem 0}
     .nav-link{
@@ -239,7 +234,7 @@
       overflow-x: auto;
       transition: opacity 0.3s ease, max-height 0.3s ease, margin-bottom 0.3s ease, padding 0.3s ease;
       max-height: 200px;
-      /* overflow: hidden; /* This was hiding the x-scroll, removed */
+      overflow: hidden;
     }
 
     .info-card {
@@ -249,7 +244,7 @@
       border-radius: var(--border-radius-card);
       padding: 0.75rem; /* Padding interne ajusté */
       text-align: center;
-      min-width: 0; /* Allow shrinking */
+      min-width: 0;
       box-shadow: none; 
     }
 
@@ -312,7 +307,12 @@
       border: 1px solid var(--border-color);
       border-radius: var(--border-radius-card);
       padding: 1rem;
+      /* box-shadow: 0 1px 3px rgba(0,0,0,0.05); MODIFIED: Removed shadow */
+      /* transition: box-shadow 0.2s ease-in-out; MODIFIED: Removed transition for shadow */
     }
+    /* .book-card-catalog:hover { MODIFIED: Removed hover effect
+        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    } */
 
     .book-card-image-area {
       flex: 0 0 60px; /* Largeur fixe pour la zone image/icône */
@@ -398,12 +398,20 @@
       justify-content: center;
       transition: background-color 0.2s ease, color 0.2s ease;
     }
-    .btn-action-icon:active { 
-      background-color: var(--action-icon-hover-bg); 
+    /* .btn-action-icon:hover { MODIFIED: Removed hover effect
+      background-color: var(--action-icon-hover-bg);
+      color: var(--primary-text);
+    } */
+    .btn-action-icon:active { /* MODIFIED: Added active state for touch feedback */
+      background-color: var(--action-icon-hover-bg); /* Using existing variable, can be renamed if a different active style is desired */
       color: var(--primary-text);
     }
-    .btn-action-icon.btn-delete-book:active { 
-      background-color: rgba(229, 50, 56, 0.15); 
+    /* .btn-action-icon.btn-delete-book:hover { MODIFIED: Removed hover effect
+      background-color: rgba(229, 50, 56, 0.1);
+      color: var(--ebay-red);
+    } */
+    .btn-action-icon.btn-delete-book:active { /* MODIFIED: Added active state for touch feedback */
+      background-color: rgba(229, 50, 56, 0.15); /* Slightly more pronounced for active state */
       color: var(--ebay-red);
     }
     .btn-action-icon i { /* Pour s'assurer que l'icône est bien centrée */
@@ -422,9 +430,9 @@
         animation: pulse 1.5s infinite ease-in-out;
     }
      @keyframes pulse {
-     0%   { opacity: 1; }
-     50%  { opacity: 0.6; }
-     100% { opacity: 1; }
+      0%   { opacity: 1; }
+      50%  { opacity: 0.6; }
+      100% { opacity: 1; }
     }
 
   </style>
@@ -471,7 +479,6 @@
       Installer l’application
     </button>
   </main>
-
 <main id="sell" class="page">
   <style>
 
@@ -482,7 +489,6 @@
       width: 100%;
       overflow-y: auto;
       /* Padding pour laisser la place à la navigation du wizard en bas */
-      /* This will be dynamically adjusted by JS for keyboard */
       padding: 0 0 calc(56px + 1rem + env(safe-area-inset-bottom)); /* 56px nav wizard + 1rem marge */
     }
 
@@ -551,10 +557,6 @@
         top: 0; /* Se colle sous le header principal si header principal existe pour l'étape */
         z-index: 14; /* En dessous du header principal, au-dessus du contenu */
     }
-    /* Specific adjustment for step 1 title if header is present */
-    #sell .sell-step[data-step="1"] h3.step-title {
-        top: 61px; /* Approx height of .sell-header-step1 */
-    }
 
 
     /* Navigation du Wizard */
@@ -569,7 +571,6 @@
       background: #fff;
       border-top: 1px solid var(--border-color);
       z-index: 20; /* Au-dessus du contenu de l'étape */
-      transition: bottom 0.2s ease-out; /* For keyboard adjustment */
     }
 
     .wizard-nav-sell button {
@@ -735,7 +736,6 @@
       position: fixed; bottom: calc(env(safe-area-inset-bottom) + 56px + 1rem); /* Au dessus de la nav wizard */
       width: 100%; left:0; box-sizing: border-box;
       z-index: 25; /* Au dessus de la nav wizard */
-      pointer-events: none; /* So it doesn't block clicks on elements behind it if empty */
     }
     #sell-feedback-message.success { color: var(--ebay-green); }
     #sell-feedback-message.error { color: var(--ebay-red); }
@@ -877,29 +877,26 @@
         if (currentSellStep === 1) {
             renderStep1CartSummary();
             step1NextBtn.disabled = salesCart.length === 0;
-            searchInputSellEl.focus(); // Focus search on step 1
         } else if (currentSellStep === 2) {
             renderSalesCartForStep2(); // Afficher le panier éditable
             step2NextBtn.disabled = salesCart.length === 0;
-        } else if (currentSellStep === 3) {
-            customerNameInputEl.focus(); // Focus first field on step 3
         } else if (currentSellStep === 4) {
             renderSalesSummaryForStep4(); // Afficher le récapitulatif final
             validateSaleButtonStep4El.disabled = salesCart.length === 0;
         }
-        // Scroll to top of the main sell page container or step content
-        const activeStepEl = sellPageEl.querySelector(`.sell-step.active`);
-        if (activeStepEl) activeStepEl.scrollTop = 0;
+        sellPageEl.scrollTop = 0; // Scroll to top of the main sell page container
+        const activeStepContent = sellPageEl.querySelector(`.sell-step[data-step="${currentSellStep}"] .sell-step-content`);
+        if(activeStepContent) activeStepContent.scrollTop = 0; // Scroll to top of step content
+
     }
 
     sellPageEl.addEventListener('click', function(e) {
         const targetPrev = e.target.closest('.btn-sell-secondary[data-target-step]');
-        const targetNext = e.target.closest('.btn-sell-primary[data-target-step]'); 
+        const targetNext = e.target.closest('.btn-sell-primary[data-target-step]');
 
         if (targetPrev) {
             showSellStep(targetPrev.dataset.targetStep);
         } else if (targetNext) {
-            // Validation avant de passer à l'étape suivante (si nécessaire)
             if (currentSellStep === 1 && salesCart.length === 0) {
                 showFeedback("Veuillez ajouter au moins un livre au panier.", true, 2000);
                 return;
@@ -917,12 +914,12 @@
     auth.onAuthStateChanged(user => {
         if (user) {
             currentUserUID = user.uid;
-            // loadUserBooks(); // Will be called by observer if page becomes visible
+            loadUserBooks();
         } else {
             currentUserUID = null;
             userBooksCache = [];
             salesCart = [];
-            if (sellPageEl.classList.contains('visible')) { 
+            if (document.getElementById('sell')?.classList.contains('visible')) {
                 resetSellPage(); 
             }
         }
@@ -930,17 +927,14 @@
 
     async function loadUserBooks() {
         if (!currentUserUID) return;
-        // Show some loading state in search results
-        searchResultsContainerEl.innerHTML = '<p class="no-results">Chargement du stock...</p>';
         try {
             const snapshot = await db.collection('users').doc(currentUserUID).collection('books').get();
             userBooksCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            if(currentSellStep === 1) filterAndRenderBookResults(); // Render based on current search or initial message
+            if(currentSellStep === 1) filterAndRenderBookResults();
         } catch (error) {
             console.error("Erreur de chargement des livres de l'utilisateur:", error);
             showFeedback("Erreur de chargement des livres.", true);
             userBooksCache = [];
-            searchResultsContainerEl.innerHTML = '<p class="no-results error">Erreur de chargement du stock.</p>';
         }
     }
 
@@ -950,15 +944,11 @@
     function filterAndRenderBookResults() {
         const searchTerm = searchInputSellEl.value.trim().toLowerCase();
         if (!searchTerm && userBooksCache.length > 0) { 
-             searchResultsContainerEl.innerHTML = '<p class="no-results">Entrez un terme pour rechercher dans votre stock.</p>';
-             return;
-        }
-        if (!userBooksCache.length && !searchTerm){ 
-            searchResultsContainerEl.innerHTML = '<p class="no-results">Votre stock est vide. Commencez par rechercher ou ajoutez des livres via "Approvisionnement".</p>';
+            searchResultsContainerEl.innerHTML = '<p class="no-results">Entrez un terme pour rechercher dans votre stock.</p>';
             return;
         }
-        if (!userBooksCache.length && searchTerm){ 
-            searchResultsContainerEl.innerHTML = `<p class="no-results">Votre stock est vide. Aucun livre trouvé pour "${searchInputSellEl.value}".</p>`;
+        if (!userBooksCache.length && !searchTerm){ 
+            searchResultsContainerEl.innerHTML = '<p class="no-results">Votre stock est vide ou non chargé. Commencez par rechercher.</p>';
             return;
         }
 
@@ -971,7 +961,7 @@
     function renderSearchResults(books) {
         searchResultsContainerEl.innerHTML = '';
         if (books.length === 0) {
-            searchResultsContainerEl.innerHTML = `<p class="no-results">Aucun livre en stock ne correspond à "${searchInputSellEl.value}".</p>`;
+            searchResultsContainerEl.innerHTML = '<p class="no-results">Aucun livre trouvé ou en stock pour cette recherche.</p>';
             return;
         }
         books.forEach(book => {
@@ -1016,7 +1006,7 @@
             title: book.title,
             quantity: 1,
             unitPrice: book.price || 0,
-            stock: book.quantity, // Current stock at time of adding
+            stock: book.quantity,
             suggestedPrice: book.price || 0
         });
 
@@ -1049,17 +1039,41 @@
             salesCart.forEach((item, index) => {
                 const listItem = document.createElement('div');
                 listItem.className = 'sell-cart-item';
+                listItem.setAttribute('data-index', index);
+
                 listItem.innerHTML = `
                     <span class="title" title="${item.title}">${item.title}</span>
                     <input type="number" class="quantity" value="${item.quantity}" min="1" max="${item.stock}" data-index="${index}" aria-label="Quantité pour ${item.title}">
                     <input type="number" class="price" value="${item.unitPrice.toFixed(0)}" step="50" min="0" data-index="${index}" aria-label="Prix de vente pour ${item.title}">
-                    <span class="subtotal">${(item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0})}</span>
+                    <span class="subtotal" data-index="${index}">${(item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0})}</span>
                     <button class="remove-item-btn" data-index="${index}" aria-label="Supprimer ${item.title}"><i class="bi bi-trash-fill"></i></button>
                 `;
-                listItem.querySelector('.quantity').addEventListener('change', (e) => updateCartItemQuantity(index, parseInt(e.target.value)));
-                listItem.querySelector('.quantity').addEventListener('input', (e) => updateCartItemQuantity(index, parseInt(e.target.value))); // For immediate feedback
-                listItem.querySelector('.price').addEventListener('change', (e) => updateCartItemPrice(index, parseFloat(e.target.value)));
-                listItem.querySelector('.price').addEventListener('input', (e) => updateCartItemPrice(index, parseFloat(e.target.value))); // For immediate feedback
+
+                const quantityInput = listItem.querySelector('.quantity');
+                const priceInput = listItem.querySelector('.price');
+
+                // Pour le champ QUANTITÉ: Sélectionner le contenu au focus pour remplacement facile
+                quantityInput.addEventListener('focus', (e) => {
+                    e.target.select();
+                });
+
+                // Pour le champ PRIX:
+                priceInput.addEventListener('focus', (e) => {
+                    if (e.target.value === '0') {
+                        e.target.value = ''; // Effacer si c'est "0"
+                    } else {
+                        e.target.select(); // Sinon, sélectionner pour remplacement facile
+                    }
+                });
+
+                // Écouteurs pour la mise à jour des données
+                quantityInput.addEventListener('input', (e) => {
+                    updateCartItemQuantity(index, parseInt(e.target.value));
+                });
+                priceInput.addEventListener('input', (e) => {
+                    updateCartItemPrice(index, parseFloat(e.target.value));
+                });
+
                 listItem.querySelector('.remove-item-btn').addEventListener('click', () => removeCartItem(index));
                 cartItemsListStep2El.appendChild(listItem);
             });
@@ -1067,47 +1081,97 @@
         updateCartSummaryForStep2();
         step2NextBtn.disabled = salesCart.length === 0;
     }
-
-    function updateCartItemQuantity(index, newQuantity) {
+    function updateCartItemQuantity(index, newQuantityFromInput) {
         const item = salesCart[index];
         if (!item) return;
 
-        if (isNaN(newQuantity) || newQuantity < 1) newQuantity = 1;
-        else if (newQuantity > item.stock) {
-            newQuantity = item.stock;
+        let validatedQuantity = newQuantityFromInput;
+
+        if (isNaN(validatedQuantity) || validatedQuantity < 1) {
+            validatedQuantity = 1;
+        } else if (validatedQuantity > item.stock) {
+            validatedQuantity = item.stock;
             showFeedback(`Stock maximum pour "${item.title}" est ${item.stock}.`, true, 2000);
         }
-        item.quantity = newQuantity;
-        // Update the input field value directly to reflect validated quantity
-        const quantityInput = cartItemsListStep2El.querySelector(`.quantity[data-index="${index}"]`);
-        if (quantityInput) quantityInput.value = newQuantity;
         
-        renderSalesCartForStep2(); // Re-render for subtotals and overall total
-        renderStep1CartSummary(); // Update step 1 summary as well
+        const quantityInputEl = cartItemsListStep2El.querySelector(`input.quantity[data-index="${index}"]`);
+        // Vérifier si une mise à jour est réellement nécessaire pour éviter des opérations DOM inutiles
+        if (item.quantity === validatedQuantity && quantityInputEl && parseInt(quantityInputEl.value) === validatedQuantity) {
+            return; 
+        }
+
+        item.quantity = validatedQuantity;
+
+        if (quantityInputEl && parseInt(quantityInputEl.value) !== validatedQuantity) {
+             quantityInputEl.value = validatedQuantity; 
+        }
+        
+        const subtotalEl = cartItemsListStep2El.querySelector(`span.subtotal[data-index="${index}"]`);
+        if (subtotalEl) {
+            subtotalEl.textContent = (item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
+        }
+
+        updateCartSummaryForStep2(); 
+        renderStep1CartSummary();   
     }
 
-    function updateCartItemPrice(index, newPrice) {
+    function updateCartItemPrice(index, newPriceFromInput) {
         const item = salesCart[index];
         if (!item) return;
-        if (isNaN(newPrice) || newPrice < 0) newPrice = 0;
-        item.unitPrice = newPrice;
-        // Update the input field value directly
-        const priceInput = cartItemsListStep2El.querySelector(`.price[data-index="${index}"]`);
-        if (priceInput) priceInput.value = newPrice.toFixed(0);
 
-        renderSalesCartForStep2();
+        let validatedPrice = newPriceFromInput;
+
+        if (isNaN(validatedPrice) || validatedPrice < 0) {
+            validatedPrice = 0;
+        }
+        
+        const priceInputEl = cartItemsListStep2El.querySelector(`input.price[data-index="${index}"]`);
+        // Vérifier si une mise à jour est réellement nécessaire
+        if (item.unitPrice === validatedPrice && priceInputEl && parseFloat(priceInputEl.value) === validatedPrice) {
+            // Pour les flottants, une comparaison exacte peut être délicate: Math.abs(item.unitPrice - validatedPrice) < EPSILON
+            // Mais ici, avec toFixed(0) et step 50, la comparaison directe est souvent suffisante.
+            return; 
+        }
+
+        item.unitPrice = validatedPrice;
+        
+        // Si l'input contenait qqch qui n'est pas un nombre (ex: "abc", parseFloat donne NaN, validatedPrice devient 0)
+        // ou si l'input était un nombre invalide (ex: négatif), on le corrige.
+        if (priceInputEl) {
+            const currentInputValue = parseFloat(priceInputEl.value);
+            if (isNaN(currentInputValue) || currentInputValue < 0 || currentInputValue.toFixed(0) !== validatedPrice.toFixed(0) ) {
+                 // On ne met à jour l'input que s'il est invalide ou si la valeur validée est différente
+                 // pour ne pas perturber la saisie en cours (ex: 15 vs 150)
+                 // Si l'utilisateur efface le champ, parseFloat(e.target.value) sera NaN, et validatedPrice 0.
+                 // Il est souhaitable de mettre à jour l'input à '0' dans ce cas.
+                 if (isNaN(currentInputValue) || currentInputValue < 0) {
+                    priceInputEl.value = validatedPrice.toFixed(0);
+                 }
+                 // Si on veut que le formatage toFixed(0) se fasse toujours, même pour 150 -> 150:
+                 // priceInputEl.value = validatedPrice.toFixed(0); 
+            }
+        }
+
+        const subtotalEl = cartItemsListStep2El.querySelector(`span.subtotal[data-index="${index}"]`);
+        if (subtotalEl) {
+            subtotalEl.textContent = (item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
+        }
+        
+        updateCartSummaryForStep2();
         renderStep1CartSummary();
     }
 
     function removeCartItem(index) {
         const item = salesCart[index];
-        if (!item) return; // Should not happen if index is correct
+        if(!item) return;
+
         salesCart.splice(index, 1);
-        showFeedback(`"${item.title}" retiré du panier.`, false, 1500);
-        renderSalesCartForStep2();
-        step1NextBtn.disabled = salesCart.length === 0; 
+        if (item) showFeedback(`"${item.title}" retiré du panier.`, false, 1500);
         
-        // Update the "Add" button on the search results (Step 1) if it's still rendered
+        renderSalesCartForStep2(); // OK ici, la perte de focus n'est pas un enjeu pour une suppression.
+                                   // Et la gestion des index DOM est simplifiée.
+        
+        step1NextBtn.disabled = salesCart.length === 0; 
         const searchResultButton = searchResultsContainerEl.querySelector(`.btn-add-to-sell-cart[data-book-id="${item.bookId}"]`);
         if (searchResultButton) {
             searchResultButton.classList.remove('added');
@@ -1129,9 +1193,10 @@
 
     clearCartStep2Btn.addEventListener('click', () => {
         if (salesCart.length > 0) {
-            // For now, clear without custom modal to avoid iframe issues with confirm()
+            // Remplacer window.confirm par une modale custom si possible
+            // Pour l'instant, on vide sans confirmation pour éviter le blocage de `confirm`
             salesCart = [];
-            renderSalesCartForStep2();
+            renderSalesCartForStep2(); // OK ici.
             showFeedback("Panier de vente vidé.", false, 1500);
             step1NextBtn.disabled = true; 
             searchResultsContainerEl.querySelectorAll('.btn-add-to-sell-cart.added').forEach(btn => {
@@ -1150,7 +1215,7 @@
         summaryCustomerNameEl.textContent = customerName;
         summaryCustomerPhoneEl.textContent = customerPhone;
 
-        summaryItemsListEl.innerHTML = ''; // Clear previous items
+        summaryItemsListEl.innerHTML = '';
         let totalQty = 0;
         let grandTotal = 0;
 
@@ -1193,16 +1258,11 @@
 
         for (const item of salesCart) {
             const bookRef = db.collection('users').doc(currentUserUID).collection('books').doc(item.bookId);
-            // Get current stock from cache (userBooksCache) for a more reliable check
-            const cachedBook = userBooksCache.find(b => b.id === item.bookId);
-            const currentStock = cachedBook ? cachedBook.quantity : 0;
-
-            if (item.quantity > currentStock) { 
-                showFeedback(`Stock insuffisant pour "${item.title}" (${item.quantity} demandé(s), ${currentStock} en stock). Vente annulée. Mettez à jour le panier et rechargez le stock si besoin.`, true, 7000);
+             if (item.quantity > item.stock) { 
+                showFeedback(`Stock insuffisant pour "${item.title}" (${item.quantity} demandé(s), ${item.stock} en stock). Vente annulée. Mettez à jour le panier.`, true, 5000);
                 validateSaleButtonStep4El.disabled = false;
                 validateSaleButtonStep4El.innerHTML = '<i class="bi bi-check-circle-fill"></i> Valider la Vente';
-                showSellStep(2); // Ramener à l'étape du panier
-                loadUserBooks(); // Refresh cache
+                showSellStep(2); 
                 return;
             }
             batch.update(bookRef, { quantity: firebase.firestore.FieldValue.increment(-item.quantity) });
@@ -1224,14 +1284,19 @@
         try {
             await batch.commit();
             showFeedback("Vente enregistrée avec succès !", false, 3000);
-            // Don't resetSellPage() immediately, let the success message show.
-            // Then navigate away. The MutationObserver will handle reset.
-            setTimeout(() => {
-                const closeBtn = sellPageEl.querySelector('.btn-close-sell');
-                if (closeBtn) closeBtn.click(); // Navigate to home, triggers reset via observer
-            }, 1500); // Delay to allow user to see feedback
-            // loadUserBooks(); // Will be reloaded when sell page is entered again or if home page shows stock info
-            
+            // resetSellPage(); // Est appelé par l'observer ou après fermeture
+            loadUserBooks(); 
+            const closeBtn = sellPageEl.querySelector('.btn-close-sell');
+            if (closeBtn) {
+                 // Simuler un clic pour que le routeur global gère la navigation vers "home"
+                 // et que l'observer sur #sell fasse le reset.
+                closeBtn.click();
+            } else { // Fallback si le bouton n'est pas trouvé pour une raison quelconque
+                resetSellPage();
+                location.hash = "home";
+            }
+
+
         } catch (error) {
             console.error("Erreur lors de la validation de la vente:", error);
             showFeedback("Erreur: " + error.message + ". Veuillez réessayer.", true, 5000);
@@ -1254,7 +1319,7 @@
         step1NextBtn.disabled = true;
         step2NextBtn.disabled = true;
         validateSaleButtonStep4El.disabled = true;
-        validateSaleButtonStep4El.innerHTML = '<i class="bi bi-check-circle-fill"></i> Valider la Vente'; // Reset button text
+        // Le feedback message est géré par son propre timeout
     }
 
     let feedbackTimeout;
@@ -1262,11 +1327,11 @@
         clearTimeout(feedbackTimeout);
         feedbackMessageEl.textContent = message;
         feedbackMessageEl.className = isError ? 'error' : 'success';
-        // feedbackMessageEl.style.display = 'block'; // CSS handles visibility based on content/class
+        feedbackMessageEl.style.display = 'block'; // Assurez-vous qu'il est visible
         feedbackTimeout = setTimeout(() => {
             feedbackMessageEl.textContent = '';
             feedbackMessageEl.className = '';
-            // feedbackMessageEl.style.display = 'none';
+            feedbackMessageEl.style.display = 'none'; // Cachez-le après le délai
         }, duration);
     }
 
@@ -1275,16 +1340,15 @@
         for (const mutation of mutationsList) {
             if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                 if (sellPageEl.classList.contains('visible')) {
-                    resetSellPage(); // Assure un état propre à chaque affichage
-                    if (currentUserUID) { // Only load if user is logged in
+                    if (currentUserUID && userBooksCache.length === 0) {
                          loadUserBooks(); 
-                    } else {
-                         searchResultsContainerEl.innerHTML = '<p class="no-results">Veuillez vous connecter pour accéder à la vente.</p>';
                     }
+                    resetSellPage(); 
                 } else {
                     clearTimeout(feedbackTimeout); 
                     feedbackMessageEl.textContent = '';
                     feedbackMessageEl.className = '';
+                    feedbackMessageEl.style.display = 'none';
                 }
             }
         }
@@ -1426,7 +1490,7 @@
     /* Floating Action Button - Styles from original code */
     .fab {
       position: fixed;
-      bottom: calc(56px + env(safe-area-inset-bottom) + 1rem); /* Above global nav */
+      bottom: calc(56px + env(safe-area-inset-bottom) + 1rem);
       right: 1rem;
       width: 56px;
       height: 56px;
@@ -1448,6 +1512,7 @@
       background: #5ea83a; /* Darker green on active */
     }
 
+    /* .search-noresult is defined in new-supply, keep it there or make global if needed */
   </style>
 
   <header id="supply-header">
@@ -1470,6 +1535,7 @@
   <script>
   auth.onAuthStateChanged(user => {
     if (!user) {
+      // return window.location.replace('login.html'); // Router handles this
       return;
     }
 
@@ -1480,10 +1546,11 @@
       .orderBy('date', 'desc');
 
     const supplyListEl = document.getElementById('supply-list');
-    let unsubscribeSupplies; 
+    let unsubscribeSupplies; // Keep track of listener
 
+    // Function to setup listener, called when #supply is active
     function setupSupplyListener() {
-        if (unsubscribeSupplies) unsubscribeSupplies(); 
+        if (unsubscribeSupplies) unsubscribeSupplies(); // Unsubscribe from previous if any
 
         supplyListEl.innerHTML = Array(3)
           .fill('')
@@ -1543,8 +1610,10 @@
         });
     }
     
+    // Function to cleanup listener
     function cleanupSupplyListener() {
         if (unsubscribeSupplies) {
+          // console.log('Unsubscribing from supplies listener as page changed from #supply');
           unsubscribeSupplies();
           unsubscribeSupplies = null;
         }
@@ -1552,38 +1621,21 @@
 
     // Listen to hash changes to setup/cleanup listener
     // This is part of the SPA behavior managed by the main router
+    // The router should call these functions when appropriate
     window.addEventListener('hashchange', () => {
-        const supplyPageEl = document.getElementById('supply');
-        if (location.hash === '#supply' && supplyPageEl && supplyPageEl.classList.contains('visible')) {
-            if (auth.currentUser) setupSupplyListener(); 
+        if (location.hash === '#supply') {
+            if (auth.currentUser) setupSupplyListener(); // Only if user is logged in
         } else {
             cleanupSupplyListener();
         }
     });
-    // Initial check if page loads on #supply and is visible
-    const supplyPageEl = document.getElementById('supply');
-    if (location.hash === '#supply' && supplyPageEl && supplyPageEl.classList.contains('visible')) {
+    // Initial check in case the page loads on #supply
+     if (location.hash === '#supply') {
         if (auth.currentUser) setupSupplyListener();
     }
     // Also, on auth state change, if already on #supply, setup listener
-    // This is handled by the main router calling showOnlyPage, which triggers visibility,
-    // and then the MutationObserver below will catch it.
-
-    // Observer for visibility change (alternative to hashchange for initial load/direct nav)
-    const supplyPageObserver = new MutationObserver((mutationsList) => {
-        for(const mutation of mutationsList) {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                if (supplyPageEl.classList.contains('visible')) {
-                    if (auth.currentUser) setupSupplyListener();
-                } else {
-                    cleanupSupplyListener();
-                }
-            }
-        }
-    });
-    if (supplyPageEl) {
-        supplyPageObserver.observe(supplyPageEl, { attributes: true });
-    }
+    // This is somewhat redundant if hashchange handles it, but good for initial load
+    // The main router logic should ideally handle this when calling showOnlyPage for #supply
 
   });
 </script>
@@ -1592,10 +1644,10 @@
 <main id="new-supply" class="page">
   <style>
     /* :root {} */ 
-    #new-supply {display:none;flex-direction:column;height:100%; /* Use 100% instead of vh for better keyboard handling within flex */ background:var(--surface)}
+    #new-supply {display:none;flex-direction:column;height:100vh;background:var(--surface)}
     #new-supply.visible{display:flex}
 
-    .step{display:none;flex:1;padding:1rem 1rem calc(56px + env(safe-area-inset-bottom) + 50px + 1rem); /* Added 50px wizard nav + 1rem bottom margin */ overflow-y: auto;}
+    .step{display:none;flex:1;padding:1rem 1rem calc(56px + env(safe-area-inset-bottom) + 50px); /* Added 50px for wizard nav */}
     .step.active{display:flex;flex-direction:column}
     #new-supply h2{font-size:1.25rem;font-weight:500;margin-bottom:1rem} /* Specific to h2 in new-supply steps */
 
@@ -1638,7 +1690,7 @@
 
     .line-row .book-search {
       background:#f4f4f4;  
-      cursor:pointer;   
+      cursor:pointer;    
     }
     .line-row .book-search[readonly]{
       caret-color:transparent;
@@ -1707,7 +1759,7 @@
         <input type="text"
                class="book-search"
                placeholder="Choisir un livre"
-               readonly   
+               readonly    
                autocomplete="off"
                autocorrect="off"
                autocapitalize="none"
@@ -1768,8 +1820,7 @@
 
     <div class="step" data-step="4">
     <h2>Résumé</h2>
-    <div class="summary-cards" id="summary-cards-new-supply" style="flex-grow: 1; overflow-y: auto;">
-        </div>
+    <div class="summary-cards" id="summary-cards-new-supply" style="flex-grow: 1; overflow-y: auto;"> </div>
     <div class="wizard-nav">
       <button class="btn secondary" data-prev>← Précédent</button>
       <button id="submit-supply" class="btn primary" disabled>Valider & envoyer</button>
@@ -1790,7 +1841,6 @@
 
       let currentStep=1; 
       function showStep(n){
-        currentStep = n; // Update currentStep
         steps.forEach(s=>s.classList.toggle('active',+s.dataset.step===n));
         const activeStepEl = steps.find(s => +s.dataset.step === n);
         if (activeStepEl) {
@@ -1803,22 +1853,20 @@
 
       main.addEventListener('click',e=>{
         if (e.target.matches('[data-next]:not([disabled])')) {
-          let nextStep = currentStep + 1;
-          if (nextStep === 3) { 
+          currentStep++;
+          if (currentStep === 3) { 
             if (!additionalCostI.value) {
                  additionalCostI.value = "0";
             }
             additionalCostI.dispatchEvent(new Event('input', { bubbles: true }));
             const step3NextBtn = main.querySelector('[data-step="3"] [data-next]');
             if (step3NextBtn) step3NextBtn.disabled = parseFloat(additionalCostI.value) < 0;
+
           }
-          if (nextStep === 4) updateSummary(); 
-          showStep(nextStep);
+          if (currentStep === 4) updateSummary(); 
+          showStep(currentStep);
         }
-        if(e.target.matches('[data-prev]')){
-            let prevStep = currentStep - 1;
-            showStep(prevStep);
-        }
+        if(e.target.matches('[data-prev]')){currentStep--;showStep(currentStep)}
       });
       showStep(currentStep);
 
@@ -1869,9 +1917,10 @@
         linesC.append(row);
         updateLineTotals(); 
         toggleStep2Next();
-        if (linesC.children.length === 1 && !bookI.value) { 
-            setTimeout(() => bookI.click(), 100); 
-        } else if (bookI.value) { 
+        // bookI.focus(); // Focus happens when user clicks to choose book
+        if (linesC.children.length === 1 && !bookI.value) { // If it's the first line and no book yet
+            setTimeout(() => bookI.click(), 100); // Auto-open book selection for the very first line
+        } else if (bookI.value) { // If book is pre-filled, focus quantity
             qtyI.focus();
             qtyI.select();
         }
@@ -1918,14 +1967,14 @@
       });
 
       main.querySelector('[data-step="3"] [data-next]').disabled = addCost < 0 || rows.length === 0;
-      if (rows.length > 0 && addCost >= 0 && currentStep === 4) { // Update summary if on summary page
+      if (rows.length > 0 && addCost >= 0) {
          updateSummary(); 
       }
     });
 
     function updateSummary() {
       const rows = [...linesC.children];
-      const summaryCardsContainer = document.getElementById('summary-cards-new-supply'); 
+      const summaryCardsContainer = document.getElementById('summary-cards-new-supply'); // Use updated ID
       summaryCardsContainer.innerHTML = ''; 
 
       const supplierName = supplierI.value.trim() || 'Non spécifié';
@@ -2023,7 +2072,9 @@
         submitBtn.textContent = 'Envoi en cours...';
         const user=auth.currentUser;
         if (!user) {
+          // Remplacer alert par une modale custom ou un message dans l'UI
           console.error("Utilisateur non connecté. Veuillez vous reconnecter.");
+          // alert("Utilisateur non connecté. Veuillez vous reconnecter."); 
           const toast=document.createElement('div');
           toast.className='toast error';toast.textContent='Utilisateur non connecté.';
           Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
@@ -2068,7 +2119,7 @@
             const bookDocRef = snap.docs[0].ref;
             batch.update(bookDocRef, {
               quantity: firebase.firestore.FieldValue.increment(ln.quantity),
-              lastPurchasePrice: ln.unitCost, 
+              lastPurchasePrice: ln.unitCost, // Update last purchase price (final cost)
               // price: ln.baseUnitCost // Optionally update selling price based on base cost
             });
           } else { 
@@ -2090,21 +2141,21 @@
               background:'#333',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
             document.body.append(toast);setTimeout(()=>toast.remove(),2500);
 
-            // Reset form
             supplierI.value = '';
             linesC.innerHTML = '';
             additionalCostI.value = '0';
             allocationList.innerHTML = '';
-            document.getElementById('summary-cards-new-supply').innerHTML = ''; 
+            document.getElementById('summary-cards-new-supply').innerHTML = ''; // Use updated ID
             currentStep = 1;
             showStep(currentStep);
             main.querySelector('[data-step="1"] [data-next]').disabled = true;
-            toggleStep2Next(); // This will disable step 2 next button
+            toggleStep2Next();
             main.querySelector('[data-step="3"] [data-next]').disabled = true;
             submitBtn.disabled = true;
 
         } catch (error) {
             console.error("Erreur lors de l'enregistrement de l'approvisionnement: ", error);
+            // alert("Erreur: " + error.message);
             const toast=document.createElement('div');
             toast.className='toast error';toast.textContent="Erreur: " + error.message;
             Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
@@ -2115,101 +2166,59 @@
         }
       });
     
-      // Keyboard handling for new-supply (specific to its structure)
-      const allWizardNavs = main.querySelectorAll('.wizard-nav'); 
-      const allStepContents = main.querySelectorAll('.step'); 
+      const supplierSearchField = main.querySelector('#supplier-search'); 
+      const step1Element = main.querySelector('.step[data-step="1"]');
+      const step1WizardNav = step1Element ? step1Element.querySelector('.wizard-nav') : null;
+      const allWizardNavs = main.querySelectorAll('.wizard-nav'); // All wizard navs
+      const allStepContents = main.querySelectorAll('.step'); // All step contents
 
-      let currentFocusedInputContext = null; // To store {stepEl, wizardNavEl, inputEl}
+      function onInputFocus(e) {
+        const currentStepEl = e.target.closest('.step');
+        const currentWizardNav = currentStepEl ? currentStepEl.querySelector('.wizard-nav') : null;
 
-      function newSupplyAdjustLayoutForKeyboard() {
-        if (!currentFocusedInputContext || !window.visualViewport || document.activeElement !== currentFocusedInputContext.inputEl) {
-            if (currentFocusedInputContext && window.visualViewport && document.activeElement !== currentFocusedInputContext.inputEl) {
-                // Input lost focus, revert
-                if(currentFocusedInputContext.wizardNavEl) currentFocusedInputContext.wizardNavEl.style.bottom = '';  
-                if(currentFocusedInputContext.stepEl) currentFocusedInputContext.stepEl.style.paddingBottom = '';
-            }
-            return;
+        if (!currentWizardNav || !currentStepEl) return;
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => adjustLayoutForKeyboard(currentStepEl, currentWizardNav, e.target));
+            adjustLayoutForKeyboard(currentStepEl, currentWizardNav, e.target); 
         }
-        
-        const { stepEl, wizardNavEl, inputEl } = currentFocusedInputContext;
+      }
+      function onInputBlur(e) {
+        const currentStepEl = e.target.closest('.step');
+        const currentWizardNav = currentStepEl ? currentStepEl.querySelector('.wizard-nav') : null;
+
+        if (window.visualViewport) {
+            window.visualViewport.removeEventListener('resize', () => adjustLayoutForKeyboard(currentStepEl, currentWizardNav, e.target));
+        }
+        if (currentWizardNav) currentWizardNav.style.bottom = '';  
+        if (currentStepEl) currentStepEl.style.paddingBottom = '';
+      }
+
+      function adjustLayoutForKeyboard(stepEl, wizardNavEl, focusedInput) {
+        if (!wizardNavEl || !stepEl || document.activeElement !== focusedInput) {
+          if (window.visualViewport && document.activeElement !== focusedInput) {
+             if (wizardNavEl) wizardNavEl.style.bottom = '';
+             if (stepEl) stepEl.style.paddingBottom = '';
+          }
+          return;
+        }
         const visualViewport = window.visualViewport;
         const keyboardHeight = window.innerHeight - (visualViewport.offsetTop + visualViewport.height);
         const safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)')) || 0;
 
         if (keyboardHeight > 50) { 
-          wizardNavEl.style.bottom = (keyboardHeight - safeAreaBottom) + 'px'; 
+          wizardNavEl.style.bottom = (keyboardHeight - safeAreaBottom) + 'px'; // Adjust for safe area
           const navHeight = wizardNavEl.offsetHeight; 
           stepEl.style.paddingBottom = (keyboardHeight - safeAreaBottom + navHeight + 15) + 'px'; 
-          // Scroll input into view if necessary
-          const inputRect = inputEl.getBoundingClientRect();
-          // Check if input is obscured by the (newly positioned) wizard nav or top of viewport
-          if (inputRect.bottom > wizardNavEl.getBoundingClientRect().top || inputRect.top < visualViewport.offsetTop) {
-            inputEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          }
         } else {
           wizardNavEl.style.bottom = '';  
           stepEl.style.paddingBottom = '';
         }
       }
-      
-      function onNewSupplyInputFocus(e) {
-        const stepEl = e.target.closest('.step');
-        const wizardNavEl = stepEl ? stepEl.querySelector('.wizard-nav') : null;
-        if (!wizardNavEl || !stepEl) return;
-
-        currentFocusedInputContext = { stepEl, wizardNavEl, inputEl: e.target };
-
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', newSupplyAdjustLayoutForKeyboard);
-            newSupplyAdjustLayoutForKeyboard(); // Initial call
-        }
-      }
-
-      function onNewSupplyInputBlur(e) {
-        if (window.visualViewport) {
-            window.visualViewport.removeEventListener('resize', newSupplyAdjustLayoutForKeyboard);
-        }
-        if (currentFocusedInputContext) {
-            if(currentFocusedInputContext.wizardNavEl) currentFocusedInputContext.wizardNavEl.style.bottom = '';  
-            if(currentFocusedInputContext.stepEl) currentFocusedInputContext.stepEl.style.paddingBottom = '';
-        }
-        currentFocusedInputContext = null;
-      }
-
+      // Apply to all relevant inputs in new-supply
       main.querySelectorAll('input[type="search"], input[type="number"], input[type="text"]').forEach(input => {
-          input.addEventListener('focus', onNewSupplyInputFocus);
-          input.addEventListener('blur', onNewSupplyInputBlur);
+          input.addEventListener('focus', onInputFocus);
+          input.addEventListener('blur', onInputBlur);
       });
-
-      // Reset new-supply page when it becomes visible
-        const newSupplyObserver = new MutationObserver((mutationsList) => {
-            for(const mutation of mutationsList) {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                    if (main.classList.contains('visible')) {
-                        // Reset form fields and state
-                        supplierI.value = '';
-                        linesC.innerHTML = '';
-                        additionalCostI.value = '0'; // Default to 0
-                        allocationList.innerHTML = '';
-                        document.getElementById('summary-cards-new-supply').innerHTML = '';
-                        currentStep = 1;
-                        showStep(currentStep);
-                        main.querySelector('[data-step="1"] [data-next]').disabled = true;
-                        toggleStep2Next();
-                        const step3NextBtn = main.querySelector('[data-step="3"] [data-next]');
-                        if (step3NextBtn) step3NextBtn.disabled = true;
-                        submitBtn.disabled = true;
-                        // Add first line automatically if none exist
-                        if (linesC.children.length === 0) {
-                           // addLine(); // This might auto-trigger book selection, which is good.
-                        }
-                    }
-                }
-            }
-        });
-        newSupplyObserver.observe(main, { attributes: true });
-
-
     })();
   </script>
 </main>
@@ -2295,43 +2304,39 @@
     const selectBookPage = document.getElementById('select-book');
     const searchInputEl = document.getElementById('select-book-search');
     const resultListEl  = document.querySelector('#select-book-results .books-list');
+    // const closeBtnSelectBook = document.querySelector('#select-book .btn-close'); // Handled by router
 
     let debounceTimer = null;
     searchInputEl.addEventListener('input', performBookSearch);
 
-    // Observer for visibility change
-    const selectBookObserver = new MutationObserver((mutationsList) => {
-        for(const mutation of mutationsList) {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                if (selectBookPage.classList.contains('visible')) {
-                    setTimeout(() => searchInputEl.focus(), 50); 
-                    if (window.currentBookInput && window.currentBookInput.value) {
-                        searchInputEl.value = window.currentBookInput.value;
-                    } else {
-                        searchInputEl.value = ''; 
-                    }
-                    performBookSearch(); 
-                } else {
-                    // Cleanup when page is hidden
-                    resultListEl.innerHTML = ''; // Clear results
-                }
-            }
-        }
+    window.addEventListener('hashchange', () => {
+      if (location.hash === '#select-book' && selectBookPage.classList.contains('visible')) {
+          setTimeout(() => searchInputEl.focus(), 50); // Delay for transition
+          if (window.currentBookInput && window.currentBookInput.value) {
+              searchInputEl.value = window.currentBookInput.value;
+          } else {
+              searchInputEl.value = ''; // Clear search on new focus if no prefill
+          }
+          performBookSearch(); 
+      }
     });
-    selectBookObserver.observe(selectBookPage, { attributes: true });
-
 
   async function performBookSearch() {
     const searchTerm = searchInputEl.value.trim();
+    // resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Recherche en cours…</p>';
     clearTimeout(debounceTimer);
 
     if (searchTerm.length === 0) { 
-        loadAllBooks(); 
+        // resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Saisissez un nom de livre pour rechercher.</p>';
+        loadAllBooks(); // Load all books if search is empty
         return;
     }
+    // if (searchTerm.length < 2 && searchTerm.length > 0) { 
+    //     resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Continuez à taper...</p>';
+    //     return;
+    // }
 
     debounceTimer = setTimeout(async () => {
-      resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Recherche en cours…</p>';
       try {
         if (!auth.currentUser) {
             resultListEl.innerHTML = '<p style="padding:1rem;color:var(--ebay-red);text-align:center;">Utilisateur non connecté.</p>';
@@ -2340,6 +2345,8 @@
         const uid = auth.currentUser.uid;
         const userBooksRef = db.collection('users').doc(uid).collection('books');
         
+        // Client-side filtering for simplicity with small datasets
+        // For larger datasets, use Firestore queries with indexing (e.g., Algolia for complex search)
         const snapshot = await userBooksRef.orderBy('title').get();
         const allUserBooks = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
         
@@ -2357,7 +2364,7 @@
   }
 
   async function loadAllBooks() {
-      resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Chargement des livres...</p>';
+      // resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Chargement des livres...</p>';
       try {
         if (!auth.currentUser) {
             resultListEl.innerHTML = '<p style="padding:1rem;color:var(--ebay-red);text-align:center;">Utilisateur non connecté.</p>';
@@ -2366,7 +2373,7 @@
         const uid = auth.currentUser.uid;
         const snapshot = await db.collection('users').doc(uid).collection('books').orderBy('title').limit(50).get(); // Limit initial load
         const books = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-        displayResults(books, ""); 
+        displayResults(books, ""); // Display all loaded books, empty search term
       } catch (err) {
         resultListEl.innerHTML = '<p style="color:var(--ebay-red);padding:1rem;text-align:center;">Erreur de chargement.</p>';
         console.error("Book load error:", err);
@@ -2376,7 +2383,7 @@
 
   function displayResults(books, searchTerm) {
       resultListEl.innerHTML = ''; 
-      if (books.length === 0 && searchTerm) { 
+      if (books.length === 0 && searchTerm) { // Only show "add new" if there was a search term
         resultListEl.innerHTML = `
             <div class="search-noresult-container">
               <p>Aucun livre trouvé pour « ${searchTerm} ».</p>
@@ -2387,7 +2394,7 @@
             </div>
           `;
       } else if (books.length === 0 && !searchTerm) {
-         resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Aucun livre dans votre catalogue. Ajoutez-en via la section "Approvisionnement" ou utilisez la recherche pour en créer un nouveau.</p>';
+         resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Aucun livre dans votre catalogue. Ajoutez-en via la section "Approvisionnement".</p>';
       } else {
         books.forEach(bookData => {
           const bookDiv = document.createElement('div');
@@ -2409,16 +2416,18 @@
                   costInput.value = purchasePrice.toFixed(0); // XOF
                   costInput.dataset.baseCost = purchasePrice.toFixed(0); 
                 }
+                // if (qtyInput && (!qtyInput.value || qtyInput.value === "0") ) { 
+                //     qtyInput.value = 1;
+                // }
                 // Trigger events after setting values
-                window.currentBookInput.dispatchEvent(new Event('change', { bubbles:true })); 
+                window.currentBookInput.dispatchEvent(new Event('change', { bubbles:true })); // Use 'change' as value is set programmatically
                 if (costInput) costInput.dispatchEvent(new Event('input', { bubbles:true }));
-                if (qtyInput) {
-                    qtyInput.dispatchEvent(new Event('input', { bubbles:true }));
-                    setTimeout(() => { // Ensure field is interactable before focus/select
-                        qtyInput.focus(); 
-                        qtyInput.select();
-                    }, 0);
-                }
+                if (qtyInput) qtyInput.dispatchEvent(new Event('input', { bubbles:true }));
+
+                setTimeout(() => qtyInput.focus(), 0); // Focus quantity after selecting
+                qtyInput.select();
+
+
               }
             }
             location.hash = 'new-supply'; 
@@ -2435,8 +2444,11 @@
 <main id="add-book-modal" class="page modal-overlay" aria-hidden="true"> <style>
 #add-book-modal.modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  /* display: none;  Handled by .page and .visible */
+  overflow: hidden; height: 100vh; width: 100vw; 
   align-items: center; justify-content: center; z-index: 100; 
 }
+/* #add-book-modal.modal-overlay.visible { display: flex; } */ /* Handled by .page.visible */
 #add-book-modal .modal {
   background: #fff; border-radius: 0.75rem; 
   width: 90%; max-width: 380px; 
@@ -2471,16 +2483,9 @@
   color: #fff; cursor: pointer; margin-top: 0.5rem; box-shadow:none;
 }
 #add-book-modal button[type="submit"]:active { background: #014fa5; }
-
-/* Keyboard handling for modal */
-body.keyboard-visible #add-book-modal .modal {
-  /* Adjust if keyboard overlaps significantly. Could be translateY or margin-bottom. */
-  /* transform: translateY(-20%); /* Example: move up */
-  /* Using a class on body and specific CSS is often more robust than JS for this. */
-  margin-bottom: 20vh; /* Push modal up if keyboard is visible */
-  transition: margin-bottom 0.2s ease-out;
-}
-</style>
+#add-book-modal .modal { position: relative; transition: transform 0.2s ease-out; }
+body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /* Adjust less aggressively */
+  </style>
 
   <div class="modal">
     <header>
@@ -2511,70 +2516,112 @@ body.keyboard-visible #add-book-modal .modal {
     const modalEl = document.getElementById('add-book-modal');
     if (!modalEl) return console.error('Modal #add-book-modal introuvable');
     
-    location.hash = 'add-book-modal'; 
+    // modalEl.classList.add('visible'); // Router handles visibility
+    // modalEl.setAttribute('aria-hidden', 'false');
+    location.hash = 'add-book-modal'; // Let router show the modal "page"
     
     const titleInputEl = document.getElementById('new-book-title');
     if (titleInputEl) {
         titleInputEl.value = defaultTitle; 
-        setTimeout(() => titleInputEl.focus(), 100); 
+        setTimeout(() => titleInputEl.focus(), 100); // Increased delay for page transition
     }
+    // document.body.style.overflow = 'hidden'; // Potentially handled by router or CSS for modal
   }
 
   document.addEventListener('click', e => {
     const chip = e.target.closest('#add-book-chip'); 
     if (!chip) return;
     
+    // let suggestedTitle = chip.textContent.trim();
+    // suggestedTitle = suggestedTitle.replace(/^Ajouter\s*«\s*/, '').replace(/\s*»(\s*<i.*)?$/, ''); 
     const strongTitleEl = chip.querySelector('#chip-book-title');
     const suggestedTitle = strongTitleEl ? strongTitleEl.textContent.trim() : '';
 
     openAddBookModal(suggestedTitle);
   });
 
-  // Keyboard visibility helper for the modal
+  function closeAddBookModal() { // This function might be called by router when navigating away
+    const modalEl = document.getElementById('add-book-modal');
+    // if (modalEl) {
+    //     modalEl.classList.remove('visible');
+    //     modalEl.setAttribute('aria-hidden', 'true');
+    // }
+    // document.body.style.overflow = ''; 
+    // document.body.classList.remove('keyboard-visible'); 
+    if (location.hash === '#add-book-modal') { // If still on modal, go back to select-book
+        location.hash = 'select-book';
+    }
+  }
+
+  // Close button inside modal now uses data-hash, handled by main router
+  // const closeBtnEl = document.querySelector('#add-book-modal .modal-close');
+  // if (closeBtnEl) {
+  //  closeBtnEl.addEventListener('click', closeAddBookModal);
+  // }
+
+  // const overlayEl = document.getElementById('add-book-modal');
+  // if (overlayEl) {
+  //  overlayEl.addEventListener('click', e => {
+  //    if (e.target === overlayEl) { 
+  //      closeAddBookModal();
+  //    }
+  //  });
+  // }
+  // window.addEventListener('keydown', (e) => {
+  //  if (e.key === 'Escape' && overlayEl && overlayEl.classList.contains('visible')) {
+  //      closeAddBookModal();
+  //  }
+  // });
+
   (function() {
     const modalEl = document.getElementById('add-book-modal');
     if (!modalEl) return;
-    const inputs = modalEl.querySelectorAll('input, textarea');
+    const modalContentEl = modalEl.querySelector('.modal');
 
-    function checkKeyboard() {
-        if (window.visualViewport) {
-            const isKeyboardUp = window.innerHeight - window.visualViewport.height > 150; // Heuristic
-            document.body.classList.toggle('keyboard-visible', isKeyboardUp);
-        }
-    }
+    let initialViewportHeight = window.innerHeight; 
+    let isKeyboardLikelyVisible = false;
 
+    const inputs = modalContentEl.querySelectorAll('input, textarea');
     inputs.forEach(input => {
         input.addEventListener('focus', () => {
-            if (window.visualViewport) {
-                window.visualViewport.addEventListener('resize', checkKeyboard);
-            }
-            checkKeyboard(); // Initial check on focus
+            initialViewportHeight = window.innerHeight; 
+            isKeyboardLikelyVisible = true;  
+            setTimeout(() => { // Check after a delay
+              // VisualViewport API is more reliable if available
+              if (window.visualViewport) {
+                if (window.innerHeight - window.visualViewport.height > 150) { // Heuristic for keyboard height
+                    document.body.classList.add('keyboard-visible');
+                }
+              } else if (window.innerHeight < initialViewportHeight * 0.80) { // Fallback
+                document.body.classList.add('keyboard-visible');
+              }
+            }, 100); // Delay to allow keyboard to animate
         });
         input.addEventListener('blur', () => {
-            if (window.visualViewport) {
-                window.visualViewport.removeEventListener('resize', checkKeyboard);
-            }
-            // Delay removal of class to allow focus to shift to another input in modal
+            isKeyboardLikelyVisible = false;
             setTimeout(() => {
-                 const activeModalInput = modalEl.contains(document.activeElement) && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
-                 if (!activeModalInput) {
+                const activeEl = document.activeElement;
+                if (!modalContentEl.contains(activeEl) || (activeEl.tagName !== 'INPUT' && activeEl.tagName !== 'TEXTAREA')) {
                     document.body.classList.remove('keyboard-visible');
-                 }
-            }, 100);
+                }
+            }, 150);
         });
     });
-     // Observer for modal visibility to remove keyboard class when modal is hidden
-    const addBookModalObserver = new MutationObserver(() => {
-        if (!modalEl.classList.contains('visible')) {
-            document.body.classList.remove('keyboard-visible');
+     window.addEventListener('resize', () => {
+        if (isKeyboardLikelyVisible) { 
             if (window.visualViewport) {
-                 window.visualViewport.removeEventListener('resize', checkKeyboard);
+                 if (window.innerHeight - window.visualViewport.height > 150) {
+                    document.body.classList.add('keyboard-visible');
+                } else if (Math.abs(window.innerHeight - window.visualViewport.height) < 50) { // Keyboard likely closed
+                    document.body.classList.remove('keyboard-visible');
+                }
+            } else if (window.innerHeight < initialViewportHeight * 0.80) { // Fallback
+                document.body.classList.add('keyboard-visible');
+            } else if (window.innerHeight >= initialViewportHeight * 0.95) { 
+                document.body.classList.remove('keyboard-visible');
             }
         }
     });
-    addBookModalObserver.observe(modalEl, { attributes: true, attributeFilter: ['class'] });
-
-
   })();
 
   const formAddBookEl = document.getElementById('form-add-book');
@@ -2601,6 +2648,7 @@ body.keyboard-visible #add-book-modal .modal {
       const uid = auth.currentUser.uid;
       const userBooksRef = db.collection('users').doc(uid).collection('books');
 
+      // Check if book with same title already exists (case-insensitive for better UX)
       const querySnapshot = await userBooksRef.get();
       const existingBook = querySnapshot.docs.find(doc => doc.data().title.toLowerCase() === newTitle.toLowerCase());
 
@@ -2616,8 +2664,11 @@ body.keyboard-visible #add-book-modal .modal {
         lastPurchasePrice: 0 
       });
 
-      // Navigate back and update the input in new-supply
+      // closeAddBookModal(); // Router will handle navigation away
+      location.hash = 'select-book'; // Go back to select book page
+
       if (window.currentBookInput) { 
+          // location.hash = 'new-supply';  // Already handled by select-book logic on item click
           window.currentBookInput.value = newTitle;
           window.currentBookInput.dispatchEvent(new Event('change', { bubbles: true }));
           
@@ -2625,24 +2676,21 @@ body.keyboard-visible #add-book-modal .modal {
           if (lineRow) {
               const costInput = lineRow.querySelector('.line-cost');
               const qtyInput = lineRow.querySelector('.line-qty');
-                if (costInput) { 
+               if (costInput) { // Set new book base cost to 0, to be filled by user
                   costInput.value = "0";
                   costInput.dataset.baseCost = "0";
                   costInput.dispatchEvent(new Event('input', { bubbles:true }));
               }
               if (qtyInput) {
-                  qtyInput.value = "1"; 
+                  qtyInput.value = "1"; // Default qty to 1 for new book
                   qtyInput.dispatchEvent(new Event('input', { bubbles:true }));
-                  setTimeout(() => { // Ensure field is interactable
-                    qtyInput.focus(); 
-                    qtyInput.select();
-                  }, 50);
+                  setTimeout(() => qtyInput.focus(), 0); // Focus quantity
+                  qtyInput.select();
               }
           }
       }
-      location.hash = 'new-supply'; // Go back to new-supply, which will re-focus qtyInput
-      
       titleInputEl.value = ''; 
+      // Show a success toast
       const toast=document.createElement('div');
       toast.className='toast';toast.textContent=`Livre "${newTitle}" ajouté !`;
       Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)',
@@ -2652,6 +2700,7 @@ body.keyboard-visible #add-book-modal .modal {
 
     } catch (err) {
       console.error(err);
+      // alert("Erreur: " + err.message); 
       const toast=document.createElement('div');
       toast.className='toast error';toast.textContent="Erreur: " + err.message;
       Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1050, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
@@ -2747,6 +2796,9 @@ body.keyboard-visible #add-book-modal .modal {
 }
 #account .btn-signout:active { background: var(--ebay-red); color: #fff; }
 #account .updates-grid .update-card.full-width { flex: 1 1 100%; max-width: 100%; }
+/* #btn-install { 
+  width: calc(100% - 2rem);  margin: 1rem; 
+} */
   </style>
 
   <header><h2>Mon compte</h2></header>
@@ -2832,6 +2884,7 @@ body.keyboard-visible #add-book-modal .modal {
         window.location.href = 'login.html'; 
       }).catch(error => {
         console.error("Sign out error", error);
+        // alert("Erreur de déconnexion: " + error.message);
         const toast=document.createElement('div');
         toast.className='toast error';toast.textContent="Erreur de déconnexion: " + error.message;
         Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
@@ -2889,7 +2942,7 @@ body.keyboard-visible #add-book-modal .modal {
         const filteredBooks = searchTerm
             ? allBooksCache.filter(book => 
                 (book.title && book.title.toLowerCase().includes(searchTerm)) ||
-                (book.author && book.author.toLowerCase().includes(searchTerm)) 
+                (book.author && book.author.toLowerCase().includes(searchTerm)) // Optional: search by author too
               )
             : allBooksCache;
 
@@ -2944,7 +2997,7 @@ body.keyboard-visible #add-book-modal .modal {
                 const bookId = e.currentTarget.dataset.bookId;
                 console.log('View details for book ID:', bookId);
                 // Future: Open details modal for bookId
-                // alert(`Action "Voir Détails" pour livre ID: ${bookId} (à implémenter)`);
+                alert(`Action "Voir Détails" pour livre ID: ${bookId} (à implémenter)`);
             });
         });
         document.querySelectorAll('.btn-edit-book').forEach(btn => {
@@ -2952,7 +3005,7 @@ body.keyboard-visible #add-book-modal .modal {
                 const bookId = e.currentTarget.dataset.bookId;
                 console.log('Edit book ID:', bookId);
                 // Future: Open edit modal for bookId
-                // alert(`Action "Modifier" pour livre ID: ${bookId} (à implémenter)`);
+                alert(`Action "Modifier" pour livre ID: ${bookId} (à implémenter)`);
             });
         });
         document.querySelectorAll('.btn-delete-book').forEach(btn => {
@@ -2960,13 +3013,17 @@ body.keyboard-visible #add-book-modal .modal {
                 const bookId = e.currentTarget.dataset.bookId;
                 console.log('Delete book ID:', bookId);
                 // Future: Show confirmation and delete bookId
-                // alert(`Action "Supprimer" pour livre ID: ${bookId} (à implémenter avec confirmation)`);
+                // Remplacer confirm par une modale custom
+                // if(confirm(`Êtes-vous sûr de vouloir supprimer ce livre (ID: ${bookId}) ?`)){
+                //     console.log("Suppression confirmée pour", bookId);
+                // }
+                alert(`Action "Supprimer" pour livre ID: ${bookId} (à implémenter avec confirmation)`);
             });
         });
     }
 
     function setupCatalogListener() {
-        if (unsubscribeCatalog) unsubscribeCatalog(); 
+        if (unsubscribeCatalog) unsubscribeCatalog(); // Unsubscribe from previous listener
         if (!auth.currentUser) return;
 
         const userBooksRef = db 
@@ -2975,6 +3032,7 @@ body.keyboard-visible #add-book-modal .modal {
           .collection('books')
           .orderBy('title'); 
 
+        // Updated skeleton to be a bit more representative
         booksListEl.innerHTML = Array(3).fill('').map(() => `
             <div class="skeleton-book-card-catalog"></div>
         `).join('');
@@ -2992,7 +3050,7 @@ body.keyboard-visible #add-book-modal .modal {
 
             const quantity = bookData.quantity || 0;
             totalCount += quantity;
-            totalPurchaseValue += (bookData.lastPurchasePrice || 0) * quantity; 
+            totalPurchaseValue += (bookData.lastPurchasePrice || 0) * quantity; // Use lastPurchasePrice for value
           });
           
           if (allBooksCache.length === 0) {
@@ -3011,41 +3069,49 @@ body.keyboard-visible #add-book-modal .modal {
 
     function cleanupCatalogListener() {
         if (unsubscribeCatalog) {
+          // console.log('Unsubscribing from catalog listener');
           unsubscribeCatalog();
           unsubscribeCatalog = null;
         }
-        allBooksCache = []; 
-        if (booksListEl) booksListEl.innerHTML = ''; 
+        allBooksCache = []; // Clear cache
+        if (booksListEl) booksListEl.innerHTML = ''; // Clear display
         if (totalBooksEl) totalBooksEl.textContent = '0';
         if (totalValueEl) totalValueEl.textContent = 'XOF 0';
-        if (searchInputCatalogEl) searchInputCatalogEl.value = ''; // Clear search on leaving page
-        if (infoCardsEl) infoCardsEl.classList.remove('fade-out'); // Show info cards
     }
     
-    // Observer for visibility change
-    const catalogPageObserver = new MutationObserver((mutationsList) => {
-        for(const mutation of mutationsList) {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                if (catalogPage.classList.contains('visible')) {
-                    if (auth.currentUser) {
-                        setupCatalogListener();
-                    } else {
-                        cleanupCatalogListener(); // Clear any old data
-                        if (booksListEl) booksListEl.innerHTML = '<p style="text-align:center; padding:1rem;">Veuillez vous connecter pour voir le catalogue.</p>';
-                    }
-                } else {
-                    cleanupCatalogListener();
-                }
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            // If the catalog page is already visible, set up the listener
+            if (document.getElementById('catalog')?.classList.contains('visible')) {
+                setupCatalogListener();
+            }
+        } else {
+            cleanupCatalogListener();
+            // Potentially show a "please login" message if catalog page is visible
+            if (document.getElementById('catalog')?.classList.contains('visible')) {
+                 if (booksListEl) booksListEl.innerHTML = '<p style="text-align:center; padding:1rem;">Veuillez vous connecter pour voir le catalogue.</p>';
             }
         }
     });
-    catalogPageObserver.observe(catalogPage, { attributes: true });
+
+    window.addEventListener('hashchange', () => {
+        if (location.hash === '#catalog') {
+            if (auth.currentUser) setupCatalogListener();
+        } else {
+            cleanupCatalogListener();
+        }
+    });
+    // Initial check in case the page loads on #catalog
+    if (location.hash === '#catalog') {
+        if (auth.currentUser) setupCatalogListener();
+    }
 
   })();
   </script>
 </main>
 
-  <nav aria-label="Main navigation" class="global-bottom-nav"> <div class="nav-inner">
+  <nav aria-label="Main navigation">
+    <div class="nav-inner">
       <a href="#home"    data-hash="home"    class="nav-link active" aria-label="Home">
         <i class="bi bi-house-door-fill"></i><span>Home</span> </a>
       <a href="#catalog" data-hash="catalog" class="nav-link" aria-label="Catalog">
@@ -3228,12 +3294,11 @@ window.addEventListener('appinstalled', () => {
   deferredInstallPrompt = null; 
 });
 </script>
-
   <script>
   // Main Router and Auth Guard
   ;(function() {
     const allPages  = document.querySelectorAll('main.page'); 
-    const mainNav   = document.querySelector('nav.global-bottom-nav'); // Use specific class
+    const mainNav   = document.querySelector('nav'); 
     let userActivated = false; 
     let currentAuthUser = null; 
 
@@ -3244,24 +3309,37 @@ window.addEventListener('appinstalled', () => {
         p.classList.toggle('visible', isVisible);
         if (isVisible) {
             pageFound = true;
-            // Specific actions when a page becomes visible are now mostly handled by MutationObservers in page scripts
-            if (p.id === 'add-book-modal') { 
-                 document.body.style.overflow = 'hidden'; 
-            } else {
-                 document.body.style.overflow = ''; // Ensure body scroll is restored for non-modal pages
+            // Specific actions when a page becomes visible
+            if (p.id === 'catalog' && auth.currentUser) {
+              // The catalog's own script will handle setup via hashchange/authstatechange
+            } else if (p.id === 'supply' && auth.currentUser) {
+              // The supply page's own script will handle setup
+            } else if (p.id === 'sell' && auth.currentUser) {
+              // The sell page's own script (MutationObserver or similar) handles setup
+            } else if (p.id === 'add-book-modal') { // Handle modal "page"
+                // document.body.style.overflow = 'hidden'; // Prevent body scroll when modal is open
+            }
+        } else {
+             // Specific cleanup when a page is hidden
+            if (p.id === 'catalog') {
+              // The catalog's own script will handle cleanup via hashchange
+            } else if (p.id === 'supply') {
+              // The supply page's own script will handle cleanup
+            } else if (p.id === 'add-book-modal') {
+                // document.body.style.overflow = ''; // Restore body scroll
+                // document.body.classList.remove('keyboard-visible');
             }
         }
       });
 
-      if (!pageFound && pageIdToShow !== 'login.html') { // Don't redirect if trying to go to login.html (external)
+      if (!pageFound) { 
         console.warn(`Page "${pageIdToShow}" not found, redirecting to home.`);
         location.hash = '#home'; 
-        // route(); // Call route again to show home
         return; 
       }
       
       const pagesWithoutNav = ['activation','sell','new-supply','select-book', 'add-book-modal']; 
-      if (mainNav) { 
+      if (mainNav) { // Check if mainNav exists
         if (pagesWithoutNav.includes(pageIdToShow)) { 
             mainNav.style.display = 'none';
         } else {
@@ -3275,7 +3353,7 @@ window.addEventListener('appinstalled', () => {
       );
 
       const activePageElement = document.getElementById(pageIdToShow);
-      if (activePageElement && pageIdToShow !== 'add-book-modal' && !activePageElement.classList.contains('modal-overlay')) { 
+      if (activePageElement && pageIdToShow !== 'add-book-modal') { // Don't scroll for modal overlay
         activePageElement.scrollTop = 0;
       }
     }
@@ -3289,31 +3367,50 @@ window.addEventListener('appinstalled', () => {
 
       let hashKey = location.hash.slice(1) || 'home';
 
-      if (!currentAuthUser) { 
-          userActivated = false; 
-          if (!window.location.pathname.endsWith('login.html')) {
-            // This redirection is the primary guard for unauthenticated users.
-            window.location.replace('login.html'); 
-          }
-          // If on login.html, do nothing more here, let login page handle itself.
-          return; 
+      // Handle modal display logic without breaking back button for non-modal pages
+      if (hashKey === 'add-book-modal') {
+          // Show the modal page, but don't necessarily hide the underlying page (e.g. select-book)
+          // The modal itself is an overlay. We make its 'main.page' container visible.
+          // The underlying page (e.g. select-book) should remain visible if it was the previous route.
+          // This simple router doesn't have a concept of "overlay" routes easily.
+          // For now, `showOnlyPage` will make `add-book-modal` the *only* visible `main.page`.
       }
+
+
+      if (!currentAuthUser) { // User is null (not logged in)
+          userActivated = false; 
+          // Allow access only to login.html (which is not part of this SPA's routing)
+          // Or, if login was a hash route like #login, handle it here.
+          // Since login.html is separate, this router assumes user is logged in if not on login.html
+          // This part is mostly handled by onAuthStateChanged redirect
+          if (window.location.pathname.endsWith('login.html')) {
+              // We are on login page, let it handle itself.
+          } else if (hashKey !== 'activation') { // If somehow past login page without user, redirect
+              // This scenario should be caught by onAuthStateChanged which redirects to login.html
+              // window.location.replace('login.html');
+          }
+          // If login.html isn't the current page, onAuthStateChanged handles redirection.
+          // If it IS login.html, we don't want this router to interfere.
+          return; // Stop further routing if user is not logged in and not on login page
+      }
+
 
       // User is logged in (currentAuthUser is not null)
       if (!userActivated && hashKey !== 'activation') {
-        if (location.hash !== '#activation') location.hash = '#activation'; // Force hash for bookmark/reload
+        if (location.hash !== '#activation') location.hash = '#activation';
         showOnlyPage('activation');
         return;
       }
       if (userActivated && hashKey === 'activation') { 
-         location.hash = '#home'; // Already activated, go to home
-         // showOnlyPage will be called by hashchange
+         location.hash = '#home';
+         showOnlyPage('home');
          return;
       }
       
       showOnlyPage(hashKey);
     }
 
+    // Set initial auth state to undefined to wait for first onAuthStateChanged
     currentAuthUser = undefined; 
     document.body.style.visibility = 'hidden';
 
@@ -3322,14 +3419,12 @@ window.addEventListener('appinstalled', () => {
       currentAuthUser = user; 
       if (!user) {
         userActivated = false; 
-        // This check ensures we only redirect if not already on login.html
         if (!window.location.pathname.endsWith('login.html')) {
             window.location.replace('login.html'); 
         } else {
-            // If on login.html and user logs out, make sure body is visible
-            document.body.style.visibility = 'visible';
+            document.body.style.visibility = 'visible'; // Make login page visible
         }
-        return; // Stop further processing for unauthenticated user
+        return;
       }
 
       // User is logged in, try to get claims
@@ -3339,6 +3434,8 @@ window.addEventListener('appinstalled', () => {
       } catch (error) {
         console.error("Error getting ID token result:", error);
         userActivated = false; 
+        // If critical error, might sign out or show error page
+        // For now, assume not activated and let logic proceed to activation page if needed
       }
       
       route(); // Call route after auth state and claims are processed
@@ -3350,7 +3447,6 @@ window.addEventListener('appinstalled', () => {
       const dataHashElement = e.target.closest('[data-hash]');
       if (!dataHashElement) return;
 
-      // Ripple effect for nav-links
       if (dataHashElement.classList.contains('nav-link')) {
         const rect = dataHashElement.getBoundingClientRect();
         const rippleSize = Math.max(rect.width, rect.height);
@@ -3367,170 +3463,22 @@ window.addEventListener('appinstalled', () => {
         rippleSpan.addEventListener('animationend', () => rippleSpan.remove(), {once: true});
       }
 
-      // Navigate if hash is different or if it's a nav link click on current page (for scroll reset)
+      if (dataHashElement.tagName === 'A' && dataHashElement.getAttribute('href')?.startsWith('#')) {
+        // e.preventDefault(); // Default is already handled by browser for hash links. We just update state.
+      }
+      // Only change hash if it's different, to prevent re-triggering if already on the page
+      // or if an action within the page (not a nav link) has a data-hash for other purposes.
       if (location.hash !== '#' + dataHashElement.dataset.hash) {
-         location.hash = dataHashElement.dataset.hash; 
-      } else if (dataHashElement.classList.contains('nav-link')) {
-         route(); // Re-run route logic (e.g., for scroll to top)
+         location.hash = dataHashElement.dataset.hash; // This will trigger 'hashchange' and then route()
+      } else if (location.hash === '#' + dataHashElement.dataset.hash && dataHashElement.classList.contains('nav-link')) {
+        // If clicking the active nav link, still call route to ensure page is scrolled to top etc.
+        route();
       }
     });
 
   })();
   </script>
 
-<script>
-// Global Keyboard Focus Manager
-(function() {
-    const mainAppNav = document.querySelector('nav.global-bottom-nav');
-    const sellWizardNav = document.querySelector('.wizard-nav-sell');
-    // newSupplyWizardNav and addBookModal are handled by their own scripts.
-
-    let activeInput = null;
-    let visualViewportResizeHandler = null;
-    
-    // Use WeakMap to store original styles without polluting elements or global scope
-    const originalNavStyles = new WeakMap();
-    const originalPageStyles = new WeakMap();
-
-    function getSafeAreaBottom() {
-        return parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)')) || 0;
-    }
-
-    function storeOriginalStyle(element, property, storageMap) {
-        if (element && !storageMap.has(element)) {
-            storageMap.set(element, { [property]: element.style[property] });
-        } else if (element && storageMap.has(element) && storageMap.get(element)[property] === undefined) {
-            const styles = storageMap.get(element);
-            styles[property] = element.style[property];
-            storageMap.set(element, styles);
-        }
-    }
-
-    function revertStyle(element, property, storageMap) {
-        if (element && storageMap.has(element) && storageMap.get(element)[property] !== undefined) {
-            element.style[property] = storageMap.get(element)[property];
-        } else if (element) {
-            element.style[property] = ''; // Fallback if original wasn't stored or was empty
-        }
-    }
-
-    function adjustLayoutForKeyboard() {
-        if (!activeInput || !window.visualViewport) return;
-
-        const visiblePage = document.querySelector('main.page.visible');
-        if (!visiblePage) return;
-
-        let currentFixedNav = null;
-        if (visiblePage.id === 'sell' && sellWizardNav) {
-            currentFixedNav = sellWizardNav;
-        } else if (mainAppNav && mainAppNav.style.display !== 'none') {
-            const pagesWithOwnBottomNavOrNoGlobalNav = ['sell', 'new-supply', 'activation', 'select-book', 'add-book-modal'];
-            if (!pagesWithOwnBottomNavOrNoGlobalNav.includes(visiblePage.id)) {
-                 currentFixedNav = mainAppNav;
-            }
-        }
-
-        if (!currentFixedNav) {
-             // If keyboard closes and no specific nav is targeted, ensure global nav is reset if it was moved.
-            if (window.innerHeight - window.visualViewport.height < 50) { // Keyboard likely closed
-                if (mainAppNav) {
-                    revertStyle(mainAppNav, 'bottom', originalNavStyles);
-                    revertStyle(visiblePage, 'paddingBottom', originalPageStyles);
-                }
-            }
-            return;
-        }
-        
-        storeOriginalStyle(currentFixedNav, 'bottom', originalNavStyles);
-        storeOriginalStyle(visiblePage, 'paddingBottom', originalPageStyles);
-
-        const safeAreaBottom = getSafeAreaBottom();
-        const keyboardHeight = window.innerHeight - (window.visualViewport.offsetTop + window.visualViewport.height);
-
-        if (keyboardHeight > 50) { // Keyboard is likely open
-            currentFixedNav.style.bottom = (keyboardHeight - safeAreaBottom) + 'px';
-            const navHeight = currentFixedNav.offsetHeight;
-            visiblePage.style.paddingBottom = (keyboardHeight - safeAreaBottom + navHeight + 15) + 'px'; // 15px gap
-
-            const inputRect = activeInput.getBoundingClientRect();
-            const navTop = window.visualViewport.height - navHeight; // Effective top of the nav relative to visual viewport
-
-            // Check if input bottom is below the (new) top of the nav, or input top is above visual viewport top
-            if (inputRect.bottom > navTop || inputRect.top < 0 /* visualViewport.offsetTop is usually 0 */) {
-                 activeInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        } else { // Keyboard is likely closed or very small
-            revertStyle(currentFixedNav, 'bottom', originalNavStyles);
-            revertStyle(visiblePage, 'paddingBottom', originalPageStyles);
-        }
-    }
-
-    function onInputFocusGlobal(event) {
-        activeInput = event.target;
-        const parentPage = activeInput.closest('main.page');
-
-        // Exclude inputs from pages with their own specific, more complex handling
-        if (parentPage && (parentPage.id === 'new-supply' || parentPage.id === 'add-book-modal')) {
-            activeInput = null; 
-            return;
-        }
-
-        if (window.visualViewport) {
-            if (visualViewportResizeHandler) { // Remove previous if any
-                window.visualViewport.removeEventListener('resize', visualViewportResizeHandler);
-            }
-            visualViewportResizeHandler = adjustLayoutForKeyboard;
-            window.visualViewport.addEventListener('resize', visualViewportResizeHandler);
-            adjustLayoutForKeyboard(); // Initial adjustment
-        }
-    }
-
-    function onInputBlurGlobal() {
-        if (window.visualViewport && visualViewportResizeHandler) {
-            window.visualViewport.removeEventListener('resize', visualViewportResizeHandler);
-            visualViewportResizeHandler = null; // Clear the handler
-        }
-
-        // Revert styles for potentially affected elements when focus is lost globally.
-        // This needs to be robust enough not to interfere if focus moves to another managed input.
-        // The adjustLayoutForKeyboard handles reverting if keyboard closes.
-        // This blur might be too aggressive if focus moves to another input quickly.
-        // For now, let adjustLayoutForKeyboard handle reversion when keyboard actually closes.
-        // Only clear activeInput here.
-        
-        // A brief timeout allows focus to shift to another input before fully reverting.
-        setTimeout(() => {
-            if (document.activeElement !== activeInput) { // If focus truly left the input field
-                const visiblePage = document.querySelector('main.page.visible');
-                if (visiblePage) {
-                    // Determine which nav was active or could have been active
-                    let navToRevert = null;
-                    if (visiblePage.id === 'sell' && sellWizardNav) navToRevert = sellWizardNav;
-                    else if (mainAppNav && mainAppNav.style.display !== 'none') {
-                        const pagesWithOwnBottomNavOrNoGlobalNav = ['sell', 'new-supply', 'activation', 'select-book', 'add-book-modal'];
-                         if (!pagesWithOwnBottomNavOrNoGlobalNav.includes(visiblePage.id)) navToRevert = mainAppNav;
-                    }
-                    if (navToRevert) revertStyle(navToRevert, 'bottom', originalNavStyles);
-                    revertStyle(visiblePage, 'paddingBottom', originalPageStyles);
-                }
-                activeInput = null;
-            }
-        }, 100);
-
-
-    }
-
-    document.querySelectorAll('input[type="text"], input[type="search"], input[type="tel"], input[type="number"], input[type="email"], textarea').forEach(input => {
-        const parentPage = input.closest('main.page');
-        if (parentPage && (parentPage.id === 'new-supply' || parentPage.id === 'add-book-modal')) {
-            return; 
-        }
-        input.addEventListener('focus', onInputFocusGlobal);
-        input.addEventListener('blur', onInputBlurGlobal);
-    });
-
-})();
-</script>
-
 </body>
 </html>
+
