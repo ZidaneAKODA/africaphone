@@ -3689,7 +3689,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
       position: -webkit-sticky;
       position: sticky;
       top: 0;
-      z-index: 15;
+      z-index: 25;
     }
     main#reports header#reports-header h2 {
       margin: 0;
@@ -3698,158 +3698,89 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
       color: var(--primary-text);
     }
 
-    main#reports .reports-content {
-      padding: 0;
+    .reports-active-filter-summary-bar {
       display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .reports-filter-bar {
-      background-color: #f8f9fa;
-      padding: 1rem;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 1rem;
+      background-color: var(--surface);
       border-bottom: 1px solid var(--border-color);
       position: -webkit-sticky;
       position: sticky;
       top: 57px; /* Hauteur approx. du header#reports-header */
-      z-index: 14;
+      z-index: 24;
+      font-size: 0.9rem;
     }
-
-    .filter-group {
-      margin-bottom: 1rem;
-    }
-    .filter-group:last-child {
-      margin-bottom: 0;
-    }
-
-    .filter-group-title {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 500;
+    #active-filters-display {
       color: var(--secondary-text);
-      margin-bottom: 0.5rem;
-      display: flex;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-right: 0.5rem;
+    }
+    #btn-open-reports-filters {
+      background-color: var(--accent-bg-light, rgba(0,100,210,0.1));
+      color: var(--accent);
+      border: 1px solid var(--accent-border, rgba(0,100,210,0.3));
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--border-radius-pill);
+      font-weight: 500;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
       align-items: center;
       gap: 0.4rem;
     }
-    .filter-group-title i {
-      font-size: 1rem;
-    }
+    #btn-open-reports-filters i { font-size: 1rem; }
 
-    .filter-options {
+
+    .reports-content-scrollable {
+      padding: 0.75rem; /* Padding pour l'ensemble du contenu scrollable */
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-
-    .filter-options select,
-    .filter-options input[type="date"],
-    .filter-options button {
-      padding: 0.6rem 0.8rem;
-      font-size: 0.9rem;
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius-card);
-      background-color: #fff;
-      box-shadow: none;
-      outline: none;
-      height: 40px; /* Hauteur cohérente */
-    }
-    .filter-options select {
-      flex-grow: 1;
-      min-width: 150px;
-    }
-    .filter-options input[type="date"] {
-        flex-grow: 1;
-        min-width: 120px;
-    }
-
-    .custom-date-range-inputs {
-      display: none; /* Caché par défaut */
       flex-direction: column;
-      gap: 0.75rem;
-      width: 100%;
-      margin-top: 0.75rem;
-    }
-    .custom-date-range-inputs.visible {
-      display: flex;
-    }
-     .custom-date-inputs-wrapper {
-        display: flex;
-        gap: 0.75rem;
-        width: 100%;
-    }
-    .custom-date-inputs-wrapper > div {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-    .custom-date-inputs-wrapper label {
-        font-size: 0.75rem;
-        color: var(--secondary-text);
-        margin-bottom: 0.25rem;
-    }
-
-    .filter-options button.btn-apply-filter {
-      background-color: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-      font-weight: 500;
-      cursor: pointer;
-      padding: 0.6rem 1rem;
-    }
-    .filter-options button.btn-apply-filter:hover {
-      background-color: #0056b3; /* Darker accent */
-    }
-     .filter-options button.btn-apply-filter i {
-        margin-right: 0.4rem;
-    }
-
-
-    .reports-data-area {
-        padding: 1rem;
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
+      gap: 1rem; /* Espace entre KPIs et graphiques */
+      /* height: calc(100% - 57px - 45px); /* Hauteur totale - header - filter summary bar */
+      /* overflow-y: auto; */
     }
 
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Taille réduite */
+      gap: 0.75rem; /* Espace réduit */
     }
     .kpi-card {
-      background-color: #fff;
+      background-color: var(--surface);
       border: 1px solid var(--border-color);
       border-radius: var(--border-radius-card);
-      padding: 1rem;
+      padding: 0.75rem; /* Padding réduit */
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 0.3rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      gap: 0.2rem; /* Espace interne réduit */
+      box-shadow: none; /* Pas d'ombre */
     }
     .kpi-card .kpi-icon {
-        font-size: 1.5rem;
-        color: var(--accent);
-        margin-bottom: 0.25rem;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background-color: rgba(0,100,210,0.1);
+      font-size: 1.3rem; /* Taille icône réduite */
+      color: var(--accent);
+      margin-bottom: 0.2rem;
+      width: 28px; /* Taille conteneur icône réduite */
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0,100,210,0.1);
     }
-    .kpi-card .kpi-icon.revenue { color: var(--chart-sales-color); background-color: rgba(0,123,255,0.1); }
-    .kpi-card .kpi-icon.cogs { color: var(--chart-cogs-color); background-color: rgba(255,193,7,0.1); }
-    .kpi-card .kpi-icon.profit { color: var(--chart-profit-color); background-color: rgba(40,167,69,0.1); }
-    .kpi-card .kpi-icon.sales-count { color: var(--ebay-green); background-color: rgba(134,184,23,0.1); }
-    .kpi-card .kpi-icon.items-sold { color: var(--ebay-blue); background-color: rgba(0,100,210,0.1); }
-    .kpi-card .kpi-icon.profit-margin { color: var(--ebay-yellow); background-color: rgba(245,175,2,0.1); }
-
+    .kpi-card .kpi-icon.revenue { color: var(--chart-sales-color); background-color: rgba(0,123,255,0.08); }
+    .kpi-card .kpi-icon.cogs { color: var(--chart-cogs-color); background-color: rgba(255,193,7,0.08); }
+    .kpi-card .kpi-icon.profit { color: var(--chart-profit-color); background-color: rgba(40,167,69,0.08); }
+    .kpi-card .kpi-icon.sales-count { color: var(--ebay-green); background-color: rgba(134,184,23,0.08); }
+    .kpi-card .kpi-icon.items-sold { color: var(--ebay-blue); background-color: rgba(0,100,210,0.08); }
+    .kpi-card .kpi-icon.profit-margin { color: var(--ebay-yellow); background-color: rgba(245,175,2,0.08); }
 
     .kpi-card .kpi-value {
-      font-size: 1.6rem;
+      font-size: 1.4rem; /* Valeur KPI réduite */
       font-weight: 600;
       color: var(--primary-text);
       line-height: 1.2;
@@ -3859,27 +3790,27 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
     .kpi-card .kpi-value.cogs { color: var(--chart-cogs-color); }
 
     .kpi-card .kpi-label {
-      font-size: 0.85rem;
+      font-size: 0.75rem; /* Label KPI réduit */
       color: var(--secondary-text);
     }
 
     .chart-container {
-      background-color: #fff;
+      background-color: var(--surface);
       border: 1px solid var(--border-color);
       border-radius: var(--border-radius-card);
-      padding: 1rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-      height: 380px;
+      padding: 0.75rem; /* Padding réduit */
+      box-shadow: none; /* Pas d'ombre */
+      height: 320px; /* Hauteur réduite */
       position: relative;
     }
     .chart-container .chart-title-area {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem; /* Marge réduite */
     }
     .chart-container .chart-title-area h3 {
-      font-size: 1.1rem;
+      font-size: 1rem; /* Titre graphique réduit */
       font-weight: 500;
       margin: 0;
       color: var(--primary-text);
@@ -3887,76 +3818,157 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
 
     .chart-loading-message, .chart-error-message, .chart-no-data-message {
       text-align: center;
-      padding: 2rem;
+      padding: 1.5rem; /* Padding réduit */
       color: var(--secondary-text);
       font-style: italic;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: calc(100% - 2rem);
+      width: calc(100% - 1.5rem);
+      font-size: 0.9rem;
     }
     .chart-error-message { color: var(--ebay-red); font-weight: 500; }
     .chart-no-data-message { font-weight: 500; }
 
-    /* Placeholder for future report types */
     .report-type-placeholder {
-        padding: 2rem;
-        text-align: center;
-        color: var(--secondary-text);
-        border: 2px dashed var(--border-color);
-        border-radius: var(--border-radius-card);
-        margin: 1rem;
+      padding: 1.5rem; text-align: center; color: var(--secondary-text);
+      border: 2px dashed var(--border-color); border-radius: var(--border-radius-card);
+      margin: 0.75rem; font-size: 0.9rem;
     }
+
+    .drawer-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.3);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease-out, visibility 0s 0.3s linear;
+      z-index: 90;
+    }
+    .drawer-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+      transition-delay: 0s;
+    }
+
+    .report-filter-drawer {
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 100%;
+      max-height: 85vh; /* Limite la hauteur du tiroir */
+      background-color: var(--surface);
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      box-shadow: 0 -3px 15px rgba(0,0,0,0.15); /* Ombre pour l'élévation */
+      transform: translateY(100%);
+      transition: transform 0.3s ease-out;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .report-filter-drawer.visible {
+      transform: translateY(0%);
+    }
+    .report-filter-drawer .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .report-filter-drawer .drawer-header h4 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .report-filter-drawer .close-drawer-btn {
+      background: none; border: none; font-size: 1.5rem; color: var(--secondary-text); cursor: pointer; padding: 0.25rem;
+    }
+
+    .report-filter-drawer .drawer-body {
+      padding: 1rem;
+      overflow-y: auto; /* Scroll si le contenu dépasse */
+      flex-grow: 1;
+    }
+    .report-filter-drawer .filter-group { margin-bottom: 1.25rem; }
+    .report-filter-drawer .filter-group:last-child { margin-bottom: 0; }
+    .report-filter-drawer .filter-group-title {
+      display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;
+      font-weight: 600; color: var(--secondary-text); margin-bottom: 0.6rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .report-filter-drawer .filter-group-title i { font-size: 0.9rem; }
+
+    .report-filter-drawer .filter-options {
+      display: flex; flex-direction: column; /* Options en colonne pour le tiroir */
+      gap: 0.75rem;
+    }
+    .report-filter-drawer .filter-options select,
+    .report-filter-drawer .filter-options input[type="date"] {
+      padding: 0.7rem 0.8rem; /* Padding légèrement ajusté */
+      font-size: 0.95rem; /* Taille de police pour lisibilité */
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-card);
+      background-color: #fff;
+      box-shadow: none; outline: none;
+      width: 100%; /* Pleine largeur dans le tiroir */
+      height: 42px;
+    }
+    .report-filter-drawer .custom-date-range-inputs {
+      display: none; flex-direction: column; gap: 0.75rem; width: 100%; margin-top: 0.5rem;
+    }
+    .report-filter-drawer .custom-date-range-inputs.visible { display: flex; }
+    .report-filter-drawer .custom-date-inputs-wrapper {
+      display: flex; gap: 0.75rem; width: 100%;
+    }
+    .report-filter-drawer .custom-date-inputs-wrapper > div {
+      flex: 1; display: flex; flex-direction: column;
+    }
+    .report-filter-drawer .custom-date-inputs-wrapper label {
+      font-size: 0.7rem; text-transform: uppercase; color: var(--secondary-text); margin-bottom: 0.25rem;
+    }
+    .report-filter-drawer .drawer-footer {
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--border-color);
+      background-color: var(--surface);
+    }
+    .report-filter-drawer .btn-apply-filter.full-width {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius-pill);
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .report-filter-drawer .btn-apply-filter.full-width:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
   </style>
 
   <header id="reports-header">
     <h2>Rapports & Analyses</h2>
   </header>
 
-  <div class="reports-content">
-    <div class="reports-filter-bar">
-      <div class="filter-group">
-        <span class="filter-group-title"><i class="bi bi-calendar-range-fill"></i> Période</span>
-        <div class="filter-options">
-          <select id="reports-period-selector">
-            <option value="today">Aujourd'hui</option>
-            <option value="yesterday">Hier</option>
-            <option value="last7days">7 derniers jours</option>
-            <option value="last30days" selected>30 derniers jours</option>
-            <option value="thisMonth">Ce mois-ci</option>
-            <option value="lastMonth">Mois dernier</option>
-            <option value="custom">Personnalisée</option>
-          </select>
-        </div>
-        <div class="custom-date-range-inputs" id="custom-date-inputs-reports">
-            <div class="custom-date-inputs-wrapper">
-                <div>
-                    <label for="reports-date-start">Date de début</label>
-                    <input type="date" id="reports-date-start">
-                </div>
-                <div>
-                    <label for="reports-date-end">Date de fin</label>
-                    <input type="date" id="reports-date-end">
-                </div>
-            </div>
-            <button id="btn-apply-custom-date-reports" class="btn-apply-filter"><i class="bi bi-check-circle-fill"></i>Appliquer</button>
-        </div>
-      </div>
+  <div class="reports-active-filter-summary-bar">
+    <span id="active-filters-display">Période: 30 derniers jours</span>
+    <button id="btn-open-reports-filters">
+      <i class="bi bi-funnel-fill"></i> Filtres
+    </button>
+  </div>
 
-      <div class="filter-group">
-        <span class="filter-group-title"><i class="bi bi-file-earmark-text-fill"></i> Type de Rapport</span>
-        <div class="filter-options">
-          <select id="reports-type-selector">
-            <option value="summary" selected>Synthèse Globale</option>
-            <option value="sales_detail" disabled>Détail des Ventes (Bientôt)</option>
-            <option value="product_performance" disabled>Performance Produits (Bientôt)</option>
-            <option value="inventory_status" disabled>État des Stocks (Bientôt)</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
+  <div class="reports-content-scrollable">
     <div class="reports-data-area" id="reports-data-summary">
       <div class="kpi-grid">
         <div class="kpi-card">
@@ -4012,7 +4024,58 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
       </div>
     </div>
     <div class="report-type-placeholder" id="reports-data-placeholder" style="display:none;">
-        <p>Ce type de rapport sera bientôt disponible.</p>
+      <p>Ce type de rapport sera bientôt disponible.</p>
+    </div>
+  </div>
+
+  <div class="drawer-overlay" id="reports-filter-overlay"></div>
+  <div class="report-filter-drawer" id="report-filter-drawer-content">
+    <div class="drawer-header">
+      <h4>Filtres des Rapports</h4>
+      <button id="btn-close-reports-filters" class="close-drawer-btn"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="drawer-body">
+      <div class="filter-group">
+        <span class="filter-group-title"><i class="bi bi-calendar-range-fill"></i> Période</span>
+        <div class="filter-options">
+          <select id="reports-period-selector">
+            <option value="today">Aujourd'hui</option>
+            <option value="yesterday">Hier</option>
+            <option value="last7days">7 derniers jours</option>
+            <option value="last30days" selected>30 derniers jours</option>
+            <option value="thisMonth">Ce mois-ci</option>
+            <option value="lastMonth">Mois dernier</option>
+            <option value="custom">Personnalisée</option>
+          </select>
+        </div>
+        <div class="custom-date-range-inputs" id="custom-date-inputs-reports">
+            <div class="custom-date-inputs-wrapper">
+                <div>
+                    <label for="reports-date-start">Date de début</label>
+                    <input type="date" id="reports-date-start">
+                </div>
+                <div>
+                    <label for="reports-date-end">Date de fin</label>
+                    <input type="date" id="reports-date-end">
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-group-title"><i class="bi bi-file-earmark-text-fill"></i> Type de Rapport</span>
+        <div class="filter-options">
+          <select id="reports-type-selector">
+            <option value="summary" selected>Synthèse Globale</option>
+            <option value="sales_detail" disabled>Détail des Ventes (Bientôt)</option>
+            <option value="product_performance" disabled>Performance Produits (Bientôt)</option>
+            <option value="inventory_status" disabled>État des Stocks (Bientôt)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-footer">
+        <button id="btn-apply-drawer-filters" class="btn-apply-filter full-width"><i class="bi bi-check-circle-fill"></i>Appliquer les Filtres</button>
     </div>
   </div>
 
@@ -4042,15 +4105,55 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
     const customDateInputsEl = document.getElementById('custom-date-inputs-reports');
     const dateStartInputEl = document.getElementById('reports-date-start');
     const dateEndInputEl = document.getElementById('reports-date-end');
-    const applyCustomDateBtnEl = document.getElementById('btn-apply-custom-date-reports');
-
+    
     const reportsDataSummaryEl = document.getElementById('reports-data-summary');
     const reportsDataPlaceholderEl = document.getElementById('reports-data-placeholder');
+
+    const btnOpenFiltersEl = document.getElementById('btn-open-reports-filters');
+    const btnCloseFiltersEl = document.getElementById('btn-close-reports-filters');
+    const filterDrawerEl = document.getElementById('report-filter-drawer-content');
+    const filterOverlayEl = document.getElementById('reports-filter-overlay');
+    const btnApplyDrawerFiltersEl = document.getElementById('btn-apply-drawer-filters');
+    const activeFiltersDisplayEl = document.getElementById('active-filters-display');
 
     let salesProfitChartInstance = null;
     let topSellingBooksChartInstance = null;
     let allBooksDataCache = {};
     let currentStartDate, currentEndDate;
+    let tempPeriodSettings = {};
+
+    function toggleFilterDrawer(show) {
+        if (show) {
+            tempPeriodSettings.period = periodSelectorEl.value;
+            tempPeriodSettings.startDate = dateStartInputEl.value;
+            tempPeriodSettings.endDate = dateEndInputEl.value;
+            tempPeriodSettings.reportType = reportTypeSelectorEl.value;
+
+            filterDrawerEl.classList.add('visible');
+            filterOverlayEl.classList.add('visible');
+            document.body.style.overflow = 'hidden';
+        } else {
+            filterDrawerEl.classList.remove('visible');
+            filterOverlayEl.classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+    }
+
+    if(btnOpenFiltersEl) btnOpenFiltersEl.addEventListener('click', () => toggleFilterDrawer(true));
+    if(btnCloseFiltersEl) btnCloseFiltersEl.addEventListener('click', () => {
+        periodSelectorEl.value = tempPeriodSettings.period || 'last30days';
+        dateStartInputEl.value = tempPeriodSettings.startDate || '';
+        dateEndInputEl.value = tempPeriodSettings.endDate || '';
+        reportTypeSelectorEl.value = tempPeriodSettings.reportType || 'summary';
+        if (periodSelectorEl.value === 'custom') {
+            customDateInputsEl.classList.add('visible');
+        } else {
+            customDateInputsEl.classList.remove('visible');
+        }
+        toggleFilterDrawer(false);
+    });
+    if(filterOverlayEl) filterOverlayEl.addEventListener('click', () => btnCloseFiltersEl.click());
+
 
     function showChartMessage(chartType, type, message = "") {
         const loadingEl = chartType === 'salesProfit' ? salesProfitChartLoadingEl : topSellingBooksChartLoadingEl;
@@ -4076,10 +4179,9 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
                 noDataEl.style.display = 'block';
             }
         } else if (type === 'showChart') {
-             if (canvasEl) canvasEl.style.display = 'block';
+            if (canvasEl) canvasEl.style.display = 'block';
         }
     }
-
 
     async function fetchAllBooksDetails() {
         if (!auth.currentUser) return {};
@@ -4096,20 +4198,24 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             allBooksDataCache = booksDetails;
             return booksDetails;
         } catch (error) {
-            console.error("Error fetching book details for reports:", error);
             showChartMessage('salesProfit', 'error', 'Erreur de récupération des détails des livres.');
             showChartMessage('topSellingBooks', 'error', 'Erreur de récupération des détails des livres.');
             return {};
         }
     }
     
-    function setDateRange() {
+    function setDateRange(updateDisplayOnly = false) {
         const selectedPeriod = periodSelectorEl.value;
         const today = new Date();
         let startDate = new Date(today);
         let endDate = new Date(today);
+        let displayPeriodText = periodSelectorEl.options[periodSelectorEl.selectedIndex].text;
 
-        customDateInputsEl.classList.remove('visible');
+        if (selectedPeriod === 'custom') {
+            customDateInputsEl.classList.add('visible');
+        } else {
+            customDateInputsEl.classList.remove('visible');
+        }
 
         switch (selectedPeriod) {
             case 'today':
@@ -4132,12 +4238,13 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
                 startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
                 break;
             case 'custom':
-                customDateInputsEl.classList.add('visible');
                 const storedStart = dateStartInputEl.value;
                 const storedEnd = dateEndInputEl.value;
                 if (storedStart && storedEnd) {
                     startDate = new Date(storedStart + 'T00:00:00');
                     endDate = new Date(storedEnd + 'T23:59:59');
+                    const formatDate = (d) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+                    displayPeriodText = `du ${formatDate(startDate)} au ${formatDate(endDate)}`;
                 } else {
                     dateEndInputEl.valueAsDate = today;
                     const thirtyDaysAgo = new Date(today);
@@ -4145,20 +4252,21 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
                     dateStartInputEl.valueAsDate = thirtyDaysAgo;
                     startDate = thirtyDaysAgo;
                     endDate = today;
+                     displayPeriodText = "Personnalisée (par défaut 30j)";
                 }
                 break;
         }
 
         if (selectedPeriod !== 'custom') {
-             const yearStart = startDate.getFullYear();
-             const monthStart = String(startDate.getMonth() + 1).padStart(2, '0');
-             const dayStart = String(startDate.getDate()).padStart(2, '0');
-             dateStartInputEl.value = `${yearStart}-${monthStart}-${dayStart}`;
+            const yearStart = startDate.getFullYear();
+            const monthStart = String(startDate.getMonth() + 1).padStart(2, '0');
+            const dayStart = String(startDate.getDate()).padStart(2, '0');
+            dateStartInputEl.value = `${yearStart}-${monthStart}-${dayStart}`;
 
-             const yearEnd = endDate.getFullYear();
-             const monthEnd = String(endDate.getMonth() + 1).padStart(2, '0');
-             const dayEnd = String(endDate.getDate()).padStart(2, '0');
-             dateEndInputEl.value = `${yearEnd}-${monthEnd}-${dayEnd}`;
+            const yearEnd = endDate.getFullYear();
+            const monthEnd = String(endDate.getMonth() + 1).padStart(2, '0');
+            const dayEnd = String(endDate.getDate()).padStart(2, '0');
+            dateEndInputEl.value = `${yearEnd}-${monthEnd}-${dayEnd}`;
         }
         
         startDate.setHours(0, 0, 0, 0);
@@ -4167,8 +4275,8 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
         currentStartDate = startDate;
         currentEndDate = endDate;
 
-        if (selectedPeriod !== 'custom') {
-            loadReportData();
+        if (updateDisplayOnly && activeFiltersDisplayEl) {
+            activeFiltersDisplayEl.textContent = `Période: ${displayPeriodText}`;
         }
     }
 
@@ -4185,8 +4293,8 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
         await fetchAllBooksDetails();
 
         if (!currentStartDate || !currentEndDate) {
-             showChartMessage('salesProfit', 'error', "Veuillez sélectionner une période valide.");
-             showChartMessage('topSellingBooks', 'error', "Veuillez sélectionner une période valide.");
+            showChartMessage('salesProfit', 'error', "Veuillez sélectionner une période valide.");
+            showChartMessage('topSellingBooks', 'error', "Veuillez sélectionner une période valide.");
             return;
         }
         
@@ -4254,7 +4362,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             }
 
             if (salesProfitChartInstance) salesProfitChartInstance.destroy();
-            if (salesSnapshot.empty) {
+            if (salesSnapshot.empty && salesProfitChartCtx) {
                 showChartMessage('salesProfit', 'noData');
             } else if (salesProfitChartCtx) {
                 showChartMessage('salesProfit', 'showChart');
@@ -4284,7 +4392,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
                     options: {
                         responsive: true, maintainAspectRatio: false,
                         scales: {
-                            x: { type: 'time', time: { unit: salesProfitLabels.length > 45 ? 'week' : 'day', tooltipFormat: 'dd MMM yyyy', displayFormats: { day: 'dd MMM', week: 'dd MMM' }}},
+                            x: { type: 'time', time: { unit: salesProfitLabels.length > 45 ? 'week' : 'day', tooltipFormat: 'dd MMM yy', displayFormats: { day: 'dd MMM', week: 'dd MMM' }}},
                             y: { beginAtZero: true, ticks: { callback: function(value) { return value.toLocaleString('fr-FR') + ' XOF'; }}}
                         },
                         plugins: { tooltip: { callbacks: { label: function(context) { let label = context.dataset.label || ''; if (label) { label += ': '; } if (context.parsed.y !== null) { label += context.parsed.y.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});} return label;}}}}
@@ -4298,7 +4406,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
                 .slice(0, 5);
 
             if (topSellingBooksChartInstance) topSellingBooksChartInstance.destroy();
-            if (sortedBooks.length === 0) {
+            if (sortedBooks.length === 0 && topSellingBooksChartCtx) {
                 showChartMessage('topSellingBooks', 'noData');
             } else if (topSellingBooksChartCtx) {
                 showChartMessage('topSellingBooks', 'showChart');
@@ -4329,28 +4437,43 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             }
 
         } catch (error) {
-            console.error("Error loading report data:", error);
             showChartMessage('salesProfit', 'error', "Erreur de chargement des données du rapport.");
             showChartMessage('topSellingBooks', 'error', "Erreur de chargement des données du rapport.");
         }
     }
 
-    function handleReportTypeChange() {
+    function applyFiltersAndLoadData() {
+        setDateRange(true);
         const selectedType = reportTypeSelectorEl.value;
         if (selectedType === 'summary') {
-            reportsDataSummaryEl.style.display = 'block'; // Ou 'flex' si c'est un conteneur flex
+            reportsDataSummaryEl.style.display = 'flex';
             reportsDataPlaceholderEl.style.display = 'none';
-            setDateRange(); // Recharge les données pour la synthèse
+            loadReportData();
         } else {
             reportsDataSummaryEl.style.display = 'none';
             reportsDataPlaceholderEl.style.display = 'block';
-             // Ici, vous pourriez ajouter la logique pour charger d'autres types de rapports
         }
+        toggleFilterDrawer(false);
     }
+    
+    if(btnApplyDrawerFiltersEl) btnApplyDrawerFiltersEl.addEventListener('click', applyFiltersAndLoadData);
+    if(periodSelectorEl) periodSelectorEl.addEventListener('change', () => setDateRange(false));
+    if(reportTypeSelectorEl) reportTypeSelectorEl.addEventListener('change', () => {
+         const selectedType = reportTypeSelectorEl.value;
+         if (selectedType !== 'summary') {
+             reportsDataSummaryEl.style.display = 'none';
+             reportsDataPlaceholderEl.style.display = 'block';
+         } else {
+             reportsDataSummaryEl.style.display = 'flex';
+             reportsDataPlaceholderEl.style.display = 'none';
+         }
+    });
+
 
     function initializeReportsPage() {
         if (auth.currentUser) {
-            handleReportTypeChange(); // Cela appellera setDateRange et loadReportData si 'summary' est sélectionné
+            setDateRange(true); 
+            applyFiltersAndLoadData(); 
         } else {
             if(kpiTotalRevenueEl) kpiTotalRevenueEl.textContent = 'XOF 0';
             if(kpiTotalCogsEl) kpiTotalCogsEl.textContent = 'XOF 0';
@@ -4365,30 +4488,10 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             const msg = "Veuillez vous connecter pour voir les rapports.";
             showChartMessage('salesProfit', 'error', msg);
             showChartMessage('topSellingBooks', 'error', msg);
+             if(activeFiltersDisplayEl) activeFiltersDisplayEl.textContent = "Non connecté";
         }
     }
     
-    if(periodSelectorEl) periodSelectorEl.addEventListener('change', setDateRange);
-    if(reportTypeSelectorEl) reportTypeSelectorEl.addEventListener('change', handleReportTypeChange);
-    if(applyCustomDateBtnEl) {
-        applyCustomDateBtnEl.addEventListener('click', () => {
-            const startDateVal = dateStartInputEl.value;
-            const endDateVal = dateEndInputEl.value;
-            if (startDateVal && endDateVal) {
-                currentStartDate = new Date(startDateVal + 'T00:00:00');
-                currentEndDate = new Date(endDateVal + 'T23:59:59');
-                if (currentStartDate > currentEndDate) {
-                    alert("La date de début ne peut pas être après la date de fin.");
-                    return;
-                }
-                loadReportData();
-            } else {
-                alert("Veuillez sélectionner une date de début et une date de fin.");
-            }
-        });
-    }
-
-
     window.addEventListener('hashchange', () => {
         if (location.hash === '#reports') {
             initializeReportsPage();
@@ -4407,7 +4510,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
     if (location.hash === '#reports') {
         initializeReportsPage();
     } else {
-        setDateRange(); // Set initial dates so they are ready if user navigates here
+        setDateRange(false);
     }
 
   })();
