@@ -1955,16 +1955,15 @@
 
 <main id="new-supply" class="page">
   <style>
-    /* :root {} */ 
     #new-supply {display:none;flex-direction:column;height:100vh;background:var(--surface)}
     #new-supply.visible{display:flex}
 
-    .step{display:none;flex:1;padding:1rem 1rem calc(56px + env(safe-area-inset-bottom) + 50px); /* Added 50px for wizard nav */}
+    .step{display:none;flex:1;padding:1rem 1rem calc(56px + env(safe-area-inset-bottom) + 50px); }
     .step.active{display:flex;flex-direction:column}
-    #new-supply h2{font-size:1.25rem;font-weight:500;margin-bottom:1rem} /* Specific to h2 in new-supply steps */
+    #new-supply h2{font-size:1.25rem;font-weight:500;margin-bottom:1rem}
 
     .form-group{margin-bottom:1rem}
-    #new-supply label{font-size:.9rem;color:var(--secondary-text);margin-bottom:.25rem;display:block} /* Specific to new-supply labels */
+    #new-supply label{font-size:.9rem;color:var(--secondary-text);margin-bottom:.25rem;display:block}
     #new-supply input[type=text], #new-supply input[type=number], #new-supply input[type=search]{
       width:100%;padding:.8rem;border:1px solid var(--border-color);border-radius:var(--border-radius-card);
       font-size:1rem;outline:none; box-shadow: none;
@@ -1976,22 +1975,22 @@
     .line-total{font-weight:600;margin-left:auto}
     .remove-line{background:none;border:none;font-size:1.4rem;color:#e53935; cursor: pointer;}
 
-    #new-supply .fab{ 
+    #new-supply .fab{
         position:fixed;
         right:1rem;
-        bottom:calc(env(safe-area-inset-bottom) + 1rem + 50px + 1rem); /* 50px wizard nav, 1rem spacing */
+        bottom:calc(env(safe-area-inset-bottom) + 1rem + 50px + 1rem); 
         width:56px;height:56px;
         border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:1.7rem;
         display:flex;align-items:center;justify-content:center;
-        box-shadow:none; border: 1px solid #0052a3; /* No shadow, add border */
+        box-shadow:none; border: 1px solid #0052a3; 
         z-index:40
     }
 
     .wizard-nav{position:fixed;left:0;bottom:env(safe-area-inset-bottom);width:100%;
       display:flex;gap:.6rem;padding:.7rem 1rem;background:var(--surface);
-      box-shadow:none; border-top: 1px solid var(--border-color); /* No shadow, add border */
-      z-index: 50; 
-      transition: bottom 0.2s ease-out; 
+      box-shadow:none; border-top: 1px solid var(--border-color); 
+      z-index: 50;
+      transition: bottom 0.2s ease-out;
     }
     .btn{flex:1;padding:.8rem;font-size:1rem;font-weight:500;border:none;border-radius:var(--border-radius-card); cursor: pointer; box-shadow:none;}
     .btn.primary{background:var(--accent);color:#fff}.btn.primary:disabled{background:#bfc8d7; cursor: not-allowed;}
@@ -2001,14 +2000,14 @@
     .summary div{margin-bottom:.3rem}
 
     .line-row .book-search {
-      background:#f4f4f4;  
-      cursor:pointer;    
+      background:#f4f4f4;
+      cursor:pointer;
     }
     .line-row .book-search[readonly]{
       caret-color:transparent;
     }
 
-    .step[data-step="3"] { display: none; flex-direction: column; }
+    .step[data-step="3"] { display: none; flex-direction: column; } 
     .step[data-step="3"].active { display: flex; }
     .step[data-step="3"] h2 { font-size: 1.3rem; text-align: center; margin-bottom: 1rem; }
     .step[data-step="3"] .form-group { margin-bottom: 1.5rem; }
@@ -2040,7 +2039,7 @@
     .summary-card .value { font-size: 1rem; font-weight: 600; color: var(--primary-text); }
     .summary-card .value.accent { color: var(--accent); }
     .summary-card .line.total { border-top: 1px solid #f0f0f0; padding-top: 0.75rem; margin-top: 0.75rem; }
-    .search-noresult { /* Style for "Add new book" chip */
+    .search-noresult { 
       display: inline-flex;
       align-items: center;
       padding: 0.75rem 1rem;
@@ -2071,7 +2070,7 @@
         <input type="text"
                class="book-search"
                placeholder="Choisir un livre"
-               readonly  
+               readonly
                autocomplete="off"
                autocorrect="off"
                autocapitalize="none"
@@ -2084,36 +2083,23 @@
   </template>
 
   <div class="step active" data-step="1">
-    <h2>Fournisseur</h2>
-    <div class="form-group">
-      <label for="supplier-search">Nom du fournisseur</label>
-      <input id="supplier-search" type="search" placeholder="Rechercher ou saisir" autocomplete="off"
-             autocorrect="off" autocapitalize="none" spellcheck="false">
+    <h2>Articles</h2>
+    <div id="lines-container" style="flex-grow: 1; overflow-y: auto;">
     </div>
+    <button id="add-line-btn" class="fab" aria-label="Ajouter une ligne">+</button>
     <div class="wizard-nav">
-      <button class="btn secondary" data-next disabled>Suivant →</button>
+      <button class="btn primary" data-next disabled>Suivant →</button>
     </div>
   </div>
 
   <div class="step" data-step="2">
-    <h2>Articles</h2>
-    <div id="lines-container" style="flex-grow: 1; overflow-y: auto;">
-        </div>
-    <button id="add-line-btn" class="fab" aria-label="Ajouter une ligne">+</button>
-    <div class="wizard-nav">
-      <button class="btn secondary" data-prev>← Précédent</button>
-      <button class="btn primary"   data-next disabled>Suivant →</button>
-    </div>
-  </div>
-
-    <div class="step" data-step="3">
     <h2>Allocation du coût d’achat</h2>
     <div class="form-group">
       <label for="additional-cost">Coût supplémentaire (XOF)</label>
       <input
         id="additional-cost"
         type="number"
-        step="50" 
+        step="50"
         min="0"
         placeholder="0"
         autocomplete="off"
@@ -2123,14 +2109,27 @@
       >
     </div>
     <div class="cost-allocation-list" style="flex-grow: 1; overflow-y: auto;">
-        </div>
+    </div>
     <div class="wizard-nav">
       <button class="btn secondary" data-prev>← Précédent</button>
       <button class="btn primary" data-next disabled>Suivant →</button>
     </div>
   </div>
 
-    <div class="step" data-step="4">
+  <div class="step" data-step="3">
+    <h2>Fournisseur</h2>
+    <div class="form-group">
+      <label for="supplier-search">Nom du fournisseur</label>
+      <input id="supplier-search" type="search" placeholder="Rechercher ou saisir" autocomplete="off"
+             autocorrect="off" autocapitalize="none" spellcheck="false">
+    </div>
+    <div class="wizard-nav">
+      <button class="btn secondary" data-prev>← Précédent</button>
+      <button class="btn primary" data-next disabled>Suivant →</button>
+    </div>
+  </div>
+
+  <div class="step" data-step="4">
     <h2>Résumé</h2>
     <div class="summary-cards" id="summary-cards-new-supply" style="flex-grow: 1; overflow-y: auto;"> </div>
     <div class="wizard-nav">
@@ -2151,14 +2150,14 @@
       const addLineBtn= main.querySelector('#add-line-btn');
       const submitBtn = main.querySelector('#submit-supply');
 
-      let currentStep=1; 
+      let currentStep=1;
       function showStep(n){
         steps.forEach(s=>s.classList.toggle('active',+s.dataset.step===n));
         const activeStepEl = steps.find(s => +s.dataset.step === n);
         if (activeStepEl) {
             const firstInput = activeStepEl.querySelector('input:not([type=hidden]):not([readonly]), textarea, select');
-            if (firstInput) {
-                setTimeout(() => firstInput.focus(), 50); 
+            if (firstInput && activeStepEl.id !== 'lines-container') {
+                 setTimeout(() => firstInput.focus(), 50);
             }
         }
       }
@@ -2166,60 +2165,63 @@
       main.addEventListener('click',e=>{
         if (e.target.matches('[data-next]:not([disabled])')) {
           currentStep++;
-          if (currentStep === 3) { 
+          if (currentStep === 2) {
             if (!additionalCostI.value) {
                 additionalCostI.value = "0";
             }
             additionalCostI.dispatchEvent(new Event('input', { bubbles: true }));
-            const step3NextBtn = main.querySelector('[data-step="3"] [data-next]');
-            if (step3NextBtn) step3NextBtn.disabled = parseFloat(additionalCostI.value) < 0;
-
+            const step2NextBtn = main.querySelector('[data-step="2"] [data-next]');
+            if (step2NextBtn) step2NextBtn.disabled = parseFloat(additionalCostI.value) < 0;
           }
-          if (currentStep === 4) updateSummary(); 
+          if (currentStep === 4) updateSummary();
           showStep(currentStep);
         }
         if(e.target.matches('[data-prev]')){currentStep--;showStep(currentStep)}
       });
       showStep(currentStep);
 
-      supplierI.addEventListener('input',()=>main.querySelector('[data-step="1"] [data-next]').disabled=!supplierI.value.trim());
+      supplierI.addEventListener('input',()=> {
+          const step3NextBtn = main.querySelector('[data-step="3"] [data-next]');
+          if (step3NextBtn) step3NextBtn.disabled = !supplierI.value.trim();
+      });
 
-      let lineIdCounter=0; 
+
+      let lineIdCounter=0;
       addLineBtn.addEventListener('click',()=>addLine());
-      
+
       function addLine(data={}){
         lineIdCounter++;
         const row = document.importNode(tmplLine,true).firstElementChild;
         row.dataset.id=lineIdCounter;
         const bookI=row.querySelector('.book-search');
         bookI.addEventListener('click', () => {
-          window.currentBookInput = bookI; 
+          window.currentBookInput = bookI;
           location.hash = 'select-book';
         });
 
         const qtyI =row.querySelector('.line-qty');
         const costI=row.querySelector('.line-cost');
-        const totalEl=row.querySelector('.line-total'); 
+        const totalEl=row.querySelector('.line-total');
 
         if(data.title)bookI.value=data.title;
         if(data.qty)  qtyI.value=data.qty;
         if(data.cost !== undefined) costI.value=data.cost; else costI.value = "0";
 
 
-        function updateLineTotals(){ 
+        function updateLineTotals(){
           const q=parseInt(qtyI.value,10)||0;
           const c=parseFloat(costI.value)||0;
           totalEl.textContent='XOF '+(q*c).toLocaleString('fr-FR', {minimumFractionDigits:0});
-          toggleStep2Next(); 
+          toggleNextButtonForStep1();
         }
         qtyI.addEventListener('input',updateLineTotals);
         costI.addEventListener('input',updateLineTotals);
-        bookI.addEventListener('change', updateLineTotals); // Use change for readonly field populated by modal
+        bookI.addEventListener('change', updateLineTotals);
 
         row.querySelector('.remove-line').addEventListener('click',()=>{
           row.remove();
-          toggleStep2Next();
-          if (currentStep === 3) {
+          toggleNextButtonForStep1();
+          if (currentStep === 2) {
             additionalCostI.dispatchEvent(new Event('input', { bubbles: true }));
           } else if (currentStep === 4) {
             updateSummary();
@@ -2227,166 +2229,166 @@
         });
 
         linesC.append(row);
-        updateLineTotals(); 
-        toggleStep2Next();
-        // bookI.focus(); // Focus happens when user clicks to choose book
-        if (linesC.children.length === 1 && !bookI.value) { // If it's the first line and no book yet
-            setTimeout(() => bookI.click(), 100); // Auto-open book selection for the very first line
-        } else if (bookI.value) { // If book is pre-filled, focus quantity
+        updateLineTotals();
+        toggleNextButtonForStep1();
+        if (linesC.children.length === 1 && !bookI.value) {
+            setTimeout(() => bookI.click(), 100);
+        } else if (bookI.value) {
             qtyI.focus();
             qtyI.select();
         }
       }
 
 
-    additionalCostI.addEventListener('input', () => {
-      const addCost = parseFloat(additionalCostI.value) || 0;
-      const rows = [...linesC.children];
-      const totalQtyAllBooks = rows.reduce((sum, r) => {
-        const q = parseInt(r.querySelector('.line-qty').value, 10) || 0;
-        return sum + q;
-      }, 0);
+      additionalCostI.addEventListener('input', () => {
+        const addCost = parseFloat(additionalCostI.value) || 0;
+        const rows = [...linesC.children];
+        const totalQtyAllBooks = rows.reduce((sum, r) => {
+          const q = parseInt(r.querySelector('.line-qty').value, 10) || 0;
+          return sum + q;
+        }, 0);
 
-      const unitExtraCost = totalQtyAllBooks > 0 ? addCost / totalQtyAllBooks : 0;
-      allocationList.innerHTML = ''; 
+        const unitExtraCost = totalQtyAllBooks > 0 ? addCost / totalQtyAllBooks : 0;
+        allocationList.innerHTML = '';
 
-      rows.forEach(r => {
-        const qtyInput      = r.querySelector('.line-qty');
-        const costInput     = r.querySelector('.line-cost');
-        const lineTotalEl = r.querySelector('.line-total');
-        const bookSearchInput = r.querySelector('.book-search');
+        rows.forEach(r => {
+          const qtyInput      = r.querySelector('.line-qty');
+          const costInput     = r.querySelector('.line-cost');
+          const lineTotalEl = r.querySelector('.line-total');
+          const bookSearchInput = r.querySelector('.book-search');
 
-        const currentQty  = parseInt(qtyInput.value, 10) || 0;
+          const currentQty  = parseInt(qtyInput.value, 10) || 0;
 
-        if (!costInput.dataset.baseCost) { 
-          costInput.dataset.baseCost = costInput.value || "0";
+          if (!costInput.dataset.baseCost) {
+            costInput.dataset.baseCost = costInput.value || "0";
+          }
+          const baseUnitCost = parseFloat(costInput.dataset.baseCost) || 0;
+          const newUnitCostWithExtra = baseUnitCost + unitExtraCost;
+
+          costInput.value = newUnitCostWithExtra.toFixed(0);
+          lineTotalEl.textContent = 'XOF ' + (currentQty * newUnitCostWithExtra).toLocaleString('fr-FR', {minimumFractionDigits:0});
+
+          const extraCostForThisLineItem = currentQty * unitExtraCost;
+          const title = bookSearchInput.value || 'Livre non spécifié';
+          const div = document.createElement('div');
+          div.className = 'allocation-item';
+          div.innerHTML = `
+            <div class="item-label">${title} (Qté: ${currentQty})</div>
+            <div class="item-cost">+ ${extraCostForThisLineItem.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</div>
+          `;
+          allocationList.appendChild(div);
+        });
+
+        const step2NextBtn = main.querySelector('[data-step="2"] [data-next]');
+        if (step2NextBtn) step2NextBtn.disabled = addCost < 0 || rows.length === 0;
+
+        if (rows.length > 0 && addCost >= 0) {
+           updateSummary();
         }
-        const baseUnitCost = parseFloat(costInput.dataset.baseCost) || 0;
-        const newUnitCostWithExtra = baseUnitCost + unitExtraCost;
-
-        costInput.value = newUnitCostWithExtra.toFixed(0); // XOF no decimals for PU
-        lineTotalEl.textContent = 'XOF ' + (currentQty * newUnitCostWithExtra).toLocaleString('fr-FR', {minimumFractionDigits:0});
-
-        const extraCostForThisLineItem = currentQty * unitExtraCost;
-        const title = bookSearchInput.value || 'Livre non spécifié';
-        const div = document.createElement('div');
-        div.className = 'allocation-item';
-        div.innerHTML = `
-          <div class="item-label">${title} (Qté: ${currentQty})</div>
-          <div class="item-cost">+ ${extraCostForThisLineItem.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</div>
-        `;
-        allocationList.appendChild(div);
       });
 
-      main.querySelector('[data-step="3"] [data-next]').disabled = addCost < 0 || rows.length === 0;
-      if (rows.length > 0 && addCost >= 0) {
-         updateSummary(); 
-      }
-    });
+      function updateSummary() {
+        const rows = [...linesC.children];
+        const summaryCardsContainer = document.getElementById('summary-cards-new-supply');
+        summaryCardsContainer.innerHTML = '';
 
-    function updateSummary() {
-      const rows = [...linesC.children];
-      const summaryCardsContainer = document.getElementById('summary-cards-new-supply'); // Use updated ID
-      summaryCardsContainer.innerHTML = ''; 
+        const supplierName = supplierI.value.trim() || 'Non spécifié';
+        const additionalCostTotal = parseFloat(additionalCostI.value) || 0;
 
-      const supplierName = supplierI.value.trim() || 'Non spécifié';
-      const additionalCostTotal = parseFloat(additionalCostI.value) || 0;
-      
-      let grandTotalQty = 0;
+        let grandTotalQty = 0;
 
-      const generalInfoCard = document.createElement('div');
-      generalInfoCard.className = 'summary-card';
-      generalInfoCard.innerHTML = `
-        <div class="line">
-            <div class="left"><i class="bi bi-person-fill icon"></i><span class="label">Fournisseur</span></div>
-            <span class="value">${supplierName}</span>
-        </div>
-        <div class="line">
-            <div class="left"><i class="bi bi-cash-stack icon accent"></i><span class="label">Coût Supp. Total</span></div>
-            <span class="value accent">${additionalCostTotal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
-        </div>
-      `;
-      summaryCardsContainer.appendChild(generalInfoCard);
-
-      rows.forEach(r => {
-        const title = r.querySelector('.book-search').value || 'Livre N/A';
-        const qty   = parseInt(r.querySelector('.line-qty').value,10) || 0;
-        const unitCostFinal = parseFloat(r.querySelector('.line-cost').value) || 0;  
-        const lineTotal = unitCostFinal * qty;
-
-        grandTotalQty += qty;
-        const baseUnitCost = parseFloat(r.querySelector('.line-cost').dataset.baseCost || "0");
-        const extraPerUnitForThisItem = unitCostFinal - baseUnitCost;
-
-        const card = document.createElement('div');
-        card.className = 'summary-card';
-        card.innerHTML = `
+        const generalInfoCard = document.createElement('div');
+        generalInfoCard.className = 'summary-card';
+        generalInfoCard.innerHTML = `
           <div class="line">
-            <div class="left"><i class="bi bi-book-fill icon"></i><span class="label">Article</span></div>
-            <span class="value" style="text-align: right;">${title}</span>
+              <div class="left"><i class="bi bi-person-fill icon"></i><span class="label">Fournisseur</span></div>
+              <span class="value">${supplierName}</span>
           </div>
           <div class="line">
-            <div class="left"><i class="bi bi-tags-fill icon"></i><span class="label">PU de base</span></div>
-            <span class="value">${baseUnitCost.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
+              <div class="left"><i class="bi bi-cash-stack icon accent"></i><span class="label">Coût Supp. Total</span></div>
+              <span class="value accent">${additionalCostTotal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
           </div>
-          <div class="line">
-            <div class="left"><i class="bi bi-plus-slash-minus icon"></i><span class="label">Part Coût Supp./Unité</span></div>
-            <span class="value">${extraPerUnitForThisItem.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
-          </div>
+        `;
+        summaryCardsContainer.appendChild(generalInfoCard);
+
+        rows.forEach(r => {
+          const title = r.querySelector('.book-search').value || 'Livre N/A';
+          const qty   = parseInt(r.querySelector('.line-qty').value,10) || 0;
+          const unitCostFinal = parseFloat(r.querySelector('.line-cost').value) || 0;
+          const lineTotal = unitCostFinal * qty;
+
+          grandTotalQty += qty;
+          const baseUnitCost = parseFloat(r.querySelector('.line-cost').dataset.baseCost || "0");
+          const extraPerUnitForThisItem = unitCostFinal - baseUnitCost;
+
+          const card = document.createElement('div');
+          card.className = 'summary-card';
+          card.innerHTML = `
             <div class="line">
-            <div class="left"><i class="bi bi-currency-exchange icon accent"></i><span class="label">PU Final</span></div>
-            <span class="value accent">${unitCostFinal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
-          </div>
-          <div class="line">
-            <div class="left"><i class="bi bi-list-ol icon"></i><span class="label">Qté</span></div>
-            <span class="value">${qty}</span>
+              <div class="left"><i class="bi bi-book-fill icon"></i><span class="label">Article</span></div>
+              <span class="value" style="text-align: right;">${title}</span>
+            </div>
+            <div class="line">
+              <div class="left"><i class="bi bi-tags-fill icon"></i><span class="label">PU de base</span></div>
+              <span class="value">${baseUnitCost.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
+            </div>
+            <div class="line">
+              <div class="left"><i class="bi bi-plus-slash-minus icon"></i><span class="label">Part Coût Supp./Unité</span></div>
+              <span class="value">${extraPerUnitForThisItem.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
+            </div>
+              <div class="line">
+              <div class="left"><i class="bi bi-currency-exchange icon accent"></i><span class="label">PU Final</span></div>
+              <span class="value accent">${unitCostFinal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
+            </div>
+            <div class="line">
+              <div class="left"><i class="bi bi-list-ol icon"></i><span class="label">Qté</span></div>
+              <span class="value">${qty}</span>
+            </div>
+            <div class="line total">
+              <div class="left"><i class="bi bi-check-circle-fill icon accent"></i><span class="label">Total Ligne</span></div>
+              <span class="value accent">${lineTotal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
+            </div>
+          `;
+          summaryCardsContainer.appendChild(card);
+        });
+
+        const finalTotalCard = document.createElement('div');
+        finalTotalCard.className = 'summary-card';
+        const actualGrandTotalCost = rows.reduce((sum, r) => {
+            const qty = parseInt(r.querySelector('.line-qty').value,10) || 0;
+            const finalPU = parseFloat(r.querySelector('.line-cost').value) || 0;
+            return sum + (qty * finalPU);
+        },0);
+
+        finalTotalCard.innerHTML = `
+          <div class="line" style="border-top: 1px solid #ccc; padding-top: 0.5rem; margin-top:0.5rem;">
+              <div class="left"><i class="bi bi-calculator-fill icon"></i><span class="label">Quantité Totale d'articles</span></div>
+              <span class="value" style="font-weight: bold;">${grandTotalQty}</span>
           </div>
           <div class="line total">
-            <div class="left"><i class="bi bi-check-circle-fill icon accent"></i><span class="label">Total Ligne</span></div>
-            <span class="value accent">${lineTotal.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
+              <div class="left"><i class="bi bi-receipt-cutoff icon accent"></i><span class="label">Coût Total Appro.</span></div>
+              <span class="value accent" style="font-size: 1.2rem; font-weight: bold;">${actualGrandTotalCost.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
           </div>
         `;
-        summaryCardsContainer.appendChild(card);
-      });
-      
-      const finalTotalCard = document.createElement('div');
-      finalTotalCard.className = 'summary-card';
-      const actualGrandTotalCost = rows.reduce((sum, r) => {
-          const qty = parseInt(r.querySelector('.line-qty').value,10) || 0;
-          const finalPU = parseFloat(r.querySelector('.line-cost').value) || 0;
-          return sum + (qty * finalPU);
-      },0);
+        summaryCardsContainer.appendChild(finalTotalCard);
 
-      finalTotalCard.innerHTML = `
-        <div class="line" style="border-top: 1px solid #ccc; padding-top: 0.5rem; margin-top:0.5rem;">
-            <div class="left"><i class="bi bi-calculator-fill icon"></i><span class="label">Quantité Totale d'articles</span></div>
-            <span class="value" style="font-weight: bold;">${grandTotalQty}</span>
-        </div>
-        <div class="line total">
-            <div class="left"><i class="bi bi-receipt-cutoff icon accent"></i><span class="label">Coût Total Appro.</span></div>
-            <span class="value accent" style="font-size: 1.2rem; font-weight: bold;">${actualGrandTotalCost.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits: 0})}</span>
-        </div>
-      `;
-      summaryCardsContainer.appendChild(finalTotalCard);
-      submitBtn.disabled = rows.length === 0 || !supplierI.value.trim();
-    }
-
-    function toggleStep2Next() {
-      const step2NextBtn = main.querySelector('[data-step="2"] [data-next]');
-      if(step2NextBtn) {
-          step2NextBtn.disabled = linesC.children.length === 0 || 
-            [...linesC.children].some(row => !row.querySelector('.book-search').value.trim());
+        submitBtn.disabled = rows.length === 0 || !supplierI.value.trim();
       }
-    }
+
+      function toggleNextButtonForStep1() {
+        const step1NextBtn = main.querySelector('[data-step="1"] [data-next]');
+        if(step1NextBtn) {
+            step1NextBtn.disabled = linesC.children.length === 0 ||
+              [...linesC.children].some(row => !row.querySelector('.book-search').value.trim());
+        }
+      }
 
       submitBtn.addEventListener('click',async()=>{
         submitBtn.disabled=true;
         submitBtn.textContent = 'Envoi en cours...';
         const user=auth.currentUser;
         if (!user) {
-          // Remplacer alert par une modale custom ou un message dans l'UI
           console.error("Utilisateur non connecté. Veuillez vous reconnecter.");
-          // alert("Utilisateur non connecté. Veuillez vous reconnecter."); 
           const toast=document.createElement('div');
           toast.className='toast error';toast.textContent='Utilisateur non connecté.';
           Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
@@ -2397,11 +2399,11 @@
         }
 
         const supplierNameValue=supplierI.value.trim();
-        
+
         const supplyLinesData=[...linesC.children].map(r=>({
           title:r.querySelector('.book-search').value,
           quantity:parseInt(r.querySelector('.line-qty').value,10) || 0,
-          unitCost:parseFloat(r.querySelector('.line-cost').value) || 0, 
+          unitCost:parseFloat(r.querySelector('.line-cost').value) || 0,
           baseUnitCost: parseFloat(r.querySelector('.line-cost').dataset.baseCost || r.querySelector('.line-cost').value) || 0
         }));
 
@@ -2412,33 +2414,32 @@
         const batch=db.batch();
         const supplyRef=db.collection('users').doc(user.uid).collection('supplies').doc();
         batch.set(supplyRef,{
-            supplierName:supplierNameValue, 
+            supplierName:supplierNameValue,
             date:firebase.firestore.FieldValue.serverTimestamp(),
             lines: supplyLinesData,
             totalQty:totalQuantityFinal,
-            totalCost:totalCostFinal, 
+            totalCost:totalCostFinal,
             additionalCostApplied: additionalCostOverall
         });
-        
+
         const uid = auth.currentUser.uid;
         const userBooksRef = db.collection('users').doc(uid).collection('books');
 
         for(const ln of supplyLinesData){
-          if (!ln.title) continue; 
+          if (!ln.title) continue;
           const snap = await userBooksRef.where('title','==', ln.title).limit(1).get();
-          
-          if (!snap.empty) { 
+
+          if (!snap.empty) {
             const bookDocRef = snap.docs[0].ref;
             batch.update(bookDocRef, {
               quantity: firebase.firestore.FieldValue.increment(ln.quantity),
-              lastPurchasePrice: ln.unitCost, // Update last purchase price (final cost)
-              // price: ln.baseUnitCost // Optionally update selling price based on base cost
+              lastPurchasePrice: ln.unitCost,
             });
-          } else { 
-             batch.set(userBooksRef.doc(), { 
+          } else {
+             batch.set(userBooksRef.doc(), {
               title: ln.title,
               quantity: ln.quantity,
-              price: ln.baseUnitCost, // Default selling price based on base cost
+              price: ln.baseUnitCost,
               lastPurchasePrice: ln.unitCost,
               createdAt: firebase.firestore.FieldValue.serverTimestamp()
              });
@@ -2446,7 +2447,7 @@
         }
         try {
             await batch.commit();
-            location.hash='supply'; 
+            location.hash='supply';
             const toast=document.createElement('div');
             toast.className='toast';toast.textContent='Approvisionnement enregistré !';
             Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)',
@@ -2457,17 +2458,16 @@
             linesC.innerHTML = '';
             additionalCostI.value = '0';
             allocationList.innerHTML = '';
-            document.getElementById('summary-cards-new-supply').innerHTML = ''; // Use updated ID
+            document.getElementById('summary-cards-new-supply').innerHTML = '';
             currentStep = 1;
             showStep(currentStep);
             main.querySelector('[data-step="1"] [data-next]').disabled = true;
-            toggleStep2Next();
+            main.querySelector('[data-step="2"] [data-next]').disabled = true;
             main.querySelector('[data-step="3"] [data-next]').disabled = true;
             submitBtn.disabled = true;
 
         } catch (error) {
             console.error("Erreur lors de l'enregistrement de l'approvisionnement: ", error);
-            // alert("Erreur: " + error.message);
             const toast=document.createElement('div');
             toast.className='toast error';toast.textContent="Erreur: " + error.message;
             Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
@@ -2477,12 +2477,11 @@
             submitBtn.textContent = 'Valider & envoyer';
         }
       });
-      
-      const supplierSearchField = main.querySelector('#supplier-search'); 
+
+      const supplierSearchField = main.querySelector('#supplier-search');
       const step1Element = main.querySelector('.step[data-step="1"]');
-      const step1WizardNav = step1Element ? step1Element.querySelector('.wizard-nav') : null;
-      const allWizardNavs = main.querySelectorAll('.wizard-nav'); // All wizard navs
-      const allStepContents = main.querySelectorAll('.step'); // All step contents
+      const allWizardNavs = main.querySelectorAll('.wizard-nav');
+      const allStepContents = main.querySelectorAll('.step');
 
       function onInputFocus(e) {
         const currentStepEl = e.target.closest('.step');
@@ -2491,7 +2490,7 @@
         if (!currentWizardNav || !currentStepEl) return;
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', () => adjustLayoutForKeyboard(currentStepEl, currentWizardNav, e.target));
-            adjustLayoutForKeyboard(currentStepEl, currentWizardNav, e.target); 
+            adjustLayoutForKeyboard(currentStepEl, currentWizardNav, e.target);
         }
       }
       function onInputBlur(e) {
@@ -2501,7 +2500,7 @@
         if (window.visualViewport) {
             window.visualViewport.removeEventListener('resize', () => adjustLayoutForKeyboard(currentStepEl, currentWizardNav, e.target));
         }
-        if (currentWizardNav) currentWizardNav.style.bottom = '';  
+        if (currentWizardNav) currentWizardNav.style.bottom = '';
         if (currentStepEl) currentStepEl.style.paddingBottom = '';
       }
 
@@ -2517,20 +2516,24 @@
         const keyboardHeight = window.innerHeight - (visualViewport.offsetTop + visualViewport.height);
         const safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)')) || 0;
 
-        if (keyboardHeight > 50) { 
-          wizardNavEl.style.bottom = (keyboardHeight - safeAreaBottom) + 'px'; // Adjust for safe area
-          const navHeight = wizardNavEl.offsetHeight; 
-          stepEl.style.paddingBottom = (keyboardHeight - safeAreaBottom + navHeight + 15) + 'px'; 
+        if (keyboardHeight > 50) {
+          wizardNavEl.style.bottom = (keyboardHeight - safeAreaBottom) + 'px';
+          const navHeight = wizardNavEl.offsetHeight;
+          stepEl.style.paddingBottom = (keyboardHeight - safeAreaBottom + navHeight + 15) + 'px';
         } else {
-          wizardNavEl.style.bottom = '';  
+          wizardNavEl.style.bottom = '';
           stepEl.style.paddingBottom = '';
         }
       }
-      // Apply to all relevant inputs in new-supply
       main.querySelectorAll('input[type="search"], input[type="number"], input[type="text"]').forEach(input => {
           input.addEventListener('focus', onInputFocus);
           input.addEventListener('blur', onInputBlur);
       });
+      toggleNextButtonForStep1();
+      const step2NextBtn = main.querySelector('[data-step="2"] [data-next]');
+      if (step2NextBtn) step2NextBtn.disabled = true;
+      const step3NextBtn = main.querySelector('[data-step="3"] [data-next]');
+      if (step3NextBtn) step3NextBtn.disabled = true;
     })();
   </script>
 </main>
