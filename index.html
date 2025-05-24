@@ -319,17 +319,20 @@
       margin: 0;
     }
 
-    main#catalog > header { /* Header de la page catalogue (avec la recherche) */
-      padding-top: 0.5rem;
-      padding-bottom: 0.5rem; 
-      position: -webkit-sticky; 
-      position: sticky;
-      top: 0;
-      z-index: 15; 
-      background-color: #fff; 
-      border-bottom: 1px solid var(--border-color); 
-    }
-
+    
+main#catalog > header {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    /* position: -webkit-sticky; */
+    /* position: sticky; */
+    position: fixed; /* CHANGED */
+    top: 0;
+    left: 0; /* ADDED for fixed */
+    right: 0; /* ADDED for fixed (or use width: 100%) */
+    z-index: 15;
+    background-color: #fff;
+    border-bottom: 1px solid var(--border-color);
+}
     main#catalog .search-wrapper {
       margin-top: 0; 
     }
