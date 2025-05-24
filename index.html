@@ -1162,21 +1162,18 @@
 
   <div id="sell-feedback-message"></div>
 
-  <script>
-  (function() {
-    // Elements DOM globaux à la page de vente
+ <script>
+(function() {
     const sellPageEl = document.getElementById('sell');
     const feedbackMessageEl = document.getElementById('sell-feedback-message');
     let currentSellStep = 1;
     const sellSteps = sellPageEl.querySelectorAll('.sell-step');
 
-    // --- Éléments Étape 1: Sélection Livres ---
     const searchInputSellEl = document.getElementById('search-input-sell');
     const searchResultsContainerEl = document.getElementById('sell-search-results-container');
     const step1NextBtn = document.getElementById('btn-sell-step1-next');
     const step1CartSummaryEl = document.getElementById('sell-step1-cart-summary');
 
-    // --- Éléments Étape 2: Panier ---
     const cartItemsListStep2El = document.getElementById('sell-cart-items-list-step2');
     const cartEmptyMessageStep2El = document.getElementById('sell-cart-empty-message-step2');
     const totalItemsStep2El = document.getElementById('sell-cart-total-items-step2');
@@ -1184,12 +1181,9 @@
     const clearCartStep2Btn = document.getElementById('btn-clear-sell-cart-step2');
     const step2NextBtn = document.getElementById('btn-sell-step2-next');
 
-    // --- Éléments Étape 3: Infos Client ---
     const customerNameInputEl = document.getElementById('sell-customer-name');
     const customerPhoneInputEl = document.getElementById('sell-customer-phone');
-    // const step3NextBtn = document.getElementById('btn-sell-step3-next'); // Géré par nav globale
 
-    // --- Éléments Étape 4: Récapitulatif & Validation ---
     const summaryCustomerNameEl = document.getElementById('summary-customer-name');
     const summaryCustomerPhoneEl = document.getElementById('summary-customer-phone');
     const summaryItemsListEl = document.getElementById('sell-summary-items-list-step4');
@@ -1197,32 +1191,28 @@
     const summaryGrandTotalEl = document.getElementById('summary-grand-total');
     const validateSaleButtonStep4El = document.getElementById('btn-validate-sale-step4');
 
-    // --- État et Données ---
     let userBooksCache = [];
-    let salesCart = []; // [{ bookId, title, quantity, unitPrice, stock, suggestedPrice }, ...]
+    let salesCart = [];
     let currentUserUID = null;
 
-    // --- Fonctions du Wizard ---
     function showSellStep(stepNumber) {
         currentSellStep = parseInt(stepNumber, 10);
         sellSteps.forEach(step => {
             step.classList.toggle('active', parseInt(step.dataset.step, 10) === currentSellStep);
         });
-        // Logique spécifique à l'affichage d'une étape
         if (currentSellStep === 1) {
             renderStep1CartSummary();
             step1NextBtn.disabled = salesCart.length === 0;
         } else if (currentSellStep === 2) {
-            renderSalesCartForStep2(); // Afficher le panier éditable
+            renderSalesCartForStep2();
             step2NextBtn.disabled = salesCart.length === 0;
         } else if (currentSellStep === 4) {
-            renderSalesSummaryForStep4(); // Afficher le récapitulatif final
+            renderSalesSummaryForStep4();
             validateSaleButtonStep4El.disabled = salesCart.length === 0;
         }
-        sellPageEl.scrollTop = 0; // Scroll to top of the main sell page container
+        sellPageEl.scrollTop = 0;
         const activeStepContent = sellPageEl.querySelector(`.sell-step[data-step="${currentSellStep}"] .sell-step-content`);
-        if(activeStepContent) activeStepContent.scrollTop = 0; // Scroll to top of step content
-
+        if(activeStepContent) activeStepContent.scrollTop = 0;
     }
 
     sellPageEl.addEventListener('click', function(e) {
@@ -1244,8 +1234,6 @@
         }
     });
 
-
-    // --- Authentification et Chargement Initial ---
     auth.onAuthStateChanged(user => {
         if (user) {
             currentUserUID = user.uid;
@@ -1255,7 +1243,7 @@
             userBooksCache = [];
             salesCart = [];
             if (document.getElementById('sell')?.classList.contains('visible')) {
-                resetSellPage(); 
+                resetSellPage();
             }
         }
     });
@@ -1273,16 +1261,15 @@
         }
     }
 
-    // --- Étape 1: Fonctions de Sélection de Livres ---
     searchInputSellEl.addEventListener('input', filterAndRenderBookResults);
 
     function filterAndRenderBookResults() {
         const searchTerm = searchInputSellEl.value.trim().toLowerCase();
-        if (!searchTerm && userBooksCache.length > 0) { 
+        if (!searchTerm && userBooksCache.length > 0) {
             searchResultsContainerEl.innerHTML = '<p class="no-results">Entrez un terme pour rechercher dans votre stock.</p>';
             return;
         }
-        if (!userBooksCache.length && !searchTerm){ 
+        if (!userBooksCache.length && !searchTerm){
             searchResultsContainerEl.innerHTML = '<p class="no-results">Votre stock est vide ou non chargé. Commencez par rechercher.</p>';
             return;
         }
@@ -1316,7 +1303,7 @@
             `;
             const addButton = card.querySelector('.btn-add-to-sell-cart');
             addButton.addEventListener('click', () => {
-                if (!salesCart.some(item => item.bookId === book.id)) { 
+                if (!salesCart.some(item => item.bookId === book.id)) {
                     addBookToSalesCart(book, addButton);
                 } else {
                     showFeedback(`"${book.title}" est déjà dans le panier.`, false, 1500);
@@ -1342,7 +1329,8 @@
             quantity: 1,
             unitPrice: book.price || 0,
             stock: book.quantity,
-            suggestedPrice: book.price || 0
+            suggestedPrice: book.price || 0,
+            unitCost: book.lastPurchasePrice || 0
         });
 
         if (buttonElement) {
@@ -1364,7 +1352,6 @@
         }
     }
 
-    // --- Étape 2: Fonctions de Gestion du Panier ---
     function renderSalesCartForStep2() {
         cartItemsListStep2El.innerHTML = '';
         if (salesCart.length === 0) {
@@ -1387,21 +1374,18 @@
                 const quantityInput = listItem.querySelector('.quantity');
                 const priceInput = listItem.querySelector('.price');
 
-                // Pour le champ QUANTITÉ: Sélectionner le contenu au focus pour remplacement facile
                 quantityInput.addEventListener('focus', (e) => {
                     e.target.select();
                 });
 
-                // Pour le champ PRIX:
                 priceInput.addEventListener('focus', (e) => {
                     if (e.target.value === '0') {
-                        e.target.value = ''; // Effacer si c'est "0"
+                        e.target.value = '';
                     } else {
-                        e.target.select(); // Sinon, sélectionner pour remplacement facile
+                        e.target.select();
                     }
                 });
 
-                // Écouteurs pour la mise à jour des données
                 quantityInput.addEventListener('input', (e) => {
                     updateCartItemQuantity(index, parseInt(e.target.value));
                 });
@@ -1428,26 +1412,25 @@
             validatedQuantity = item.stock;
             showFeedback(`Stock maximum pour "${item.title}" est ${item.stock}.`, true, 2000);
         }
-        
+
         const quantityInputEl = cartItemsListStep2El.querySelector(`input.quantity[data-index="${index}"]`);
-        // Vérifier si une mise à jour est réellement nécessaire pour éviter des opérations DOM inutiles
         if (item.quantity === validatedQuantity && quantityInputEl && parseInt(quantityInputEl.value) === validatedQuantity) {
-            return; 
+            return;
         }
 
         item.quantity = validatedQuantity;
 
         if (quantityInputEl && parseInt(quantityInputEl.value) !== validatedQuantity) {
-             quantityInputEl.value = validatedQuantity; 
+             quantityInputEl.value = validatedQuantity;
         }
-        
+
         const subtotalEl = cartItemsListStep2El.querySelector(`span.subtotal[data-index="${index}"]`);
         if (subtotalEl) {
             subtotalEl.textContent = (item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
         }
 
-        updateCartSummaryForStep2(); 
-        renderStep1CartSummary();   
+        updateCartSummaryForStep2();
+        renderStep1CartSummary();
     }
 
     function updateCartItemPrice(index, newPriceFromInput) {
@@ -1459,31 +1442,20 @@
         if (isNaN(validatedPrice) || validatedPrice < 0) {
             validatedPrice = 0;
         }
-        
+
         const priceInputEl = cartItemsListStep2El.querySelector(`input.price[data-index="${index}"]`);
-        // Vérifier si une mise à jour est réellement nécessaire
         if (item.unitPrice === validatedPrice && priceInputEl && parseFloat(priceInputEl.value) === validatedPrice) {
-            // Pour les flottants, une comparaison exacte peut être délicate: Math.abs(item.unitPrice - validatedPrice) < EPSILON
-            // Mais ici, avec toFixed(0) et step 50, la comparaison directe est souvent suffisante.
-            return; 
+            return;
         }
 
         item.unitPrice = validatedPrice;
-        
-        // Si l'input contenait qqch qui n'est pas un nombre (ex: "abc", parseFloat donne NaN, validatedPrice devient 0)
-        // ou si l'input était un nombre invalide (ex: négatif), on le corrige.
+
         if (priceInputEl) {
             const currentInputValue = parseFloat(priceInputEl.value);
             if (isNaN(currentInputValue) || currentInputValue < 0 || currentInputValue.toFixed(0) !== validatedPrice.toFixed(0) ) {
-                // On ne met à jour l'input que s'il est invalide ou si la valeur validée est différente
-                // pour ne pas perturber la saisie en cours (ex: 15 vs 150)
-                // Si l'utilisateur efface le champ, parseFloat(e.target.value) sera NaN, et validatedPrice 0.
-                // Il est souhaitable de mettre à jour l'input à '0' dans ce cas.
                 if (isNaN(currentInputValue) || currentInputValue < 0) {
                     priceInputEl.value = validatedPrice.toFixed(0);
                 }
-                // Si on veut que le formatage toFixed(0) se fasse toujours, même pour 150 -> 150:
-                // priceInputEl.value = validatedPrice.toFixed(0); 
             }
         }
 
@@ -1491,7 +1463,7 @@
         if (subtotalEl) {
             subtotalEl.textContent = (item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
         }
-        
+
         updateCartSummaryForStep2();
         renderStep1CartSummary();
     }
@@ -1502,11 +1474,10 @@
 
         salesCart.splice(index, 1);
         if (item) showFeedback(`"${item.title}" retiré du panier.`, false, 1500);
-        
-        renderSalesCartForStep2(); // OK ici, la perte de focus n'est pas un enjeu pour une suppression.
-                                        // Et la gestion des index DOM est simplifiée.
-        
-        step1NextBtn.disabled = salesCart.length === 0; 
+
+        renderSalesCartForStep2();
+
+        step1NextBtn.disabled = salesCart.length === 0;
         const searchResultButton = searchResultsContainerEl.querySelector(`.btn-add-to-sell-cart[data-book-id="${item.bookId}"]`);
         if (searchResultButton) {
             searchResultButton.classList.remove('added');
@@ -1528,12 +1499,10 @@
 
     clearCartStep2Btn.addEventListener('click', () => {
         if (salesCart.length > 0) {
-            // Remplacer window.confirm par une modale custom si possible
-            // Pour l'instant, on vide sans confirmation pour éviter le blocage de `confirm`
             salesCart = [];
-            renderSalesCartForStep2(); // OK ici.
+            renderSalesCartForStep2();
             showFeedback("Panier de vente vidé.", false, 1500);
-            step1NextBtn.disabled = true; 
+            step1NextBtn.disabled = true;
             searchResultsContainerEl.querySelectorAll('.btn-add-to-sell-cart.added').forEach(btn => {
                 btn.classList.remove('added');
                 btn.innerHTML = '<i class="bi bi-plus-circle-fill"></i>';
@@ -1542,8 +1511,6 @@
         }
     });
 
-
-    // --- Étape 4: Fonctions de Récapitulatif et Validation ---
     function renderSalesSummaryForStep4() {
         const customerName = customerNameInputEl.value.trim() || "N/A";
         const customerPhone = customerPhoneInputEl.value.trim() || "N/A";
@@ -1588,50 +1555,63 @@
         const batch = db.batch();
         const salesDataItems = [];
         let grandTotalSaleAmount = 0;
+        let totalCostOfGoodsSoldSale = 0;
         const customerName = customerNameInputEl.value.trim();
         const customerPhone = customerPhoneInputEl.value.trim();
 
         for (const item of salesCart) {
             const bookRef = db.collection('users').doc(currentUserUID).collection('books').doc(item.bookId);
-             if (item.quantity > item.stock) { 
+             if (item.quantity > item.stock) {
                 showFeedback(`Stock insuffisant pour "${item.title}" (${item.quantity} demandé(s), ${item.stock} en stock). Vente annulée. Mettez à jour le panier.`, true, 5000);
                 validateSaleButtonStep4El.disabled = false;
                 validateSaleButtonStep4El.innerHTML = '<i class="bi bi-check-circle-fill"></i> Valider la Vente';
-                showSellStep(2); 
+                showSellStep(2);
                 return;
             }
             batch.update(bookRef, { quantity: firebase.firestore.FieldValue.increment(-item.quantity) });
+
+            const itemUnitCost = item.unitCost || 0;
+            const itemLineTotal = item.quantity * item.unitPrice;
+            const itemLineCogs = item.quantity * itemUnitCost;
+            const itemLineProfit = itemLineTotal - itemLineCogs;
+
             salesDataItems.push({
-                bookId: item.bookId, title: item.title, quantitySold: item.quantity,
-                unitPriceSold: item.unitPrice, lineTotal: item.quantity * item.unitPrice
+                bookId: item.bookId,
+                title: item.title,
+                quantitySold: item.quantity,
+                unitPriceSold: item.unitPrice,
+                unitCostAtTimeOfSale: itemUnitCost,
+                lineTotal: itemLineTotal,
+                lineProfit: itemLineProfit
             });
-            grandTotalSaleAmount += item.quantity * item.unitPrice;
+            grandTotalSaleAmount += itemLineTotal;
+            totalCostOfGoodsSoldSale += itemLineCogs;
         }
 
+        const totalProfitSale = grandTotalSaleAmount - totalCostOfGoodsSoldSale;
         const saleRef = db.collection('users').doc(currentUserUID).collection('sales').doc();
         batch.set(saleRef, {
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            customerName: customerName || "N/A", customerPhone: customerPhone || "N/A",
-            items: salesDataItems, grandTotalAmount: grandTotalSaleAmount,
-            totalItemsSold: salesCart.reduce((sum, item) => sum + item.quantity, 0)
+            customerName: customerName || "N/A",
+            customerPhone: customerPhone || "N/A",
+            items: salesDataItems,
+            grandTotalAmount: grandTotalSaleAmount,
+            totalItemsSold: salesCart.reduce((sum, item) => sum + item.quantity, 0),
+            totalCostOfGoodsSold: totalCostOfGoodsSoldSale,
+            totalProfit: totalProfitSale
         });
 
         try {
             await batch.commit();
             showFeedback("Vente enregistrée avec succès !", false, 3000);
-            // resetSellPage(); // Est appelé par l'observer ou après fermeture
-            loadUserBooks(); 
+            loadUserBooks();
             const closeBtn = sellPageEl.querySelector('.btn-close-sell');
             if (closeBtn) {
-                // Simuler un clic pour que le routeur global gère la navigation vers "home"
-                // et que l'observer sur #sell fasse le reset.
                 closeBtn.click();
-            } else { // Fallback si le bouton n'est pas trouvé pour une raison quelconque
+            } else {
                 resetSellPage();
                 location.hash = "home";
             }
-
-
         } catch (error) {
             console.error("Erreur lors de la validation de la vente:", error);
             showFeedback("Erreur: " + error.message + ". Veuillez réessayer.", true, 5000);
@@ -1640,21 +1620,19 @@
         }
     });
 
-    // --- Fonctions Générales et Réinitialisation ---
     function resetSellPage() {
         salesCart = [];
         searchInputSellEl.value = '';
         customerNameInputEl.value = '';
         customerPhoneInputEl.value = '';
         searchResultsContainerEl.innerHTML = '<p class="no-results">Commencez par rechercher un livre.</p>';
-        showSellStep(1); 
+        showSellStep(1);
         renderStep1CartSummary();
-        renderSalesCartForStep2(); 
-        renderSalesSummaryForStep4(); 
+        renderSalesCartForStep2();
+        renderSalesSummaryForStep4();
         step1NextBtn.disabled = true;
         step2NextBtn.disabled = true;
         validateSaleButtonStep4El.disabled = true;
-        // Le feedback message est géré par son propre timeout
     }
 
     let feedbackTimeout;
@@ -1662,25 +1640,24 @@
         clearTimeout(feedbackTimeout);
         feedbackMessageEl.textContent = message;
         feedbackMessageEl.className = isError ? 'error' : 'success';
-        feedbackMessageEl.style.display = 'block'; // Assurez-vous qu'il est visible
+        feedbackMessageEl.style.display = 'block';
         feedbackTimeout = setTimeout(() => {
             feedbackMessageEl.textContent = '';
             feedbackMessageEl.className = '';
-            feedbackMessageEl.style.display = 'none'; // Cachez-le après le délai
+            feedbackMessageEl.style.display = 'none';
         }, duration);
     }
 
-    // Observer pour réinitialiser la page si elle devient visible (géré par routeur)
     const sellPageObserver = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
             if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                 if (sellPageEl.classList.contains('visible')) {
                     if (currentUserUID && userBooksCache.length === 0) {
-                         loadUserBooks(); 
+                         loadUserBooks();
                     }
-                    resetSellPage(); 
+                    resetSellPage();
                 } else {
-                    clearTimeout(feedbackTimeout); 
+                    clearTimeout(feedbackTimeout);
                     feedbackMessageEl.textContent = '';
                     feedbackMessageEl.className = '';
                     feedbackMessageEl.style.display = 'none';
@@ -1690,8 +1667,8 @@
     });
     sellPageObserver.observe(sellPageEl, { attributes: true });
 
-  })();
-  </script>
+})();
+</script>
 </main>
 
 <main id="supply" class="page">
