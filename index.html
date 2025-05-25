@@ -991,7 +991,7 @@
       Installer l’application
     </button>
   </main>
- 
+
 <main id="sell" class="page">
   <style>
     .sell-step {
@@ -1060,18 +1060,18 @@
     top: 0; 
     z-index: 14; 
     display: flex;         
-    align-items: center;      
+    align-items: center;     
     justify-content: space-between; 
   }
   .sell-step h3.step-title #btn-clear-sell-cart-step2 {
     background: none;         
     border: none;             
     padding: 0.25rem;         
-    margin: 0;                
-    cursor: pointer;          
-    font-size: 1.3rem;        
-    line-height: 1;           
-    color: var(--ebay-red);   
+    margin: 0;               
+    cursor: pointer;         
+    font-size: 1.3rem;       
+    line-height: 1;          
+    color: var(--ebay-red);  
   }
   .sell-step h3.step-title #btn-clear-sell-cart-step2 i {
     color: inherit; 
@@ -1157,27 +1157,82 @@
         font-size: 0.9rem;
         color: var(--secondary-text);
     }
+
+    /* Styles pour la liste des articles dans le panier (Étape 2) - MODIFIÉS */
     #sell-cart-items-list-step2 .sell-cart-item {
-      display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 0;
+      display: flex;
+      flex-direction: column; /* Titre au-dessus, puis contrôles, puis sous-total */
+      gap: 0.75rem; /* Espace entre les sections de l'item */
+      padding: 1rem 0.5rem; /* Padding vertical et un peu horizontal pour l'item */
       border-bottom: 1px solid #f0f0f0;
+      background-color: #fff; /* Fond blanc pour chaque item */
+      border-radius: var(--border-radius-card); /* Coins arrondis pour chaque item */
+      margin-bottom: 0.75rem; /* Espace entre les items */
+      border: 1px solid var(--border-color); /* Bordure légère */
+      box-shadow: none; /* Pas d'ombre */
     }
-    #sell-cart-items-list-step2 .sell-cart-item:last-child { border-bottom: none; }
+    #sell-cart-items-list-step2 .sell-cart-item:last-child {
+      border-bottom: 1px solid var(--border-color); /* Assurer que le dernier a aussi une bordure en bas */
+    }
     #sell-cart-items-list-step2 .sell-cart-item .title {
-      flex-grow: 1; font-size: 0.95rem; font-weight: 500;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 80px;
+      font-weight: 600; /* Titre plus en évidence */
+      font-size: 1.05rem;
+      color: var(--primary-text);
+      width: 100%; /* Pleine largeur */
+      margin-bottom: 0.25rem; /* Petit espace sous le titre */
+      white-space: normal; /* Permettre le retour à la ligne pour les titres longs */
+      overflow: visible;
+      text-overflow: clip;
     }
-    #sell-cart-items-list-step2 .sell-cart-item input[type="number"] {
-      width: 60px; padding: 0.4rem; font-size: 0.9rem; text-align: center;
-      border: 1px solid var(--border-color); border-radius: 0.25rem; box-shadow: none;
+    .sell-cart-item-controls { /* Nouveau conteneur pour inputs et bouton supprimer */
+      display: flex;
+      align-items: center;
+      gap: 0.75rem; /* Espace entre les inputs et le bouton */
+      width: 100%;
     }
-    #sell-cart-items-list-step2 .sell-cart-item input.price { width: 80px; }
-    #sell-cart-items-list-step2 .sell-cart-item .subtotal {
-      font-size: 0.9rem; font-weight: 500; min-width: 70px; text-align: right;
+    #sell-cart-items-list-step2 .sell-cart-item input[type="number"].quantity,
+    #sell-cart-items-list-step2 .sell-cart-item input[type="number"].price {
+      flex: 1 1 0; /* Permet aux inputs de grandir et partager l'espace */
+      padding: 0.7rem 0.6rem; /* Inputs plus longs/hauts */
+      font-size: 1rem; /* Taille de police pour les inputs */
+      text-align: center;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-card); /* Coins arrondis pour inputs */
+      box-shadow: none;
+      min-width: 70px; /* Largeur minimale pour éviter qu'ils soient trop petits */
     }
     #sell-cart-items-list-step2 .sell-cart-item .remove-item-btn {
-      background: none; border: none; color: var(--ebay-red); font-size: 1.3rem;
-      cursor: pointer; padding: 0.25rem;
+      background: none;
+      border: none;
+      color: var(--ebay-red);
+      font-size: 1.5rem; /* Icône de suppression un peu plus grande */
+      cursor: pointer;
+      padding: 0.4rem; /* Zone de clic un peu plus grande */
+      flex-shrink: 0; /* Empêcher le bouton de rétrécir */
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+     .sell-cart-item-subtotal-wrapper { /* Nouveau conteneur pour le sous-total */
+      display: flex;
+      justify-content: flex-end; /* Aligner le sous-total à droite */
+      margin-top: 0.5rem; /* Espace au-dessus du sous-total */
+      width: 100%;
+    }
+    #sell-cart-items-list-step2 .sell-cart-item .subtotal {
+      font-size: 1rem; /* Taille de police pour le sous-total */
+      font-weight: 600;
+      color: var(--ebay-blue); /* Couleur distinctive pour le sous-total */
+      padding: 0.6rem 1rem; /* Padding pour l'effet "encerclé" */
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-pill); /* Coins bien arrondis */
+      background-color: #f8f8f8; /* Fond léger pour le sous-total */
+      min-width: 100px; /* Largeur minimale */
+      text-align: right;
+      box-shadow: none;
+    }
+    /* Fin des styles modifiés pour Étape 2 */
+
     #sell-cart-empty-message-step2 {
       color: var(--secondary-text); font-style: italic; text-align: center; padding: 1rem;
     }
@@ -1189,6 +1244,7 @@
     }
     .cart-summary-section-step2 .summary-line.total span { font-weight: bold; font-size: 1.15rem; }
     .cart-summary-section-step2 .summary-line.total span:last-child { color: var(--ebay-green); }
+
     .form-group-sell { margin-bottom: 1rem; }
     .form-group-sell label {
       display: block; font-size: 0.9rem; color: var(--secondary-text); margin-bottom: 0.25rem;
@@ -1199,6 +1255,7 @@
       box-shadow: none; outline: none;
     }
     .form-group-sell input:focus { border-color: var(--accent); }
+
     #sell-summary-customer-info-step4, #sell-summary-items-list-step4, #sell-summary-totals-step4 {
         margin-bottom: 1.5rem;
     }
@@ -1262,8 +1319,7 @@
             <i class="bi bi-cart-x-fill" style="color:var(--ebay-red);"></i>
         </button>
     </h3>
-    <div class="sell-step-content">
-        <div id="sell-cart-items-list-step2">
+    <div class="sell-step-content"> <div id="sell-cart-items-list-step2">
             </div>
         <div id="sell-cart-empty-message-step2" style="text-align: center; padding: 1rem; color: var(--secondary-text);">
             Le panier de vente est vide.
@@ -1529,10 +1585,14 @@
                 listItem.setAttribute('data-index', index);
                 listItem.innerHTML = `
                     <span class="title" title="${item.title}">${item.title}</span>
-                    <input type="number" class="quantity" value="${item.quantity}" min="1" max="${item.stock}" data-index="${index}" aria-label="Quantité pour ${item.title}">
-                    <input type="number" class="price" value="${item.unitPrice.toFixed(0)}" step="50" min="0" data-index="${index}" aria-label="Prix de vente pour ${item.title}">
-                    <span class="subtotal" data-index="${index}">${(item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0})}</span>
-                    <button class="remove-item-btn" data-index="${index}" aria-label="Supprimer ${item.title}"><i class="bi bi-trash-fill"></i></button>
+                    <div class="sell-cart-item-controls">
+                        <input type="number" class="quantity" value="${item.quantity}" min="1" max="${item.stock}" data-index="${index}" aria-label="Quantité pour ${item.title}">
+                        <input type="number" class="price" value="${item.unitPrice.toFixed(0)}" step="50" min="0" data-index="${index}" aria-label="Prix de vente pour ${item.title}">
+                        <button class="remove-item-btn" data-index="${index}" aria-label="Supprimer ${item.title}"><i class="bi bi-trash-fill"></i></button>
+                    </div>
+                    <div class="sell-cart-item-subtotal-wrapper">
+                        <span class="subtotal" data-index="${index}">${(item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0})}</span>
+                    </div>
                 `;
                 const quantityInput = listItem.querySelector('.quantity');
                 const priceInput = listItem.querySelector('.price');
@@ -1562,7 +1622,8 @@
         if (item.quantity === validatedQuantity && quantityInputEl && parseInt(quantityInputEl.value) === validatedQuantity) return;
         item.quantity = validatedQuantity;
         if (quantityInputEl && parseInt(quantityInputEl.value) !== validatedQuantity) quantityInputEl.value = validatedQuantity;
-        const subtotalEl = cartItemsListStep2El.querySelector(`span.subtotal[data-index="${index}"]`);
+        
+        const subtotalEl = cartItemsListStep2El.querySelector(`.sell-cart-item[data-index="${index}"] span.subtotal`);
         if (subtotalEl) subtotalEl.textContent = (item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
         updateCartSummaryForStep2();
         renderStep1CartSummary();
@@ -1582,7 +1643,7 @@
                 if (isNaN(currentInputValue) || currentInputValue < 0) priceInputEl.value = validatedPrice.toFixed(0);
             }
         }
-        const subtotalEl = cartItemsListStep2El.querySelector(`span.subtotal[data-index="${index}"]`);
+        const subtotalEl = cartItemsListStep2El.querySelector(`.sell-cart-item[data-index="${index}"] span.subtotal`);
         if (subtotalEl) subtotalEl.textContent = (item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
         updateCartSummaryForStep2();
         renderStep1CartSummary();
@@ -1908,9 +1969,9 @@
   </style>
 
   <header id="supply-header" style="padding: 1rem;"> <button class="btn-page-back" data-hash="home" aria-label="Retour à l'accueil">
-          <i class="bi bi-arrow-left"></i>
-      </button>
-      <h2>Approvisionnement</h2>
+        <i class="bi bi-arrow-left"></i>
+    </button>
+    <h2>Approvisionnement</h2>
   </header>
   <div id="supply-list" class="books-list">
     </div>
@@ -2213,7 +2274,7 @@
         >
         </div>
         <div class="cost-allocation-list">
-        </div>
+          </div>
     </div>
     <div class="wizard-nav">
       <button class="btn secondary" data-prev>← Précédent</button>
@@ -4213,9 +4274,9 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
 </main>
 <main id="reports" class="page">
   <header id="reports-header" style="padding: 1rem;"> <button class="btn-page-back" data-hash="home" aria-label="Retour à l'accueil">
-          <i class="bi bi-arrow-left"></i>
-      </button>
-      <h2>Rapports & Analyses</h2>
+        <i class="bi bi-arrow-left"></i>
+    </button>
+    <h2>Rapports & Analyses</h2>
   </header>
   <div class="reports-active-filter-summary-bar">
     <span id="active-filters-display">Période: 30 derniers jours</span>
@@ -4427,7 +4488,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
                 const storedEnd = dateEndInputEl.value;
                 if (storedStart && storedEnd) {
                     startDate = new Date(storedStart + 'T00:00:00'); // Assurer l'interprétation locale
-                    endDate = new Date(storedEnd + 'T23:59:59');   // Assurer l'interprétation locale
+                    endDate = new Date(storedEnd + 'T23:59:59');    // Assurer l'interprétation locale
                     if (startDate > endDate) { // Si la date de début est après la date de fin
                         endDate = new Date(startDate); // Mettre la date de fin égale à la date de début
                         endDate.setHours(23,59,59,999);
@@ -4855,8 +4916,8 @@ window.addEventListener('appinstalled', () => {
       // Pages sans la navigation principale
       const pagesWithoutNav = [
         'activation',
-        'sell',        // Processus de vente (pas de nav principale, a son propre "X")
-        'supply',      // Liste des approvisionnements (pas de nav principale, aura un bouton retour)
+        'sell',       // Processus de vente (pas de nav principale, a son propre "X")
+        'supply',     // Liste des approvisionnements (pas de nav principale, aura un bouton retour)
         'new-supply',  // Processus d'approvisionnement (pas de nav principale, a sa propre navigation)
         'select-book', // Sélection de livre (pas de nav principale, a son propre "X")
         'orders',      // Commandes (pas de nav principale, aura un bouton retour)
