@@ -7,9 +7,9 @@
   <title>BookShop</title>
 
   <link rel="manifest" href="manifest.json">
-<meta name="mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <style>
-    body { visibility: hidden; }
+    body { visibility: hidden; } /* Initialement caché pour éviter FOUC */
   </style>
 
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -37,10 +37,12 @@
 
     // 1) Initialise l’app et Auth UNE SEULE FOIS
     firebase.initializeApp(firebaseConfig);
+    firebase.firestore().settings({ ignoreUndefinedProperties: true }); // Bonne pratique
 
     // 2) Dès que l’état d’auth est connu…
     const auth    = firebase.auth();
-    const fn      = firebase.functions();
+    const fn      = firebase.functions(); // Si vous utilisez des fonctions Firebase (ex: Europe-west1)
+    // const fn = firebase.app().functions('europe-west1'); // Exemple pour une région spécifique
     const db = firebase.firestore();
 
     // fonction callable pour vérifier le code
@@ -95,20 +97,7 @@
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
       display:flex;flex-direction:column;
-      height:100vh;height:100dvh;
-    }
-
-    /* PAGE MANAGEMENT */
-    .page {
-      display: none;            /* cachée par défaut */
-      flex: 1 1 auto;           /* grandit pour remplir l’espace */
-      width: 100%;                /* occupe toute la largeur */
-      overflow-y: auto;           /* scroll interne si besoin */
-    }
-
-    .page.visible {
-      display: flex;            /* devient un flex-container vertical */
-      flex-direction: column;
+      height:100vh;height:100dvh; /* dvh pour une meilleure gestion du viewport sur mobile */
     }
 
     /* COMMON STYLES */
@@ -164,6 +153,8 @@
       outline:none;
     }
     .btn-primary:active{background:#014fa5}
+    .btn-primary:disabled{background:#ccc; cursor:not-allowed;}
+
 
     .trending{padding:0 1rem 5.5rem}
     .trending h3{font-size:1.35rem;margin-bottom:0.75rem}
@@ -189,9 +180,9 @@
     /* NAVIGATION BAR */
     nav{
       position:fixed;bottom:0;left:0;width:100%;background:#fff;
-      border-top:1px solid var(--border-color);z-index:30
+      border-top:1px solid var(--border-color);z-index:300; /* Augmenté pour être au-dessus des modales potentielles si mal gérées */
     }
-    .nav-inner{display:flex;justify-content:space-evenly;align-items:center;padding:0.4rem 0}
+    .nav-inner{display:flex;justify-content:space-evenly;align-items:center;padding:0.4rem 0 env(safe-area-inset-bottom) 0;}
     .nav-link{
       flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
       font-size:0.8rem;color:var(--secondary-text);outline:none;user-select:none;
@@ -226,9 +217,8 @@
     .btn-sell{background:var(--ebay-green)}
     .btn-buy {background:var(--ebay-blue)}
 
-    /* New button style for Reports on Home page */
     .btn-reports-card {
-        flex: 1 1 100%; /* Full width on small screens */
+        flex: 1 1 100%; 
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -236,27 +226,26 @@
         gap: 0.5rem;
         padding: 1.25rem 1rem;
         border: 1px solid var(--border-color);
-        border-radius: var(--border-radius-card); /* Card-like radius */
+        border-radius: var(--border-radius-card); 
         font-size: 1.1rem;
         font-weight: 500;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
-        background: #fff; /* White background */
-        color: var(--primary-text); /* Primary text color */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+        background: #fff; 
+        color: var(--primary-text); 
         cursor: pointer;
         transition: transform 0.1s ease, box-shadow 0.2s ease;
         text-decoration: none;
-        margin-top: 0.5rem; /* Space above if it wraps */
+        margin-top: 0.5rem; 
     }
     .btn-reports-card i {
-        font-size: 1.8rem; /* Larger icon */
-        color: var(--accent); /* Accent color for icon */
+        font-size: 1.8rem; 
+        color: var(--accent); 
         margin-bottom: 0.25rem;
     }
     .btn-reports-card:active {
         transform: translateY(1px);
         box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
-
 
     /* === Stock info card === */
     .stock-card{
@@ -271,39 +260,34 @@
     /* ---------- Info cards sans ombre, avec cadre ---------- */
     .info-cards {
       display: flex;
-      gap: 0.75rem; /* Espace ajusté */
-      padding: 0.75rem 1rem; /* Padding ajusté */
-      margin-bottom: 1rem; /* Espace avant la liste des livres */
+      gap: 0.75rem; 
+      padding: 0.75rem 1rem; 
+      margin-bottom: 1rem; 
       overflow-x: auto;
       transition: opacity 0.3s ease, max-height 0.3s ease, margin-bottom 0.3s ease, padding 0.3s ease;
       max-height: 200px;
-      /* overflow: hidden; REMOVED - Let it scroll if content is too wide */
     }
-
     .info-card {
       flex: 1;
       background: #fff;
       border: 1px solid var(--border-color);
       border-radius: var(--border-radius-card);
-      padding: 0.75rem; /* Padding interne ajusté */
+      padding: 0.75rem; 
       text-align: center;
-      min-width: 120px; /* Added min-width to prevent squishing */
+      min-width: 120px; 
       box-shadow: none; 
     }
-
     .info-number {
-      font-size: 1.3rem; /* Taille de police ajustée */
+      font-size: 1.3rem; 
       font-weight: 600;
       color: var(--ebay-blue);
       line-height: 1.2;
     }
-
     .info-label {
-      font-size: 0.8rem; /* Légende ajustée */
+      font-size: 0.8rem; 
       color: var(--secondary-text);
-      margin-top: 0.25rem; /* Marge ajustée */
+      margin-top: 0.25rem; 
     }
-
     .info-cards.fade-out {
       opacity: 0;
       max-height: 0;
@@ -318,8 +302,7 @@
       padding: 0; 
       margin: 0;
     }
-
-    main#catalog > header { /* Header de la page catalogue (avec la recherche) */
+    main#catalog > header { 
       padding-top: 0.5rem;
       padding-bottom: 0.5rem; 
       position: -webkit-sticky; 
@@ -329,20 +312,15 @@
       background-color: #fff; 
       border-bottom: 1px solid var(--border-color); 
     }
-
     main#catalog .search-wrapper {
       margin-top: 0; 
     }
-    
-    /* Liste des livres dans le catalogue */
     #catalog-results-main .books-list {
       display: flex;
       flex-direction: column;
       gap: 1rem; 
       padding: 1rem; 
     }
-
-    /* === Nouvelle Carte Livre pour le Catalogue (MODIFIED) === */
     .book-card-catalog {
       display: flex;
       gap: 1rem;
@@ -350,63 +328,54 @@
       border: 1px solid var(--border-color);
       border-radius: var(--border-radius-card);
       padding: 1rem;
-      /* box-shadow: 0 1px 3px rgba(0,0,0,0.05); MODIFIED: Removed shadow */
-      /* transition: box-shadow 0.2s ease-in-out; MODIFIED: Removed transition for shadow */
     }
-    /* .book-card-catalog:hover { MODIFIED: Removed hover effect
-        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-    } */
-
     .book-card-image-area {
-      flex: 0 0 60px; /* Largeur fixe pour la zone image/icône */
-      height: 80px; /* Hauteur fixe */
+      flex: 0 0 60px; 
+      height: 80px; 
       display: flex;
       align-items: center;
       justify-content: center;
       background-color: #f0f0f0;
       border-radius: calc(var(--border-radius-card) - 0.25rem);
-      overflow: hidden; /* Si jamais on met une vraie image */
+      overflow: hidden; 
     }
     .book-card-image-area .book-placeholder-icon {
-      font-size: 2.5rem; /* Taille de l'icône placeholder */
+      font-size: 2.5rem; 
       color: var(--secondary-text);
     }
-
     .book-card-content-area {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem; /* Espace entre les blocs d'info et les actions */
+      gap: 0.5rem; 
     }
-
     .book-card-main-info .book-title {
-      font-size: 1.15rem; /* Taille du titre */
+      font-size: 1.15rem; 
       font-weight: 600;
       color: var(--primary-text);
       margin-bottom: 0.25rem;
       line-height: 1.3;
     }
-    
     .book-card-main-info p, .book-card-secondary-info p {
       font-size: 0.9rem;
       color: var(--secondary-text);
       margin-bottom: 0.2rem;
-      display: flex; /* Pour aligner icône et texte */
+      display: flex; 
       align-items: center;
-      gap: 0.4rem; /* Espace entre icône et texte */
+      gap: 0.4rem; 
     }
     .book-card-main-info p i, .book-card-secondary-info p i {
-      font-size: 1rem; /* Taille des icônes d'info */
+      font-size: 1rem; 
       color: var(--action-icon-color);
-      min-width: 16px; /* Pour alignement */
+      min-width: 16px; 
       text-align: center;
     }
     .book-card-main-info p span, .book-card-secondary-info p span {
-        font-weight: 500; /* Mettre en valeur le chiffre/texte */
+        font-weight: 500; 
         color: var(--primary-text);
     }
     .book-card-main-info .book-price-sell span {
-        color: var(--ebay-blue); /* Couleur accent pour le prix de vente */
+        color: var(--ebay-blue); 
         font-weight: 600;
     }
     .book-card-main-info .stock-value {
@@ -415,25 +384,22 @@
     .book-card-main-info .stock-value.stock-normal { color: var(--ebay-green); }
     .book-card-main-info .stock-value.stock-low { color: var(--stock-low-color); }
     .book-card-main-info .stock-value.stock-out { color: var(--stock-out-color); }
-
-
     .book-card-actions {
-      margin-top: 0.5rem; /* Espace au-dessus des actions */
-      padding-top: 0.5rem; /* Ligne de séparation visuelle */
+      margin-top: 0.5rem; 
+      padding-top: 0.5rem; 
       border-top: 1px solid #f0f0f0;
       display: flex;
       gap: 0.5rem;
-      justify-content: flex-end; /* Aligner les actions à droite */
+      justify-content: flex-end; 
     }
-
     .btn-action-icon {
       background-color: transparent;
       border: none;
       color: var(--action-icon-color);
       padding: 0.5rem;
-      border-radius: 50%; /* Boutons ronds */
+      border-radius: 50%; 
       cursor: pointer;
-      font-size: 1.1rem; /* Taille de l'icône dans le bouton */
+      font-size: 1.1rem; 
       width: 36px;
       height: 36px;
       display: inline-flex;
@@ -441,27 +407,17 @@
       justify-content: center;
       transition: background-color 0.2s ease, color 0.2s ease;
     }
-    /* .btn-action-icon:hover { MODIFIED: Removed hover effect
-      background-color: var(--action-icon-hover-bg);
-      color: var(--primary-text);
-    } */
-    .btn-action-icon:active { /* MODIFIED: Added active state for touch feedback */
-      background-color: var(--action-icon-hover-bg); /* Using existing variable, can be renamed if a different active style is desired */
+    .btn-action-icon:active { 
+      background-color: var(--action-icon-hover-bg); 
       color: var(--primary-text);
     }
-    /* .btn-action-icon.btn-delete-book:hover { MODIFIED: Removed hover effect
-      background-color: rgba(229, 50, 56, 0.1);
-      color: var(--ebay-red);
-    } */
-    .btn-action-icon.btn-delete-book:active { /* MODIFIED: Added active state for touch feedback */
-      background-color: rgba(229, 50, 56, 0.15); /* Slightly more pronounced for active state */
+    .btn-action-icon.btn-delete-book:active { 
+      background-color: rgba(229, 50, 56, 0.15); 
       color: var(--ebay-red);
     }
-    .btn-action-icon i { /* Pour s'assurer que l'icône est bien centrée */
+    .btn-action-icon i { 
         line-height: 1; 
     }
-
-    /* Squelette de chargement pour le catalogue */
     #catalog-results-main .books-list .skeleton-book-card-catalog {
         display: flex;
         gap: 1rem;
@@ -469,7 +425,7 @@
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius-card);
         padding: 1rem;
-        height: 150px; /* Hauteur approximative de la carte */
+        height: 150px; 
         animation: pulse 1.5s infinite ease-in-out;
     }
       @keyframes pulse {
@@ -494,75 +450,66 @@
       font-weight: 600;
       color: var(--primary-text);
     }
-
-    /* NOUVEAUX STYLES POUR LE FILTRE ET LE RÉSUMÉ DES VENTES */
     #sales-summary-filter-container {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 0.75rem 1rem;
-        background-color: #f8f9fa; /* Un fond léger pour distinguer la zone */
+        background-color: #f8f9fa; 
         border-bottom: 1px solid var(--border-color);
-        gap: 0.75rem; /* Espace entre les éléments */
+        gap: 0.75rem; 
         position: -webkit-sticky;
         position: sticky;
         top: 57px; /* Hauteur approximative du header#sales-header */
-        z-index: 14; /* En dessous du header principal, au-dessus de la liste */
-        flex-wrap: wrap; /* Permet le retour à la ligne sur petits écrans */
+        z-index: 14; 
+        flex-wrap: wrap; 
     }
-
     #sales-summary-chip {
-        font-size: 0.85rem; /* Légèrement plus petit pour mobile */
+        font-size: 0.85rem; 
         font-weight: 500;
         padding: 0.4rem 0.8rem;
         background-color: var(--ebay-blue);
         color: white;
         border-radius: var(--border-radius-pill);
         white-space: nowrap;
-        flex-shrink: 0; /* Empêche le chip de rétrécir excessivement */
+        flex-shrink: 0; 
     }
-
     #sales-date-filter-group {
         display: flex;
         align-items: center;
-        gap: 0.5rem; /* Espace entre le texte de la date et le bouton */
-        flex-grow: 1; /* Permet au groupe de prendre l'espace restant */
-        justify-content: flex-end; /* Aligne à droite */
+        gap: 0.5rem; 
+        flex-grow: 1; 
+        justify-content: flex-end; 
     }
-
     #sales-selected-date-display {
         font-size: 0.85rem;
         color: var(--secondary-text);
         font-weight: 500;
         text-align: right;
     }
-
     #sales-date-filter-btn {
         background-color: #fff;
         border: 1px solid var(--border-color);
         color: var(--primary-text);
         border-radius: 50%;
-        width: 32px; /* Taille ajustée pour mobile */
+        width: 32px; 
         height: 32px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 1rem; /* Taille de l'icône ajustée */
+        font-size: 1rem; 
         cursor: pointer;
         box-shadow: none;
         padding:0;
         flex-shrink: 0;
     }
     #sales-date-filter-btn:active {
-        background-color: #e9ecef; /* Feedback visuel plus subtil */
+        background-color: #e9ecef; 
     }
     #sales-date-filter-btn i {
-        line-height: 1; /* Assure un bon centrage de l'icône */
+        line-height: 1; 
     }
-
-    /* Input date caché, activé par JS */
     #sales-date-picker {
-        /* display: none; -- Géré par JS pour l'accessibilité */
         position: absolute;
         opacity: 0;
         width: 1px;
@@ -574,23 +521,20 @@
         padding: 0;
         margin: -1px;
     }
-    /* FIN NOUVEAUX STYLES */
-
-
-    main#sales .sales-list { /* This is #sales-list */
+    main#sales .sales-list { 
         display: flex;
         flex-direction: column;
-        gap: 1rem; /* Space between cards */
-        padding: 1rem; /* Padding around the entire list */
+        gap: 1rem; 
+        padding: 1rem; 
     }
-    main#sales .skeleton-sale-card { /* Skeleton for sales */
+    main#sales .skeleton-sale-card { 
         background: #f9f9f9;
-        height: 100px; /* Adjusted height */
+        height: 100px; 
         margin: 0;
         border-radius: var(--border-radius-card);
         animation: pulse 1.5s infinite ease-in-out;
     }
-    main#sales .sale-card { /* Individual sale card */
+    main#sales .sale-card { 
         background: #ffffff;
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius-card);
@@ -605,22 +549,22 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        padding: 0; /* Retiré padding-bottom, géré par gap du parent .sale-card */
+        padding: 0; 
         border-bottom: 1px solid #efefef; 
-        padding-bottom: 0.5rem; /* Remis pour la ligne de séparation */
+        padding-bottom: 0.5rem; 
     }
     main#sales .sale-card header .sale-info {
         flex-grow: 1;
         margin-right: 0.75rem;
     }
-    main#sales .sale-card header .sale-info strong { /* Customer Name */
+    main#sales .sale-card header .sale-info strong { 
         font-size: 1.1rem;
         font-weight: 600;
         color: var(--primary-text);
         display: block;
         margin-bottom: 0.2rem;
     }
-    main#sales .sale-card header .sale-info small { /* Date */
+    main#sales .sale-card header .sale-info small { 
         font-size: 0.8rem;
         color: var(--secondary-text);
         display: block;
@@ -629,24 +573,23 @@
         text-align: right;
         flex-shrink: 0;
     }
-    main#sales .sale-card header .sale-meta .sale-total-amount { /* Total XOF */
+    main#sales .sale-card header .sale-meta .sale-total-amount { 
         font-size: 1.05rem;
         font-weight: 700;
         color: var(--ebay-green);
         display: block;
     }
-      main#sales .sale-card header .sale-meta .sale-total-items { /* Total items */
+      main#sales .sale-card header .sale-meta .sale-total-items { 
         font-size: 0.85rem;
         color: var(--secondary-text);
         display: block;
         margin-top: 0.1rem;
     }
-    main#sales .sale-card .sale-items-summary { /* Optional: for a brief summary of items if not expanding */
+    main#sales .sale-card .sale-items-summary { 
         font-size: 0.85rem;
         color: var(--secondary-text);
         padding-top: 0.5rem;
     }
-    /* End Sales History Styles */
 
     /* === Styles pour la page Rapports (main#reports) === */
     main#reports header#reports-header {
@@ -656,7 +599,7 @@
         position: -webkit-sticky;
         position: sticky;
         top: 0;
-        z-index: 15;
+        z-index: 15; /* Z-index pour le header de la page rapports */
     }
     main#reports header#reports-header h2 {
         margin: 0;
@@ -664,89 +607,317 @@
         font-weight: 600;
         color: var(--primary-text);
     }
-    main#reports .reports-content {
-        padding: 1rem;
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
+    .reports-active-filter-summary-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 1rem;
+      background-color: var(--surface);
+      border-bottom: 1px solid var(--border-color);
+      position: -webkit-sticky;
+      position: sticky;
+      top: 57px; /* Hauteur du header#reports-header */
+      z-index: 14; /* En dessous du header principal de la page rapports */
+      font-size: 0.9rem;
+    }
+    #active-filters-display {
+      color: var(--secondary-text);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-right: 0.5rem;
+    }
+    #btn-open-reports-filters {
+      background-color: var(--accent-bg-light, rgba(0,100,210,0.1));
+      color: var(--accent);
+      border: 1px solid var(--accent-border, rgba(0,100,210,0.3));
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--border-radius-pill);
+      font-weight: 500;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    #btn-open-reports-filters i { font-size: 1rem; }
+    .reports-content-scrollable {
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
     .kpi-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
     }
     .kpi-card {
-        background-color: #fff;
+        background-color: var(--surface);
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius-card);
-        padding: 1rem;
-        text-align: center;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        padding: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.2rem;
+        box-shadow: none;
     }
+    .kpi-card .kpi-icon {
+      font-size: 1.3rem;
+      color: var(--accent);
+      margin-bottom: 0.2rem;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0,100,210,0.1);
+    }
+    .kpi-card .kpi-icon.revenue { color: var(--chart-sales-color); background-color: rgba(0,123,255,0.08); }
+    .kpi-card .kpi-icon.cogs { color: var(--chart-cogs-color); background-color: rgba(255,193,7,0.08); }
+    .kpi-card .kpi-icon.profit { color: var(--chart-profit-color); background-color: rgba(40,167,69,0.08); }
+    .kpi-card .kpi-icon.sales-count { color: var(--ebay-green); background-color: rgba(134,184,23,0.08); }
+    .kpi-card .kpi-icon.items-sold { color: var(--ebay-blue); background-color: rgba(0,100,210,0.08); }
+    .kpi-card .kpi-icon.profit-margin { color: var(--ebay-yellow); background-color: rgba(245,175,2,0.08); }
     .kpi-card .kpi-value {
-        font-size: 1.75rem;
+        font-size: 1.4rem;
         font-weight: 600;
-        color: var(--accent);
-        margin-bottom: 0.25rem;
+        color: var(--primary-text);
         line-height: 1.2;
     }
     .kpi-card .kpi-value.profit { color: var(--chart-profit-color); }
     .kpi-card .kpi-value.revenue { color: var(--chart-sales-color); }
     .kpi-card .kpi-value.cogs { color: var(--chart-cogs-color); }
-
     .kpi-card .kpi-label {
-        font-size: 0.9rem;
+        font-size: 0.75rem;
         color: var(--secondary-text);
     }
-    .chart-container {
-        background-color: #fff;
-        border: 1px solid var(--border-color);
-        border-radius: var(--border-radius-card);
-        padding: 1rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    .report-type-placeholder {
+      padding: 1.5rem; text-align: center; color: var(--secondary-text);
+      border: 2px dashed var(--border-color); border-radius: var(--border-radius-card);
+      margin: 0.75rem; font-size: 0.9rem;
     }
-    .chart-container h3 {
-        font-size: 1.1rem;
-        font-weight: 500;
-        margin-bottom: 1rem;
-        text-align: center;
-    }
-    .chart-loading-message, .chart-error-message, .chart-no-data-message {
-        text-align: center;
-        padding: 2rem;
-        color: var(--secondary-text);
-        font-style: italic;
-    }
-    .chart-error-message { color: var(--ebay-red); }
 
-    .date-filter-reports {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        margin-bottom: 0.5rem; /* Space below filter if chart title is separate */
-        padding: 0.5rem;
-        background-color: #f8f9fa;
+    /* Styles pour le tiroir de filtres (Reports Filter Drawer) */
+    .drawer-overlay {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.3);
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.3s ease-out, visibility 0s 0.3s linear;
+      z-index: 200; /* Au-dessus de la nav principale */
+    }
+    .drawer-overlay.visible {
+      opacity: 1; visibility: visible;
+      transition-delay: 0s;
+    }
+    .report-filter-drawer {
+      position: fixed; bottom: 0; left: 0;
+      width: 100%; max-height: 85vh;
+      background-color: var(--surface);
+      border-top-left-radius: 16px; border-top-right-radius: 16px;
+      box-shadow: 0 -3px 15px rgba(0,0,0,0.15);
+      transform: translateY(100%);
+      transition: transform 0.3s ease-out;
+      z-index: 210; /* Au-dessus de l'overlay */
+      display: flex; flex-direction: column;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .report-filter-drawer.visible { transform: translateY(0%); }
+    .report-filter-drawer .drawer-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);
+    }
+    .report-filter-drawer .drawer-header h4 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+    .report-filter-drawer .close-drawer-btn {
+      background: none; border: none; font-size: 1.5rem; color: var(--secondary-text); cursor: pointer; padding: 0.25rem;
+    }
+    .report-filter-drawer .drawer-body {
+      padding: 1rem; overflow-y: auto; flex-grow: 1;
+    }
+    .report-filter-drawer .filter-group { margin-bottom: 1.25rem; }
+    .report-filter-drawer .filter-group:last-child { margin-bottom: 0; }
+    .report-filter-drawer .filter-group-title {
+      display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;
+      font-weight: 600; color: var(--secondary-text); margin-bottom: 0.6rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .report-filter-drawer .filter-group-title i { font-size: 0.9rem; }
+    .report-filter-drawer .filter-options {
+      display: flex; flex-direction: column; gap: 0.75rem;
+    }
+    .report-filter-drawer .filter-options select,
+    .report-filter-drawer .filter-options input[type="date"] {
+      padding: 0.7rem 0.8rem; font-size: 0.95rem;
+      border: 1px solid var(--border-color); border-radius: var(--border-radius-card);
+      background-color: #fff; box-shadow: none; outline: none;
+      width: 100%; height: 42px;
+    }
+    .report-filter-drawer .custom-date-range-inputs {
+      display: none; flex-direction: column; gap: 0.75rem; width: 100%; margin-top: 0.5rem;
+    }
+    .report-filter-drawer .custom-date-range-inputs.visible { display: flex; }
+    .report-filter-drawer .custom-date-inputs-wrapper {
+      display: flex; gap: 0.75rem; width: 100%;
+    }
+    .report-filter-drawer .custom-date-inputs-wrapper > div {
+      flex: 1; display: flex; flex-direction: column;
+    }
+    .report-filter-drawer .custom-date-inputs-wrapper label {
+      font-size: 0.7rem; text-transform: uppercase; color: var(--secondary-text); margin-bottom: 0.25rem;
+    }
+    .report-filter-drawer .drawer-footer {
+      padding: 0.75rem 1rem; border-top: 1px solid var(--border-color);
+      background-color: var(--surface);
+    }
+    .report-filter-drawer .btn-apply-filter.full-width {
+      width: 100%; padding: 0.8rem; background-color: var(--accent); color: #fff;
+      border: none; border-radius: var(--border-radius-pill); font-size: 1rem;
+      font-weight: 500; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; gap: 0.5rem;
+    }
+    .report-filter-drawer .btn-apply-filter.full-width:disabled {
+      background-color: #ccc; cursor: not-allowed;
+    }
+
+    /* Styles pour la modale d'ajout de livre (hors du flux des pages) */
+    .modal-overlay-container {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6); /* Fond plus sombre pour la modale */
+      display: none; /* Caché par défaut */
+      align-items: center;
+      justify-content: center;
+      z-index: 1000; /* Au-dessus de tout */
+      padding: 1rem; /* Pour éviter que la modale ne colle aux bords */
+    }
+    .modal-overlay-container.visible {
+      display: flex;
+    }
+    .modal-overlay-container .modal {
+      background: var(--surface);
+      border-radius: var(--border-radius-card);
+      width: 100%;
+      max-width: 400px; /* Largeur max de la modale */
+      max-height: calc(100dvh - 4rem); /* Hauteur max avec padding */
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      border: 1px solid var(--border-color);
+    }
+    .modal-overlay-container .modal header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-overlay-container .modal header h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+    .modal-overlay-container .modal-close-btn { /* Nom de classe plus spécifique */
+      background: none;
+      border: none;
+      font-size: 1.75rem;
+      cursor: pointer;
+      color: var(--secondary-text);
+      padding: 0.25rem;
+      line-height: 1;
+    }
+    .modal-overlay-container .modal-content {
+      padding: 1.25rem; /* Plus de padding interne */
+      flex-grow: 1; /* Permet au contenu de grandir si nécessaire */
+    }
+    .modal-overlay-container .form-group {
+      margin-bottom: 1.25rem; /* Espacement augmenté */
+    }
+    .modal-overlay-container label {
+      display: block;
+      margin-bottom: 0.5rem; /* Espacement augmenté */
+      font-size: 0.9rem;
+      color: var(--secondary-text);
+      font-weight: 500;
+    }
+    .modal-overlay-container input[type="search"], /* Cibler spécifiquement */
+    .modal-overlay-container input[type="text"] {
+      width: 100%;
+      padding: 0.85rem; /* Padding augmenté */
+      border: 1px solid var(--border-color); /* Bordure plus claire */
+      border-radius: var(--border-radius-card);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Ajout de box-shadow transition */
+      box-shadow: none;
+    }
+    .modal-overlay-container input[type="search"]:focus,
+    .modal-overlay-container input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(0,100,210,0.2); /* Effet de focus */
+    }
+    .modal-overlay-container button[type="submit"] {
+      width: 100%;
+      padding: 0.9rem; /* Padding augmenté */
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--border-radius-pill);
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      margin-top: 0.75rem; /* Marge augmentée */
+      box-shadow:none;
+      transition: background-color 0.2s ease;
+    }
+    .modal-overlay-container button[type="submit"]:hover {
+        background-color: #0052a3; /* Assombrir au survol */
+    }
+    .modal-overlay-container button[type="submit"]:active {
+      background: #004080; /* Encore plus sombre à l'activation */
+    }
+    .modal-overlay-container button[type="submit"]:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    /* Toast pour les messages (feedback) */
+    .toast-notification {
+        position: fixed;
+        bottom: calc(env(safe-area-inset-bottom) + 20px);
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0,0,0,0.8);
+        color: white;
+        padding: 0.8rem 1.5rem;
         border-radius: var(--border-radius-pill);
-    }
-    .date-filter-reports label {
+        z-index: 2000; /* Au-dessus de tout */
         font-size: 0.9rem;
-        color: var(--secondary-text);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        pointer-events: none;
     }
-    .date-filter-reports select, .date-filter-reports input[type="date"] {
-        padding: 0.4rem 0.6rem;
-        border: 1px solid var(--border-color);
-        border-radius: var(--border-radius-card);
-        font-size: 0.9rem;
-        background-color: #fff;
+    .toast-notification.visible {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
     }
-
-
+    .toast-notification.error {
+        background-color: var(--ebay-red);
+    }
+    .toast-notification.success {
+        background-color: var(--ebay-green);
+    }
   </style>
 </head>
 
 <body>
 
   <script>
+  // Web component pour input (inchangé)
   class AppInput extends HTMLElement {
     constructor() {
       super();
@@ -767,7 +938,7 @@
     }
   }
   customElements.define('app-input', AppInput);
-</script>
+  </script>
 
   <main id="home" class="page visible">
     <header><h2 style="padding:1rem">Accueil</h2></header>
@@ -789,25 +960,20 @@
       Installer l’application
     </button>
   </main>
-  
+ 
 <main id="sell" class="page">
   <style>
-
     .sell-step {
       display: none;
       flex-direction: column;
-      flex: 1 1 auto; /* Occupe l'espace disponible */
+      flex: 1 1 auto; 
       width: 100%;
       overflow-y: auto;
-      /* Padding pour laisser la place à la navigation du wizard en bas */
-      padding: 0 0 calc(56px + 1rem + env(safe-area-inset-bottom)); /* 56px nav wizard + 1rem marge */
+      padding: 0 0 calc(56px + 1rem + env(safe-area-inset-bottom)); 
     }
-
     .sell-step.active {
       display: flex;
     }
-
-    /* Header commun pour la recherche (Étape 1) */
     #sell .sell-header-step1 {
       display: flex;
       align-items: center;
@@ -819,7 +985,6 @@
       top: 0;
       z-index: 15;
     }
-
     #sell .sell-header-step1 .btn-close-sell {
       flex: 0 0 auto;
       display: flex;
@@ -834,14 +999,13 @@
       cursor: pointer;
       outline: none;
     }
-
     #sell .sell-header-step1 .search-wrapper {
       flex: 1;
       margin-top: 0;
     }
       #sell .sell-header-step1 #search-input-sell {
       width: 100%;
-      padding: 0.75rem 2.5rem; /* Ajusté pour l'icône de recherche */
+      padding: 0.75rem 2.5rem; 
       border: 1px solid var(--border-color);
       border-radius: var(--border-radius-pill);
       background: #f4f4f4;
@@ -849,55 +1013,42 @@
       outline: none;
       box-shadow: none;
     }
-
-    /* Conteneurs de contenu pour chaque étape */
     .sell-step-content {
       padding: 1rem;
       flex-grow: 1;
     }
-    /* Style pour les titres des étapes */
     .sell-step h3.step-title {
-    /* Styles existants (assurez-vous qu'ils sont là ou copiez-les depuis votre code actuel) */
     padding: 1rem 1rem 0.5rem;
     font-size: 1.2rem;
     font-weight: 600;
     margin: 0;
-    background-color: #fff; /* Pour cacher le contenu qui scrolle derrière */
+    background-color: #fff; 
     border-bottom: 1px solid var(--border-color);
     position: -webkit-sticky;
     position: sticky;
-    top: 0; /* Se colle sous le header principal si header principal existe pour l'étape */
-    z-index: 14; /* En dessous du header principal, au-dessus du contenu */
-
-    /* === AJOUTS/MODIFICATIONS CI-DESSOUS === */
-    display: flex;              /* Pour aligner le titre et le bouton sur la même ligne */
-    align-items: center;        /* Pour centrer verticalement les éléments */
-    justify-content: space-between; /* Pour pousser le bouton vers la droite */
-}
-
-/* Styles pour le bouton "Vider le panier" DANS le titre h3 */
-.sell-step h3.step-title #btn-clear-sell-cart-step2 {
-    background: none;             /* Enlève le fond du bouton */
-    border: none;                 /* Enlève la bordure */
-    padding: 0.25rem;             /* Un peu d'espace autour de l'icône */
-    margin: 0;                    /* Enlève les marges par défaut si présentes */
-    cursor: pointer;              /* Change le curseur en main */
-    font-size: 1.3rem;            /* Ajustez la taille de l'icône si nécessaire */
-    line-height: 1;               /* Pour un meilleur alignement vertical de l'icône */
-    color: var(--ebay-red);       /* Assure la couleur de l'icône (même si style en ligne existe) */
-}
-
-/* Si vous voulez être sûr que l'icône hérite bien de la couleur du bouton : */
-.sell-step h3.step-title #btn-clear-sell-cart-step2 i {
-    color: inherit; /* Hérite la couleur de son parent bouton */
-    vertical-align: middle; /* Peut aider à mieux centrer l'icône */
-}
-
-
-    /* Navigation du Wizard */
+    top: 0; 
+    z-index: 14; 
+    display: flex;         
+    align-items: center;      
+    justify-content: space-between; 
+  }
+  .sell-step h3.step-title #btn-clear-sell-cart-step2 {
+    background: none;          
+    border: none;              
+    padding: 0.25rem;          
+    margin: 0;                 
+    cursor: pointer;           
+    font-size: 1.3rem;         
+    line-height: 1;           
+    color: var(--ebay-red);   
+  }
+  .sell-step h3.step-title #btn-clear-sell-cart-step2 i {
+    color: inherit; 
+    vertical-align: middle; 
+  }
     .wizard-nav-sell {
       position: fixed;
-      bottom: env(safe-area-inset-bottom); /* Au-dessus de la barre de nav principale de l'app */
+      bottom: env(safe-area-inset-bottom); 
       left: 0;
       width: 100%;
       display: flex;
@@ -905,9 +1056,8 @@
       padding: 0.75rem 1rem;
       background: #fff;
       border-top: 1px solid var(--border-color);
-      z-index: 20; /* Au-dessus du contenu de l'étape */
+      z-index: 20; 
     }
-
     .wizard-nav-sell button {
       flex: 1;
       padding: 0.8rem;
@@ -931,11 +1081,7 @@
       color: var(--primary-text);
       border: 1px solid var(--border-color);
     }
-
-
-    /* Styles pour les résultats de recherche (Étape 1) */
     #sell-search-results-container {
-      /* padding: 1rem; */ /* Géré par sell-step-content */
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
@@ -980,8 +1126,6 @@
         font-size: 0.9rem;
         color: var(--secondary-text);
     }
-
-    /* Styles pour le panier (Étape 2) */
     #sell-cart-items-list-step2 .sell-cart-item {
       display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 0;
       border-bottom: 1px solid #f0f0f0;
@@ -1006,7 +1150,7 @@
     #sell-cart-empty-message-step2 {
       color: var(--secondary-text); font-style: italic; text-align: center; padding: 1rem;
     }
-    .cart-summary-section-step2 { /* Similaire au global .cart-summary-section */
+    .cart-summary-section-step2 { 
       margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);
     }
     .cart-summary-section-step2 .summary-line {
@@ -1014,8 +1158,6 @@
     }
     .cart-summary-section-step2 .summary-line.total span { font-weight: bold; font-size: 1.15rem; }
     .cart-summary-section-step2 .summary-line.total span:last-child { color: var(--ebay-green); }
-    
-    /* Styles pour infos client (Étape 3) */
     .form-group-sell { margin-bottom: 1rem; }
     .form-group-sell label {
       display: block; font-size: 0.9rem; color: var(--secondary-text); margin-bottom: 0.25rem;
@@ -1026,8 +1168,6 @@
       box-shadow: none; outline: none;
     }
     .form-group-sell input:focus { border-color: var(--accent); }
-
-    /* Styles pour Récapitulatif (Étape 4) */
     #sell-summary-customer-info-step4, #sell-summary-items-list-step4, #sell-summary-totals-step4 {
         margin-bottom: 1.5rem;
     }
@@ -1056,19 +1196,9 @@
         box-shadow: none; background-color: var(--ebay-green); color: white;
     }
     #btn-validate-sale-step4:disabled { background-color: #ccc; cursor: not-allowed; }
-
-
-    /* Feedback global */
-    #sell-feedback-message {
-      font-weight: 500; min-height: 1.5em; text-align:center; padding:0 1rem 1rem;
-      position: fixed; bottom: calc(env(safe-area-inset-bottom) + 56px + 1rem); /* Au dessus de la nav wizard */
-      width: 100%; left:0; box-sizing: border-box;
-      z-index: 25; /* Au dessus de la nav wizard */
+    #sell-feedback-message { /* Remplacé par toast-notification global */
+      display: none; /* Caché, car on utilise le toast global */
     }
-    #sell-feedback-message.success { color: var(--ebay-green); }
-    #sell-feedback-message.error { color: var(--ebay-red); }
-    
-
   </style>
 
   <div class="sell-step active" data-step="1">
@@ -1160,12 +1290,11 @@
       </div>
   </div>
 
-  <div id="sell-feedback-message"></div>
-
- <script>
+  <script>
+// Sell page script
 (function() {
     const sellPageEl = document.getElementById('sell');
-    const feedbackMessageEl = document.getElementById('sell-feedback-message');
+    // feedbackMessageEl est maintenant géré par showGlobalToast
     let currentSellStep = 1;
     const sellSteps = sellPageEl.querySelectorAll('.sell-step');
 
@@ -1191,8 +1320,8 @@
     const summaryGrandTotalEl = document.getElementById('summary-grand-total');
     const validateSaleButtonStep4El = document.getElementById('btn-validate-sale-step4');
 
-    let userBooksCache = [];
-    let salesCart = [];
+    let userBooksCache = []; 
+    let salesCart = []; 
     let currentUserUID = null;
 
     function showSellStep(stepNumber) {
@@ -1223,11 +1352,11 @@
             showSellStep(targetPrev.dataset.targetStep);
         } else if (targetNext) {
             if (currentSellStep === 1 && salesCart.length === 0) {
-                showFeedback("Veuillez ajouter au moins un livre au panier.", true, 2000);
+                showGlobalToast("Veuillez ajouter au moins un livre au panier.", true, 2000);
                 return;
             }
             if (currentSellStep === 2 && salesCart.length === 0) {
-                showFeedback("Le panier est vide.", true, 2000);
+                showGlobalToast("Le panier est vide.", true, 2000);
                 return;
             }
             showSellStep(targetNext.dataset.targetStep);
@@ -1237,7 +1366,7 @@
     auth.onAuthStateChanged(user => {
         if (user) {
             currentUserUID = user.uid;
-            loadUserBooks();
+            loadUserBooks(); 
         } else {
             currentUserUID = null;
             userBooksCache = [];
@@ -1252,11 +1381,16 @@
         if (!currentUserUID) return;
         try {
             const snapshot = await db.collection('users').doc(currentUserUID).collection('books').get();
-            userBooksCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            userBooksCache = snapshot.docs.map(doc => ({ 
+                id: doc.id, 
+                ...doc.data(),
+                averageCost: typeof doc.data().averageCost === 'number' ? doc.data().averageCost : (typeof doc.data().lastPurchasePrice === 'number' ? doc.data().lastPurchasePrice : 0),
+                lastPurchasePrice: typeof doc.data().lastPurchasePrice === 'number' ? doc.data().lastPurchasePrice : 0
+            }));
             if(currentSellStep === 1) filterAndRenderBookResults();
         } catch (error) {
             console.error("Erreur de chargement des livres de l'utilisateur:", error);
-            showFeedback("Erreur de chargement des livres.", true);
+            showGlobalToast("Erreur de chargement des livres.", true);
             userBooksCache = [];
         }
     }
@@ -1306,7 +1440,7 @@
                 if (!salesCart.some(item => item.bookId === book.id)) {
                     addBookToSalesCart(book, addButton);
                 } else {
-                    showFeedback(`"${book.title}" est déjà dans le panier.`, false, 1500);
+                    showGlobalToast(`"${book.title}" est déjà dans le panier.`, false, 1500);
                 }
             });
             searchResultsContainerEl.appendChild(card);
@@ -1315,29 +1449,29 @@
 
     function addBookToSalesCart(book, buttonElement) {
         if (salesCart.some(item => item.bookId === book.id)) {
-            showFeedback(`"${book.title}" est déjà dans le panier. Modifiez la quantité si besoin.`, false, 2000);
+            showGlobalToast(`"${book.title}" est déjà dans le panier. Modifiez la quantité si besoin.`, false, 2000);
             return;
         }
         if (book.quantity <= 0) {
-            showFeedback(`"${book.title}" est en rupture de stock.`, true);
+            showGlobalToast(`"${book.title}" est en rupture de stock.`, true);
             return;
         }
-
+        const costForSale = book.averageCost !== undefined ? book.averageCost : (book.lastPurchasePrice || 0);
         salesCart.push({
             bookId: book.id,
             title: book.title,
             quantity: 1,
-            unitPrice: book.price || 0,
+            unitPrice: book.price || 0, 
             stock: book.quantity,
             suggestedPrice: book.price || 0,
-            unitCost: book.lastPurchasePrice || 0
+            unitCost: costForSale 
         });
 
         if (buttonElement) {
             buttonElement.classList.add('added');
             buttonElement.innerHTML = '<i class="bi bi-check-lg"></i>';
         }
-        showFeedback(`"${book.title}" ajouté au panier.`, false, 1500);
+        showGlobalToast(`"${book.title}" ajouté au panier.`, false, 1500);
         step1NextBtn.disabled = salesCart.length === 0;
         renderStep1CartSummary();
     }
@@ -1362,7 +1496,6 @@
                 const listItem = document.createElement('div');
                 listItem.className = 'sell-cart-item';
                 listItem.setAttribute('data-index', index);
-
                 listItem.innerHTML = `
                     <span class="title" title="${item.title}">${item.title}</span>
                     <input type="number" class="quantity" value="${item.quantity}" min="1" max="${item.stock}" data-index="${index}" aria-label="Quantité pour ${item.title}">
@@ -1370,29 +1503,14 @@
                     <span class="subtotal" data-index="${index}">${(item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0})}</span>
                     <button class="remove-item-btn" data-index="${index}" aria-label="Supprimer ${item.title}"><i class="bi bi-trash-fill"></i></button>
                 `;
-
                 const quantityInput = listItem.querySelector('.quantity');
                 const priceInput = listItem.querySelector('.price');
-
-                quantityInput.addEventListener('focus', (e) => {
-                    e.target.select();
-                });
-
+                quantityInput.addEventListener('focus', (e) => e.target.select());
                 priceInput.addEventListener('focus', (e) => {
-                    if (e.target.value === '0') {
-                        e.target.value = '';
-                    } else {
-                        e.target.select();
-                    }
+                    if (e.target.value === '0') e.target.value = ''; else e.target.select();
                 });
-
-                quantityInput.addEventListener('input', (e) => {
-                    updateCartItemQuantity(index, parseInt(e.target.value));
-                });
-                priceInput.addEventListener('input', (e) => {
-                    updateCartItemPrice(index, parseFloat(e.target.value));
-                });
-
+                quantityInput.addEventListener('input', (e) => updateCartItemQuantity(index, parseInt(e.target.value)));
+                priceInput.addEventListener('input', (e) => updateCartItemPrice(index, parseFloat(e.target.value)));
                 listItem.querySelector('.remove-item-btn').addEventListener('click', () => removeCartItem(index));
                 cartItemsListStep2El.appendChild(listItem);
             });
@@ -1403,32 +1521,18 @@
     function updateCartItemQuantity(index, newQuantityFromInput) {
         const item = salesCart[index];
         if (!item) return;
-
         let validatedQuantity = newQuantityFromInput;
-
-        if (isNaN(validatedQuantity) || validatedQuantity < 1) {
-            validatedQuantity = 1;
-        } else if (validatedQuantity > item.stock) {
+        if (isNaN(validatedQuantity) || validatedQuantity < 1) validatedQuantity = 1;
+        else if (validatedQuantity > item.stock) {
             validatedQuantity = item.stock;
-            showFeedback(`Stock maximum pour "${item.title}" est ${item.stock}.`, true, 2000);
+            showGlobalToast(`Stock maximum pour "${item.title}" est ${item.stock}.`, true, 2000);
         }
-
         const quantityInputEl = cartItemsListStep2El.querySelector(`input.quantity[data-index="${index}"]`);
-        if (item.quantity === validatedQuantity && quantityInputEl && parseInt(quantityInputEl.value) === validatedQuantity) {
-            return;
-        }
-
+        if (item.quantity === validatedQuantity && quantityInputEl && parseInt(quantityInputEl.value) === validatedQuantity) return;
         item.quantity = validatedQuantity;
-
-        if (quantityInputEl && parseInt(quantityInputEl.value) !== validatedQuantity) {
-             quantityInputEl.value = validatedQuantity;
-        }
-
+        if (quantityInputEl && parseInt(quantityInputEl.value) !== validatedQuantity) quantityInputEl.value = validatedQuantity;
         const subtotalEl = cartItemsListStep2El.querySelector(`span.subtotal[data-index="${index}"]`);
-        if (subtotalEl) {
-            subtotalEl.textContent = (item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
-        }
-
+        if (subtotalEl) subtotalEl.textContent = (item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
         updateCartSummaryForStep2();
         renderStep1CartSummary();
     }
@@ -1436,34 +1540,19 @@
     function updateCartItemPrice(index, newPriceFromInput) {
         const item = salesCart[index];
         if (!item) return;
-
         let validatedPrice = newPriceFromInput;
-
-        if (isNaN(validatedPrice) || validatedPrice < 0) {
-            validatedPrice = 0;
-        }
-
+        if (isNaN(validatedPrice) || validatedPrice < 0) validatedPrice = 0;
         const priceInputEl = cartItemsListStep2El.querySelector(`input.price[data-index="${index}"]`);
-        if (item.unitPrice === validatedPrice && priceInputEl && parseFloat(priceInputEl.value) === validatedPrice) {
-            return;
-        }
-
+        if (item.unitPrice === validatedPrice && priceInputEl && parseFloat(priceInputEl.value) === validatedPrice) return;
         item.unitPrice = validatedPrice;
-
         if (priceInputEl) {
             const currentInputValue = parseFloat(priceInputEl.value);
             if (isNaN(currentInputValue) || currentInputValue < 0 || currentInputValue.toFixed(0) !== validatedPrice.toFixed(0) ) {
-                if (isNaN(currentInputValue) || currentInputValue < 0) {
-                    priceInputEl.value = validatedPrice.toFixed(0);
-                }
+                if (isNaN(currentInputValue) || currentInputValue < 0) priceInputEl.value = validatedPrice.toFixed(0);
             }
         }
-
         const subtotalEl = cartItemsListStep2El.querySelector(`span.subtotal[data-index="${index}"]`);
-        if (subtotalEl) {
-            subtotalEl.textContent = (item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
-        }
-
+        if (subtotalEl) subtotalEl.textContent = (item.quantity * item.unitPrice).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
         updateCartSummaryForStep2();
         renderStep1CartSummary();
     }
@@ -1471,12 +1560,9 @@
     function removeCartItem(index) {
         const item = salesCart[index];
         if(!item) return;
-
         salesCart.splice(index, 1);
-        if (item) showFeedback(`"${item.title}" retiré du panier.`, false, 1500);
-
+        if (item) showGlobalToast(`"${item.title}" retiré du panier.`, false, 1500);
         renderSalesCartForStep2();
-
         step1NextBtn.disabled = salesCart.length === 0;
         const searchResultButton = searchResultsContainerEl.querySelector(`.btn-add-to-sell-cart[data-book-id="${item.bookId}"]`);
         if (searchResultButton) {
@@ -1501,7 +1587,7 @@
         if (salesCart.length > 0) {
             salesCart = [];
             renderSalesCartForStep2();
-            showFeedback("Panier de vente vidé.", false, 1500);
+            showGlobalToast("Panier de vente vidé.", false, 1500);
             step1NextBtn.disabled = true;
             searchResultsContainerEl.querySelectorAll('.btn-add-to-sell-cart.added').forEach(btn => {
                 btn.classList.remove('added');
@@ -1516,11 +1602,9 @@
         const customerPhone = customerPhoneInputEl.value.trim() || "N/A";
         summaryCustomerNameEl.textContent = customerName;
         summaryCustomerPhoneEl.textContent = customerPhone;
-
         summaryItemsListEl.innerHTML = '';
         let totalQty = 0;
         let grandTotal = 0;
-
         if (salesCart.length === 0) {
             summaryItemsListEl.innerHTML = '<p style="text-align:center; color:var(--secondary-text);">Panier vide.</p>';
         } else {
@@ -1545,12 +1629,12 @@
 
     validateSaleButtonStep4El.addEventListener('click', async () => {
         if (salesCart.length === 0) {
-            showFeedback("Le panier est vide. Ajoutez des articles pour valider la vente.", true);
+            showGlobalToast("Le panier est vide. Ajoutez des articles pour valider la vente.", true);
             return;
         }
         validateSaleButtonStep4El.disabled = true;
         validateSaleButtonStep4El.innerHTML = '<i class="bi bi-hourglass-split"></i> Validation en cours...';
-        showFeedback("Traitement de la vente...", false);
+        showGlobalToast("Traitement de la vente...", false, 5000); // Durée plus longue pour le traitement
 
         const batch = db.batch();
         const salesDataItems = [];
@@ -1561,26 +1645,24 @@
 
         for (const item of salesCart) {
             const bookRef = db.collection('users').doc(currentUserUID).collection('books').doc(item.bookId);
-             if (item.quantity > item.stock) {
-                showFeedback(`Stock insuffisant pour "${item.title}" (${item.quantity} demandé(s), ${item.stock} en stock). Vente annulée. Mettez à jour le panier.`, true, 5000);
+             if (item.quantity > item.stock) { 
+                showGlobalToast(`Stock insuffisant pour "${item.title}" (${item.quantity} demandé(s), ${item.stock} en stock). Vente annulée. Mettez à jour le panier.`, true, 5000);
                 validateSaleButtonStep4El.disabled = false;
                 validateSaleButtonStep4El.innerHTML = '<i class="bi bi-check-circle-fill"></i> Valider la Vente';
-                showSellStep(2);
+                showSellStep(2); 
                 return;
             }
             batch.update(bookRef, { quantity: firebase.firestore.FieldValue.increment(-item.quantity) });
-
-            const itemUnitCost = item.unitCost || 0;
-            const itemLineTotal = item.quantity * item.unitPrice;
-            const itemLineCogs = item.quantity * itemUnitCost;
+            const itemUnitCostForCOGS = item.unitCost; 
+            const itemLineTotal = item.quantity * item.unitPrice; 
+            const itemLineCogs = item.quantity * itemUnitCostForCOGS; 
             const itemLineProfit = itemLineTotal - itemLineCogs;
-
             salesDataItems.push({
                 bookId: item.bookId,
                 title: item.title,
                 quantitySold: item.quantity,
-                unitPriceSold: item.unitPrice,
-                unitCostAtTimeOfSale: itemUnitCost,
+                unitPriceSold: item.unitPrice, 
+                unitCostAtTimeOfSale: itemUnitCostForCOGS, 
                 lineTotal: itemLineTotal,
                 lineProfit: itemLineProfit
             });
@@ -1597,25 +1679,25 @@
             items: salesDataItems,
             grandTotalAmount: grandTotalSaleAmount,
             totalItemsSold: salesCart.reduce((sum, item) => sum + item.quantity, 0),
-            totalCostOfGoodsSold: totalCostOfGoodsSoldSale,
+            totalCostOfGoodsSold: totalCostOfGoodsSoldSale, 
             totalProfit: totalProfitSale
         });
 
         try {
             await batch.commit();
-            showFeedback("Vente enregistrée avec succès !", false, 3000);
-            loadUserBooks();
+            showGlobalToast("Vente enregistrée avec succès !", false, 3000);
+            loadUserBooks(); 
             const closeBtn = sellPageEl.querySelector('.btn-close-sell');
             if (closeBtn) {
-                closeBtn.click();
+                closeBtn.click(); 
             } else {
-                resetSellPage();
+                resetSellPage(); 
                 location.hash = "home";
             }
         } catch (error) {
             console.error("Erreur lors de la validation de la vente:", error);
-            showFeedback("Erreur: " + error.message + ". Veuillez réessayer.", true, 5000);
-            validateSaleButtonStep4El.disabled = salesCart.length === 0;
+            showGlobalToast("Erreur: " + error.message + ". Veuillez réessayer.", true, 5000);
+            validateSaleButtonStep4El.disabled = salesCart.length === 0; 
             validateSaleButtonStep4El.innerHTML = '<i class="bi bi-check-circle-fill"></i> Valider la Vente';
         }
     });
@@ -1628,39 +1710,25 @@
         searchResultsContainerEl.innerHTML = '<p class="no-results">Commencez par rechercher un livre.</p>';
         showSellStep(1);
         renderStep1CartSummary();
-        renderSalesCartForStep2();
-        renderSalesSummaryForStep4();
+        renderSalesCartForStep2(); 
+        renderSalesSummaryForStep4(); 
         step1NextBtn.disabled = true;
         step2NextBtn.disabled = true;
         validateSaleButtonStep4El.disabled = true;
     }
 
-    let feedbackTimeout;
-    function showFeedback(message, isError = false, duration = 3000) {
-        clearTimeout(feedbackTimeout);
-        feedbackMessageEl.textContent = message;
-        feedbackMessageEl.className = isError ? 'error' : 'success';
-        feedbackMessageEl.style.display = 'block';
-        feedbackTimeout = setTimeout(() => {
-            feedbackMessageEl.textContent = '';
-            feedbackMessageEl.className = '';
-            feedbackMessageEl.style.display = 'none';
-        }, duration);
-    }
+    // La fonction showFeedback est remplacée par showGlobalToast (définie globalement)
 
     const sellPageObserver = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
             if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                 if (sellPageEl.classList.contains('visible')) {
-                    if (currentUserUID && userBooksCache.length === 0) {
-                         loadUserBooks();
+                    if (currentUserUID && userBooksCache.length === 0) { 
+                        loadUserBooks();
                     }
-                    resetSellPage();
+                    resetSellPage(); 
                 } else {
-                    clearTimeout(feedbackTimeout);
-                    feedbackMessageEl.textContent = '';
-                    feedbackMessageEl.className = '';
-                    feedbackMessageEl.style.display = 'none';
+                    // Le toast global se gère lui-même pour la disparition
                 }
             }
         }
@@ -1673,15 +1741,14 @@
 
 <main id="supply" class="page">
   <style>
-    /* === Styles Approvisionnement (Updated) === */
     header#supply-header {
       padding: 1rem;
-      background: #fff; /* Fond pour le sticky header */
-      border-bottom: 1px solid var(--border-color); /* Séparation pour le sticky header */
-      position: -webkit-sticky; /* Pour Safari */
+      background: #fff; 
+      border-bottom: 1px solid var(--border-color); 
+      position: -webkit-sticky; 
       position: sticky;
-      top: 0; /* Se colle en haut de la zone de défilement (main#supply) */
-      z-index: 15; /* S'assurer qu'il est au-dessus du contenu de la page mais en dessous des modales/nav */
+      top: 0; 
+      z-index: 15; 
     }
     header#supply-header h2 {
       margin: 0;
@@ -1689,99 +1756,86 @@
       font-weight: 600;
       color: var(--primary-text);
     }
-
-    main#supply .books-list { /* This is #supply-list */
+    main#supply .books-list { 
         display: flex;
         flex-direction: column;
-        gap: 1rem; /* Space between cards */
-        padding: 1rem; /* Padding around the entire list */
+        gap: 1rem; 
+        padding: 1rem; 
     }
-
     main#supply .skeleton-batch-card {
-        background: #f9f9f9; /* Slightly lighter skeleton */
-        height: 120px; /* Adjusted height to better match potential card content */
-        margin: 0; /* Relies on .books-list gap for vertical spacing and padding for horizontal */
-        border-radius: 0.75rem; /* Match new card radius */
+        background: #f9f9f9; 
+        height: 120px; 
+        margin: 0; 
+        border-radius: 0.75rem; 
         animation: pulse 1.5s infinite ease-in-out;
     }
-
     main#supply .supply-batch-card {
         background: #ffffff;
-        border: 1px solid var(--border-color); /* Slightly softer border */
-        border-radius: 0.75rem; /* More rounded corners */
-        margin: 0; /* Relies on .books-list gap and padding */
+        border: 1px solid var(--border-color); 
+        border-radius: 0.75rem; 
+        margin: 0; 
         padding: 1rem;
-        box-shadow: none; /* NO SHADOW */
-        display: flex; /* Use flex for internal layout */
-        flex-direction: column; /* Stack header and ul */
-        gap: 0.75rem; /* Space between header and ul */
+        box-shadow: none; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 0.75rem; 
     }
-
     main#supply .supply-batch-card header {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start; /* Align to top */
+        align-items: flex-start; 
         padding-bottom: 0.5rem;
-        border-bottom: 1px solid #efefef; /* Lighter border */
+        border-bottom: 1px solid #efefef; 
     }
-
     main#supply .supply-batch-card header .supplier-info {
-        flex-grow: 1; /* Takes available width */
-        margin-right: 0.75rem; /* Space to the right */
+        flex-grow: 1; 
+        margin-right: 0.75rem; 
     }
-
-    main#supply .supply-batch-card header .supplier-info strong { /* Supplier Name */
-        font-size: 1.1rem; /* Slightly larger */
+    main#supply .supply-batch-card header .supplier-info strong { 
+        font-size: 1.1rem; 
         font-weight: 600;
         color: var(--primary-text);
         display: block;
         margin-bottom: 0.2rem;
     }
-
-    main#supply .supply-batch-card header .supplier-info small { /* Date */
+    main#supply .supply-batch-card header .supplier-info small { 
         font-size: 0.8rem;
         color: var(--secondary-text);
         display: block;
     }
-
     main#supply .supply-batch-card header .batch-meta {
         text-align: right;
-        flex-shrink: 0; /* Don't shrink */
+        flex-shrink: 0; 
     }
-
-    main#supply .supply-batch-card header .batch-meta .batch-total { /* Total XOF */
+    main#supply .supply-batch-card header .batch-meta .batch-total { 
         font-size: 1.05rem;
-        font-weight: 700; /* Bold */
-        color: var(--ebay-green); /* Accent color for total */
+        font-weight: 700; 
+        color: var(--ebay-green); 
         display: block;
     }
-
     main#supply .supply-batch-card ul {
         list-style: none;
         padding-left: 0;
         margin: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.5rem; /* Space between list items */
+        gap: 0.5rem; 
     }
-
     main#supply .supply-batch-card li {
         font-size: 0.9rem;
         color: var(--primary-text);
-        padding: 0.4rem 0; /* Reduced padding as gap is used in ul */
+        padding: 0.4rem 0; 
         display: flex;
         justify-content: space-between;
-        align-items: flex-start; /* Align items to start for multi-line details */
-        gap: 0.5rem; /* Space between title and details block */
+        align-items: flex-start; 
+        gap: 0.5rem; 
     }
-
     main#supply .supply-batch-card li .item-title {
         flex-grow: 1;
         font-weight: 500;
         line-height: 1.4;
-        margin-right: 0.5rem; /* Ensure space if details are short */
+        margin-right: 0.5rem; 
     }
-
     main#supply .supply-batch-card li .item-details {
         font-size: 0.8rem;
         color: var(--secondary-text);
@@ -1789,17 +1843,14 @@
         flex-shrink: 0;
         line-height: 1.4;
     }
-
     main#supply .supply-batch-card li .item-details span {
-        display: block; /* Each piece of detail on a new line */
+        display: block; 
     }
     main#supply .supply-batch-card li .item-details .item-line-total {
         font-weight: 500;
-        color: var(--primary-text); /* Make line total stand out a bit */
+        color: var(--primary-text); 
         margin-top: 0.15rem;
     }
-
-    /* Floating Action Button - Styles from original code */
     .fab {
       position: fixed;
       bottom: calc(56px + env(safe-area-inset-bottom) + 1rem);
@@ -1814,26 +1865,22 @@
       align-items: center;
       justify-content: center;
       font-size: 1.5rem;
-      box-shadow: none; /* NO SHADOW */
-      border: 1px solid #6a9a10; /* Darker green border if shadow removed */
+      box-shadow: none; 
+      border: 1px solid #6a9a10; 
       z-index: 30; 
       cursor: pointer;
       transition: background 0.2s ease;
     }
     .fab:active {
-      background: #5ea83a; /* Darker green on active */
+      background: #5ea83a; 
     }
-
-    /* .search-noresult is defined in new-supply, keep it there or make global if needed */
   </style>
 
   <header id="supply-header">
     <h2>Approvisionnement</h2>
   </header>
-
   <div id="supply-list" class="books-list">
     </div>
-
   <button id="btn-new-supply" class="fab" aria-label="Nouvel approvisionnement">
     <i class="bi bi-plus-lg"></i>
   </button>
@@ -1847,7 +1894,6 @@
   <script>
   auth.onAuthStateChanged(user => {
     if (!user) {
-      // return window.location.replace('login.html'); // Router handles this
       return;
     }
 
@@ -1858,11 +1904,11 @@
       .orderBy('date', 'desc');
 
     const supplyListEl = document.getElementById('supply-list');
-    let unsubscribeSupplies; // Keep track of listener
+    let unsubscribeSupplies; 
 
-    // Function to setup listener, called when #supply is active
     function setupSupplyListener() {
-        if (unsubscribeSupplies) unsubscribeSupplies(); // Unsubscribe from previous if any
+        if (unsubscribeSupplies) unsubscribeSupplies(); 
+        if (!supplyListEl) return; // S'assurer que l'élément existe
 
         supplyListEl.innerHTML = Array(3)
           .fill('')
@@ -1883,8 +1929,7 @@
             const dateStr = dateObj.toLocaleDateString('fr-FR', {
               day: '2-digit', month: '2-digit', year: 'numeric'
             });
-
-            const totalBatch = supply.lines.reduce((sum, l) => sum + (l.quantity * l.unitCost), 0);
+            const totalBatch = supply.totalCost || 0; 
             const batchCard = document.createElement('div');
             batchCard.className = 'supply-batch-card';
             
@@ -1902,12 +1947,12 @@
               </header>
               <ul>
                 ${supply.lines.map(line => {
-                  const lineTotal = (line.quantity || 0) * (line.unitCost || 0);
+                  const lineTotal = (line.quantity || 0) * (line.unitCost || 0); 
                   return `<li>
                             <span class="item-title">${line.title || 'Titre inconnu'}</span>
                             <span class="item-details">
                               <span>Qté: ${line.quantity || 0}</span>
-                              <span>PU: ${(line.unitCost || 0).toLocaleString('fr-FR',{ style:'currency', currency:'XOF', minimumFractionDigits: 0 })}</span>
+                              <span>PU Final: ${(line.unitCost || 0).toLocaleString('fr-FR',{ style:'currency', currency:'XOF', minimumFractionDigits: 0 })}</span>
                               <span class="item-line-total">Total: ${lineTotal.toLocaleString('fr-FR',{ style:'currency', currency:'XOF', minimumFractionDigits: 0 })}</span>
                             </span>
                           </li>`;
@@ -1922,33 +1967,23 @@
         });
     }
     
-    // Function to cleanup listener
     function cleanupSupplyListener() {
         if (unsubscribeSupplies) {
-          // console.log('Unsubscribing from supplies listener as page changed from #supply');
           unsubscribeSupplies();
           unsubscribeSupplies = null;
         }
     }
 
-    // Listen to hash changes to setup/cleanup listener
-    // This is part of the SPA behavior managed by the main router
-    // The router should call these functions when appropriate
     window.addEventListener('hashchange', () => {
         if (location.hash === '#supply') {
-            if (auth.currentUser) setupSupplyListener(); // Only if user is logged in
+          if (auth.currentUser) setupSupplyListener(); 
         } else {
-            cleanupSupplyListener();
+          cleanupSupplyListener();
         }
     });
-    // Initial check in case the page loads on #supply
      if (location.hash === '#supply') {
         if (auth.currentUser) setupSupplyListener();
     }
-    // Also, on auth state change, if already on #supply, setup listener
-    // This is somewhat redundant if hashchange handles it, but good for initial load
-    // The main router logic should ideally handle this when calling showOnlyPage for #supply
-
   });
 </script>
 </main>
@@ -1975,21 +2010,22 @@
     .line-total{font-weight:600;margin-left:auto}
     .remove-line{background:none;border:none;font-size:1.4rem;color:#e53935; cursor: pointer;}
 
-    #new-supply .fab{
+    #new-supply .fab{ /* FAB pour ajouter une ligne */
         position:fixed;
         right:1rem;
-        bottom:calc(env(safe-area-inset-bottom) + 1rem + 50px + 1rem); 
+        /* Ajustement pour être au-dessus de .wizard-nav */
+        bottom:calc(env(safe-area-inset-bottom) + 50px + 1rem + 56px); /* 50px wizard-nav + 1rem marge + 56px hauteur FAB */
         width:56px;height:56px;
         border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:1.7rem;
         display:flex;align-items:center;justify-content:center;
         box-shadow:none; border: 1px solid #0052a3; 
-        z-index:40
+        z-index:60; /* Au-dessus de wizard-nav */
     }
 
     .wizard-nav{position:fixed;left:0;bottom:env(safe-area-inset-bottom);width:100%;
       display:flex;gap:.6rem;padding:.7rem 1rem;background:var(--surface);
       box-shadow:none; border-top: 1px solid var(--border-color); 
-      z-index: 50;
+      z-index: 50; /* Z-index pour la navigation du wizard */
       transition: bottom 0.2s ease-out;
     }
     .btn{flex:1;padding:.8rem;font-size:1rem;font-weight:500;border:none;border-radius:var(--border-radius-card); cursor: pointer; box-shadow:none;}
@@ -2062,6 +2098,15 @@
       font-size: 1.3rem;
       color: var(--accent);
     }
+    /* Style pour le contenu scrollable dans chaque étape */
+    .step > div:not(.wizard-nav):not(.fab) {
+        flex-grow: 1;
+        overflow-y: auto;
+        /* padding-bottom: 1rem; /* Espace pour ne pas être caché par le FAB ou wizard-nav */
+    }
+    #lines-container {
+        padding-bottom: 70px; /* Espace pour le FAB */
+    }
   </style>
 
   <template id="tmpl-line">
@@ -2084,8 +2129,8 @@
 
   <div class="step active" data-step="1">
     <h2>Articles</h2>
-    <div id="lines-container" style="flex-grow: 1; overflow-y: auto;">
-    </div>
+    <div id="lines-container">
+      </div>
     <button id="add-line-btn" class="fab" aria-label="Ajouter une ligne">+</button>
     <div class="wizard-nav">
       <button class="btn primary" data-next disabled>Suivant →</button>
@@ -2094,21 +2139,22 @@
 
   <div class="step" data-step="2">
     <h2>Allocation du coût d’achat</h2>
-    <div class="form-group">
-      <label for="additional-cost">Coût supplémentaire (XOF)</label>
-      <input
-        id="additional-cost"
-        type="number"
-        step="50"
-        min="0"
-        placeholder="0"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="none"
-        spellcheck="false"
-      >
-    </div>
-    <div class="cost-allocation-list" style="flex-grow: 1; overflow-y: auto;">
+    <div style="flex-grow: 1; overflow-y: auto;"> <div class="form-group">
+        <label for="additional-cost">Coût supplémentaire (XOF)</label>
+        <input
+            id="additional-cost"
+            type="number"
+            step="50"
+            min="0"
+            placeholder="0"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+        >
+        </div>
+        <div class="cost-allocation-list">
+        </div>
     </div>
     <div class="wizard-nav">
       <button class="btn secondary" data-prev>← Précédent</button>
@@ -2118,10 +2164,12 @@
 
   <div class="step" data-step="3">
     <h2>Fournisseur</h2>
-    <div class="form-group">
-      <label for="supplier-search">Nom du fournisseur</label>
-      <input id="supplier-search" type="search" placeholder="Rechercher ou saisir" autocomplete="off"
-             autocorrect="off" autocapitalize="none" spellcheck="false">
+    <div style="flex-grow: 1; overflow-y: auto;">
+        <div class="form-group">
+        <label for="supplier-search">Nom du fournisseur</label>
+        <input id="supplier-search" type="search" placeholder="Rechercher ou saisir" autocomplete="off"
+                autocorrect="off" autocapitalize="none" spellcheck="false">
+        </div>
     </div>
     <div class="wizard-nav">
       <button class="btn secondary" data-prev>← Précédent</button>
@@ -2131,7 +2179,8 @@
 
   <div class="step" data-step="4">
     <h2>Résumé</h2>
-    <div class="summary-cards" id="summary-cards-new-supply" style="flex-grow: 1; overflow-y: auto;"> </div>
+    <div class="summary-cards" id="summary-cards-new-supply" style="flex-grow: 1; overflow-y: auto;">
+        </div>
     <div class="wizard-nav">
       <button class="btn secondary" data-prev>← Précédent</button>
       <button id="submit-supply" class="btn primary" disabled>Valider & envoyer</button>
@@ -2139,6 +2188,7 @@
   </div>
 
   <script>
+    // New Supply Page Script
     (function(){
       const main      = document.getElementById('new-supply');
       const steps     = [...main.querySelectorAll('.step')];
@@ -2156,8 +2206,8 @@
         const activeStepEl = steps.find(s => +s.dataset.step === n);
         if (activeStepEl) {
             const firstInput = activeStepEl.querySelector('input:not([type=hidden]):not([readonly]), textarea, select');
-            if (firstInput && activeStepEl.id !== 'lines-container') {
-                 setTimeout(() => firstInput.focus(), 50);
+            if (firstInput && activeStepEl.id !== 'lines-container' && activeStepEl.dataset.step !== "1") { // Ne pas focus sur l'étape 1 (lignes)
+                 setTimeout(() => firstInput.focus(), 50); 
             }
         }
       }
@@ -2165,79 +2215,144 @@
       main.addEventListener('click',e=>{
         if (e.target.matches('[data-next]:not([disabled])')) {
           currentStep++;
-          if (currentStep === 2) {
-            if (!additionalCostI.value) {
+          if (currentStep === 2) { 
+            if (!additionalCostI.value) { 
                 additionalCostI.value = "0";
             }
-            additionalCostI.dispatchEvent(new Event('input', { bubbles: true }));
+            additionalCostI.dispatchEvent(new Event('input', { bubbles: true })); 
             const step2NextBtn = main.querySelector('[data-step="2"] [data-next]');
-            if (step2NextBtn) step2NextBtn.disabled = parseFloat(additionalCostI.value) < 0;
+            if (step2NextBtn) step2NextBtn.disabled = parseFloat(additionalCostI.value) < 0; 
           }
-          if (currentStep === 4) updateSummary();
+          if (currentStep === 4) updateSummary(); 
           showStep(currentStep);
         }
         if(e.target.matches('[data-prev]')){currentStep--;showStep(currentStep)}
       });
-      showStep(currentStep);
+      showStep(currentStep); 
 
       supplierI.addEventListener('input',()=> {
           const step3NextBtn = main.querySelector('[data-step="3"] [data-next]');
           if (step3NextBtn) step3NextBtn.disabled = !supplierI.value.trim();
       });
 
-
       let lineIdCounter=0;
       addLineBtn.addEventListener('click',()=>addLine());
 
-      function addLine(data={}){
+      function addLine(data={}){ 
         lineIdCounter++;
         const row = document.importNode(tmplLine,true).firstElementChild;
-        row.dataset.id=lineIdCounter;
+        row.dataset.id=lineIdCounter; // ID unique pour la ligne
         const bookI=row.querySelector('.book-search');
+        
         bookI.addEventListener('click', () => {
-          window.currentBookInput = bookI;
-          location.hash = 'select-book';
+          // AMÉLIORATION: Utilisation de sessionStorage
+          sessionStorage.setItem('targetBookInputRowId_newSupply', row.dataset.id); 
+          sessionStorage.setItem('currentBookSearchValue_newSupply', bookI.value);
+          location.hash = 'select-book'; 
         });
 
         const qtyI =row.querySelector('.line-qty');
-        const costI=row.querySelector('.line-cost');
+        const costI=row.querySelector('.line-cost'); 
         const totalEl=row.querySelector('.line-total');
 
         if(data.title)bookI.value=data.title;
         if(data.qty)  qtyI.value=data.qty;
-        if(data.cost !== undefined) costI.value=data.cost; else costI.value = "0";
-
+        if(data.cost !== undefined) costI.value=data.cost; else costI.value = "0"; 
+        costI.dataset.baseCost = costI.value; 
 
         function updateLineTotals(){
           const q=parseInt(qtyI.value,10)||0;
-          const c=parseFloat(costI.value)||0;
+          const c=parseFloat(costI.value)||0; 
           totalEl.textContent='XOF '+(q*c).toLocaleString('fr-FR', {minimumFractionDigits:0});
           toggleNextButtonForStep1();
         }
         qtyI.addEventListener('input',updateLineTotals);
-        costI.addEventListener('input',updateLineTotals);
-        bookI.addEventListener('change', updateLineTotals);
+        costI.addEventListener('input',() => { 
+            costI.dataset.baseCost = costI.value; 
+            updateLineTotals();
+        }); 
+        // 'change' est mieux si la valeur est modifiée par script (après sélection)
+        bookI.addEventListener('change', updateLineTotals); 
 
         row.querySelector('.remove-line').addEventListener('click',()=>{
           row.remove();
           toggleNextButtonForStep1();
-          if (currentStep === 2) {
+          if (currentStep === 2) { 
             additionalCostI.dispatchEvent(new Event('input', { bubbles: true }));
-          } else if (currentStep === 4) {
+          } else if (currentStep === 4) { 
             updateSummary();
           }
         });
 
         linesC.append(row);
-        updateLineTotals();
+        updateLineTotals(); 
         toggleNextButtonForStep1();
         if (linesC.children.length === 1 && !bookI.value) {
-            setTimeout(() => bookI.click(), 100);
-        } else if (bookI.value) {
-            qtyI.focus();
-            qtyI.select();
+            // Ne pas auto-cliquer, laisser l'utilisateur cliquer sur le champ ou le FAB
+        } else if (bookI.value) { 
+          qtyI.focus();
+          qtyI.select();
         }
       }
+
+      // AMÉLIORATION: Fonction pour appliquer le livre sélectionné depuis sessionStorage
+      function applySelectedBookFromStorage_newSupply() {
+        const targetRowId = sessionStorage.getItem('targetBookInputRowId_newSupply');
+        const selectedTitle = sessionStorage.getItem('selectedBookTitle_newSupply');
+        const selectedCost = sessionStorage.getItem('selectedBookBaseCost_newSupply');
+
+        if (targetRowId && selectedTitle !== null && selectedCost !== null) {
+            const row = linesC.querySelector(`.line-row[data-id="${targetRowId}"]`);
+            if (row) {
+                const bookInput = row.querySelector('.book-search');
+                const costInput = row.querySelector('.line-cost');
+                const qtyInput = row.querySelector('.line-qty');
+
+                if (bookInput) bookInput.value = selectedTitle;
+                if (costInput) {
+                    costInput.value = selectedCost;
+                    costInput.dataset.baseCost = selectedCost; // Mettre à jour le baseCost
+                }
+                
+                // Déclencher 'change' sur bookInput pour que updateLineTotals soit appelé si nécessaire
+                if (bookInput) bookInput.dispatchEvent(new Event('change', { bubbles: true }));
+                if (costInput) costInput.dispatchEvent(new Event('input', { bubbles: true })); // Pour recalculer
+                
+                if (qtyInput) {
+                    if (!qtyInput.value || qtyInput.value === "0") qtyInput.value = 1;
+                    qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    setTimeout(() => { qtyInput.focus(); qtyInput.select(); }, 50);
+                }
+            }
+        }
+        sessionStorage.removeItem('targetBookInputRowId_newSupply');
+        sessionStorage.removeItem('selectedBookTitle_newSupply');
+        sessionStorage.removeItem('selectedBookBaseCost_newSupply');
+        sessionStorage.removeItem('currentBookSearchValue_newSupply');
+      }
+      // Appeler la fonction ci-dessus lorsque la page #new-supply est affichée
+      // Ceci sera géré par le routeur principal ou un observateur spécifique à cette page.
+      // Pour l'instant, on peut l'ajouter à un listener de hashchange spécifique à cette page.
+      window.addEventListener('hashchange', () => {
+        if (location.hash === '#new-supply' && main.classList.contains('visible')) {
+            applySelectedBookFromStorage_newSupply();
+        }
+      });
+      // Et pour le chargement initial si on arrive directement sur #new-supply
+      if (location.hash === '#new-supply' && main.classList.contains('visible')) {
+          applySelectedBookFromStorage_newSupply();
+      }
+       // Observer pour détecter quand la page devient visible et appliquer les données de sessionStorage
+      const newSupplyObserver = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                if (main.classList.contains('visible')) {
+                    applySelectedBookFromStorage_newSupply();
+                }
+            }
+        }
+      });
+      newSupplyObserver.observe(main, { attributes: true });
 
 
       additionalCostI.addEventListener('input', () => {
@@ -2249,25 +2364,17 @@
         }, 0);
 
         const unitExtraCost = totalQtyAllBooks > 0 ? addCost / totalQtyAllBooks : 0;
-        allocationList.innerHTML = '';
+        allocationList.innerHTML = ''; 
 
         rows.forEach(r => {
           const qtyInput      = r.querySelector('.line-qty');
-          const costInput     = r.querySelector('.line-cost');
+          const costInput     = r.querySelector('.line-cost'); 
           const lineTotalEl = r.querySelector('.line-total');
           const bookSearchInput = r.querySelector('.book-search');
-
           const currentQty  = parseInt(qtyInput.value, 10) || 0;
-
-          if (!costInput.dataset.baseCost) {
-            costInput.dataset.baseCost = costInput.value || "0";
-          }
-          const baseUnitCost = parseFloat(costInput.dataset.baseCost) || 0;
+          const baseUnitCost = parseFloat(costInput.dataset.baseCost || "0"); 
           const newUnitCostWithExtra = baseUnitCost + unitExtraCost;
-
-          costInput.value = newUnitCostWithExtra.toFixed(0);
           lineTotalEl.textContent = 'XOF ' + (currentQty * newUnitCostWithExtra).toLocaleString('fr-FR', {minimumFractionDigits:0});
-
           const extraCostForThisLineItem = currentQty * unitExtraCost;
           const title = bookSearchInput.value || 'Livre non spécifié';
           const div = document.createElement('div');
@@ -2281,8 +2388,8 @@
 
         const step2NextBtn = main.querySelector('[data-step="2"] [data-next]');
         if (step2NextBtn) step2NextBtn.disabled = addCost < 0 || rows.length === 0;
-
-        if (rows.length > 0 && addCost >= 0) {
+        
+        if (rows.length > 0 && addCost >= 0 && currentStep === 4) {
            updateSummary();
         }
       });
@@ -2290,13 +2397,12 @@
       function updateSummary() {
         const rows = [...linesC.children];
         const summaryCardsContainer = document.getElementById('summary-cards-new-supply');
-        summaryCardsContainer.innerHTML = '';
-
+        summaryCardsContainer.innerHTML = ''; 
         const supplierName = supplierI.value.trim() || 'Non spécifié';
         const additionalCostTotal = parseFloat(additionalCostI.value) || 0;
-
+        const totalQtyAllBooksForSummary = rows.reduce((sum, r) => sum + (parseInt(r.querySelector('.line-qty').value, 10) || 0), 0);
+        const unitExtraCostForSummary = totalQtyAllBooksForSummary > 0 ? additionalCostTotal / totalQtyAllBooksForSummary : 0;
         let grandTotalQty = 0;
-
         const generalInfoCard = document.createElement('div');
         generalInfoCard.className = 'summary-card';
         generalInfoCard.innerHTML = `
@@ -2314,13 +2420,11 @@
         rows.forEach(r => {
           const title = r.querySelector('.book-search').value || 'Livre N/A';
           const qty   = parseInt(r.querySelector('.line-qty').value,10) || 0;
-          const unitCostFinal = parseFloat(r.querySelector('.line-cost').value) || 0;
+          const baseUnitCost = parseFloat(r.querySelector('.line-cost').dataset.baseCost || r.querySelector('.line-cost').value || "0");
+          const unitCostFinal = baseUnitCost + unitExtraCostForSummary; 
           const lineTotal = unitCostFinal * qty;
-
           grandTotalQty += qty;
-          const baseUnitCost = parseFloat(r.querySelector('.line-cost').dataset.baseCost || "0");
           const extraPerUnitForThisItem = unitCostFinal - baseUnitCost;
-
           const card = document.createElement('div');
           card.className = 'summary-card';
           card.innerHTML = `
@@ -2356,10 +2460,10 @@
         finalTotalCard.className = 'summary-card';
         const actualGrandTotalCost = rows.reduce((sum, r) => {
             const qty = parseInt(r.querySelector('.line-qty').value,10) || 0;
-            const finalPU = parseFloat(r.querySelector('.line-cost').value) || 0;
+            const basePU = parseFloat(r.querySelector('.line-cost').dataset.baseCost || r.querySelector('.line-cost').value || "0");
+            const finalPU = basePU + unitExtraCostForSummary;
             return sum + (qty * finalPU);
         },0);
-
         finalTotalCard.innerHTML = `
           <div class="line" style="border-top: 1px solid #ccc; padding-top: 0.5rem; margin-top:0.5rem;">
               <div class="left"><i class="bi bi-calculator-fill icon"></i><span class="label">Quantité Totale d'articles</span></div>
@@ -2371,7 +2475,6 @@
           </div>
         `;
         summaryCardsContainer.appendChild(finalTotalCard);
-
         submitBtn.disabled = rows.length === 0 || !supplierI.value.trim();
       }
 
@@ -2389,36 +2492,38 @@
         const user=auth.currentUser;
         if (!user) {
           console.error("Utilisateur non connecté. Veuillez vous reconnecter.");
-          const toast=document.createElement('div');
-          toast.className='toast error';toast.textContent='Utilisateur non connecté.';
-          Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
-          document.body.append(toast);setTimeout(()=>toast.remove(),3000);
+          showGlobalToast('Utilisateur non connecté.', true);
           submitBtn.disabled = false;
           submitBtn.textContent = 'Valider & envoyer';
           return;
         }
 
         const supplierNameValue=supplierI.value.trim();
+        const additionalCostOverall = parseFloat(additionalCostI.value) || 0;
+        const totalQtyAllBooksForSave = [...linesC.children].reduce((sum, r) => sum + (parseInt(r.querySelector('.line-qty').value, 10) || 0), 0);
+        const unitExtraCostForSave = totalQtyAllBooksForSave > 0 ? additionalCostOverall / totalQtyAllBooksForSave : 0;
 
-        const supplyLinesData=[...linesC.children].map(r=>({
-          title:r.querySelector('.book-search').value,
-          quantity:parseInt(r.querySelector('.line-qty').value,10) || 0,
-          unitCost:parseFloat(r.querySelector('.line-cost').value) || 0,
-          baseUnitCost: parseFloat(r.querySelector('.line-cost').dataset.baseCost || r.querySelector('.line-cost').value) || 0
-        }));
+        const supplyLinesData=[...linesC.children].map(r=> {
+            const baseUnitCostFromInput = parseFloat(r.querySelector('.line-cost').dataset.baseCost || r.querySelector('.line-cost').value || "0");
+            return {
+                title:r.querySelector('.book-search').value,
+                quantity:parseInt(r.querySelector('.line-qty').value,10) || 0,
+                unitCost: baseUnitCostFromInput + unitExtraCostForSave, 
+                baseUnitCost: baseUnitCostFromInput 
+            };
+        });
 
         const totalQuantityFinal = supplyLinesData.reduce((sum, ln) => sum + ln.quantity, 0);
         const totalCostFinal = supplyLinesData.reduce((sum, ln) => sum + ln.quantity * ln.unitCost, 0);
-        const additionalCostOverall = parseFloat(additionalCostI.value) || 0;
-
+        
         const batch=db.batch();
         const supplyRef=db.collection('users').doc(user.uid).collection('supplies').doc();
         batch.set(supplyRef,{
             supplierName:supplierNameValue,
             date:firebase.firestore.FieldValue.serverTimestamp(),
-            lines: supplyLinesData,
+            lines: supplyLinesData, 
             totalQty:totalQuantityFinal,
-            totalCost:totalCostFinal,
+            totalCost:totalCostFinal, 
             additionalCostApplied: additionalCostOverall
         });
 
@@ -2427,33 +2532,42 @@
 
         for(const ln of supplyLinesData){
           if (!ln.title) continue;
-          const snap = await userBooksRef.where('title','==', ln.title).limit(1).get();
+          const bookQuerySnapshot = await userBooksRef.where('title','==', ln.title).limit(1).get();
 
-          if (!snap.empty) {
-            const bookDocRef = snap.docs[0].ref;
+          if (!bookQuerySnapshot.empty) { 
+            const bookDocRef = bookQuerySnapshot.docs[0].ref;
+            const bookData = bookQuerySnapshot.docs[0].data();
+            
+            const currentQuantity = bookData.quantity || 0;
+            const currentAverageCost = bookData.averageCost !== undefined ? bookData.averageCost : (bookData.lastPurchasePrice || 0); 
+            const newQuantity = currentQuantity + ln.quantity;
+            let newAverageCost = currentAverageCost; 
+            if (newQuantity > 0) { 
+                 newAverageCost = 
+                    ((currentAverageCost * currentQuantity) + (ln.unitCost * ln.quantity)) / newQuantity;
+            } else if (ln.quantity > 0) { 
+                 newAverageCost = ln.unitCost;
+            }
             batch.update(bookDocRef, {
               quantity: firebase.firestore.FieldValue.increment(ln.quantity),
-              lastPurchasePrice: ln.unitCost,
+              lastPurchasePrice: ln.unitCost, 
+              averageCost: newAverageCost, 
             });
-          } else {
+          } else { 
              batch.set(userBooksRef.doc(), {
               title: ln.title,
               quantity: ln.quantity,
-              price: ln.baseUnitCost,
-              lastPurchasePrice: ln.unitCost,
+              price: ln.baseUnitCost, 
+              lastPurchasePrice: ln.unitCost, 
+              averageCost: ln.unitCost, 
               createdAt: firebase.firestore.FieldValue.serverTimestamp()
              });
           }
         }
         try {
             await batch.commit();
-            location.hash='supply';
-            const toast=document.createElement('div');
-            toast.className='toast';toast.textContent='Approvisionnement enregistré !';
-            Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)',
-              background:'#333',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
-            document.body.append(toast);setTimeout(()=>toast.remove(),2500);
-
+            location.hash='supply'; 
+            showGlobalToast('Approvisionnement enregistré !', false, 2500);
             supplierI.value = '';
             linesC.innerHTML = '';
             additionalCostI.value = '0';
@@ -2465,50 +2579,54 @@
             main.querySelector('[data-step="2"] [data-next]').disabled = true;
             main.querySelector('[data-step="3"] [data-next]').disabled = true;
             submitBtn.disabled = true;
-
         } catch (error) {
             console.error("Erreur lors de l'enregistrement de l'approvisionnement: ", error);
-            const toast=document.createElement('div');
-            toast.className='toast error';toast.textContent="Erreur: " + error.message;
-            Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
-            document.body.append(toast);setTimeout(()=>toast.remove(),3000);
+            showGlobalToast("Erreur: " + error.message, true, 3500);
         } finally {
-            submitBtn.disabled = false;
+            submitBtn.disabled = false; 
             submitBtn.textContent = 'Valider & envoyer';
         }
       });
 
-      const supplierSearchField = main.querySelector('#supplier-search');
-      const step1Element = main.querySelector('.step[data-step="1"]');
       const allWizardNavs = main.querySelectorAll('.wizard-nav');
       const allStepContents = main.querySelectorAll('.step');
 
       function onInputFocus(e) {
         const currentStepEl = e.target.closest('.step');
         const currentWizardNav = currentStepEl ? currentStepEl.querySelector('.wizard-nav') : null;
-
         if (!currentWizardNav || !currentStepEl) return;
         if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', () => adjustLayoutForKeyboard(currentStepEl, currentWizardNav, e.target));
+            window.visualViewport.addEventListener('resize', handleViewportResize);
             adjustLayoutForKeyboard(currentStepEl, currentWizardNav, e.target);
         }
       }
       function onInputBlur(e) {
         const currentStepEl = e.target.closest('.step');
         const currentWizardNav = currentStepEl ? currentStepEl.querySelector('.wizard-nav') : null;
-
         if (window.visualViewport) {
-            window.visualViewport.removeEventListener('resize', () => adjustLayoutForKeyboard(currentStepEl, currentWizardNav, e.target));
+            window.visualViewport.removeEventListener('resize', handleViewportResize);
         }
         if (currentWizardNav) currentWizardNav.style.bottom = '';
-        if (currentStepEl) currentStepEl.style.paddingBottom = '';
+        if (currentStepEl) currentStepEl.style.paddingBottom = ''; // Réinitialiser le padding
+      }
+      
+      // Stocker les références pour le removeEventListener
+      let currentStepElForKeyboard, currentWizardNavForKeyboard, focusedInputForKeyboard;
+
+      function handleViewportResize() {
+          adjustLayoutForKeyboard(currentStepElForKeyboard, currentWizardNavForKeyboard, focusedInputForKeyboard);
       }
 
+
       function adjustLayoutForKeyboard(stepEl, wizardNavEl, focusedInput) {
+        currentStepElForKeyboard = stepEl;
+        currentWizardNavForKeyboard = wizardNavEl;
+        focusedInputForKeyboard = focusedInput;
+
         if (!wizardNavEl || !stepEl || document.activeElement !== focusedInput) {
-          if (window.visualViewport && document.activeElement !== focusedInput) {
+          if (window.visualViewport && document.activeElement !== focusedInput) { 
              if (wizardNavEl) wizardNavEl.style.bottom = '';
-             if (stepEl) stepEl.style.paddingBottom = '';
+             if (stepEl) stepEl.style.paddingBottom = ''; // Réinitialiser le padding
           }
           return;
         }
@@ -2516,13 +2634,24 @@
         const keyboardHeight = window.innerHeight - (visualViewport.offsetTop + visualViewport.height);
         const safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)')) || 0;
 
-        if (keyboardHeight > 50) {
+        if (keyboardHeight > 50) { 
           wizardNavEl.style.bottom = (keyboardHeight - safeAreaBottom) + 'px';
           const navHeight = wizardNavEl.offsetHeight;
-          stepEl.style.paddingBottom = (keyboardHeight - safeAreaBottom + navHeight + 15) + 'px';
-        } else {
+          // Ajuster le padding du conteneur de contenu scrollable de l'étape, pas de l'étape elle-même
+          const scrollableContent = stepEl.querySelector('div[style*="overflow-y: auto"], #lines-container');
+          if (scrollableContent) {
+            scrollableContent.style.paddingBottom = (keyboardHeight - safeAreaBottom + navHeight + 15) + 'px';
+          } else { // Fallback si pas de conteneur scrollable spécifique trouvé
+            stepEl.style.paddingBottom = (keyboardHeight - safeAreaBottom + navHeight + 15) + 'px';
+          }
+        } else { 
           wizardNavEl.style.bottom = '';
-          stepEl.style.paddingBottom = '';
+          const scrollableContent = stepEl.querySelector('div[style*="overflow-y: auto"], #lines-container');
+          if (scrollableContent) {
+            scrollableContent.style.paddingBottom = ''; // Réinitialiser le padding du contenu
+          } else {
+            stepEl.style.paddingBottom = ''; // Réinitialiser le padding de l'étape
+          }
         }
       }
       main.querySelectorAll('input[type="search"], input[type="number"], input[type="text"]').forEach(input => {
@@ -2531,47 +2660,43 @@
       });
       toggleNextButtonForStep1();
       const step2NextBtn = main.querySelector('[data-step="2"] [data-next]');
-      if (step2NextBtn) step2NextBtn.disabled = true;
+      if (step2NextBtn) step2NextBtn.disabled = true; 
       const step3NextBtn = main.querySelector('[data-step="3"] [data-next]');
-      if (step3NextBtn) step3NextBtn.disabled = true;
+      if (step3NextBtn) step3NextBtn.disabled = true; 
     })();
   </script>
 </main>
 
 <main id="select-book" class="page">
   <style>
-
-    #select-book .books-list .book-card { /* Style for clickable book cards */
+    #select-book .books-list .book-card { 
         cursor: pointer;
         transition: background-color 0.15s ease-in-out;
-        /* Re-using general book-card styles from catalog, specific styling below */
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius-card);
         padding: 1rem;
         background: #fff;
         box-shadow: none;
     }
-    #select-book .books-list .book-card:hover { /* Desktop hover */
+    #select-book .books-list .book-card:hover { 
         background-color: #f9f9f9;
     }
-    #select-book .books-list .book-card:active { /* Mobile tap */
+    #select-book .books-list .book-card:active { 
         background-color: #f0f0f0;
     }
-    #select-book .search-noresult-container { /* Container for the chip */
+    #select-book .search-noresult-container { 
         padding: 1rem; text-align: center;
     }
-    /* Styles for book-card content within select-book modal */
     #select-book .book-title {
       font-size: 1.1rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--primary-text);
     }
-    #select-book .book-price {
+    #select-book .book-price { 
       font-size: 0.9rem; font-weight: 500; color: var(--ebay-red); margin-bottom: 0.2rem;
     }
     #select-book .book-quantity {
       font-size: 0.85rem; color: var(--secondary-text);
     }
-    /* Header for select-book page (re-using .sell-header structure) */
-    #select-book > header.sell-header { /* More specific selector */
+    #select-book > header.sell-header { 
         display: flex;
         align-items: center;
         padding: 0.75rem 1rem;
@@ -2591,7 +2716,7 @@
         flex: 1; margin-top: 0;
     }
     #select-book > header.sell-header #select-book-search {
-        width: 100%; padding: 0.75rem 2.75rem 0.75rem 2.75rem; /* Adjusted for search icon */
+        width: 100%; padding: 0.75rem 2.75rem 0.75rem 2.75rem; 
         border: 1px solid var(--border-color); border-radius: var(--border-radius-pill);
         background: #f4f4f4; font-size: 1rem; outline: none; box-shadow: none;
     }
@@ -2615,42 +2740,49 @@
   <div id="select-book-results" style="padding-bottom: 1rem;"> <div class="books-list" style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem;"></div> </div>
 
   <script>
+  // Select Book Page Script
   (function() {
     const selectBookPage = document.getElementById('select-book');
     const searchInputEl = document.getElementById('select-book-search');
     const resultListEl  = document.querySelector('#select-book-results .books-list');
-    // const closeBtnSelectBook = document.querySelector('#select-book .btn-close'); // Handled by router
-
     let debounceTimer = null;
+
     searchInputEl.addEventListener('input', performBookSearch);
 
     window.addEventListener('hashchange', () => {
       if (location.hash === '#select-book' && selectBookPage.classList.contains('visible')) {
-          setTimeout(() => searchInputEl.focus(), 50); // Delay for transition
-          if (window.currentBookInput && window.currentBookInput.value) {
-              searchInputEl.value = window.currentBookInput.value;
+          setTimeout(() => searchInputEl.focus(), 50); 
+          // AMÉLIORATION: Lire depuis sessionStorage
+          const prefillSearch = sessionStorage.getItem('currentBookSearchValue_newSupply');
+          if (prefillSearch) {
+              searchInputEl.value = prefillSearch;
           } else {
-              searchInputEl.value = ''; // Clear search on new focus if no prefill
+              searchInputEl.value = ''; 
           }
           performBookSearch(); 
       }
     });
+     // Exécuter aussi si la page est déjà visible au chargement initial (ex: refresh)
+    if (location.hash === '#select-book' && selectBookPage.classList.contains('visible')) {
+        setTimeout(() => searchInputEl.focus(), 50);
+        const prefillSearch = sessionStorage.getItem('currentBookSearchValue_newSupply');
+        if (prefillSearch) {
+            searchInputEl.value = prefillSearch;
+        } else {
+            searchInputEl.value = '';
+        }
+        performBookSearch();
+    }
+
 
   async function performBookSearch() {
     const searchTerm = searchInputEl.value.trim();
-    // resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Recherche en cours…</p>';
     clearTimeout(debounceTimer);
 
     if (searchTerm.length === 0) { 
-        // resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Saisissez un nom de livre pour rechercher.</p>';
-        loadAllBooks(); // Load all books if search is empty
+        loadAllBooks(); 
         return;
     }
-    // if (searchTerm.length < 2 && searchTerm.length > 0) { 
-    //   resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Continuez à taper...</p>';
-    //   return;
-    // }
-
     debounceTimer = setTimeout(async () => {
       try {
         if (!auth.currentUser) {
@@ -2659,17 +2791,12 @@
         }
         const uid = auth.currentUser.uid;
         const userBooksRef = db.collection('users').doc(uid).collection('books');
-        
-        // Client-side filtering for simplicity with small datasets
-        // For larger datasets, use Firestore queries with indexing (e.g., Algolia for complex search)
         const snapshot = await userBooksRef.orderBy('title').get();
         const allUserBooks = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-        
         const searchTermLower = searchTerm.toLowerCase();
         const filteredBooks = allUserBooks.filter(book => 
             book.title.toLowerCase().includes(searchTermLower)
         );
-
         displayResults(filteredBooks, searchTerm);
       } catch (err) {
         resultListEl.innerHTML = '<p style="color:var(--ebay-red);padding:1rem;text-align:center;">Erreur de recherche.</p>';
@@ -2679,139 +2806,92 @@
   }
 
   async function loadAllBooks() {
-      // resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Chargement des livres...</p>';
       try {
         if (!auth.currentUser) {
             resultListEl.innerHTML = '<p style="padding:1rem;color:var(--ebay-red);text-align:center;">Utilisateur non connecté.</p>';
             return;
         }
         const uid = auth.currentUser.uid;
-        const snapshot = await db.collection('users').doc(uid).collection('books').orderBy('title').limit(50).get(); // Limit initial load
+        const snapshot = await db.collection('users').doc(uid).collection('books').orderBy('title').limit(50).get(); 
         const books = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-        displayResults(books, ""); // Display all loaded books, empty search term
+        displayResults(books, ""); 
       } catch (err) {
         resultListEl.innerHTML = '<p style="color:var(--ebay-red);padding:1rem;text-align:center;">Erreur de chargement.</p>';
         console.error("Book load error:", err);
       }
   }
 
-
   function displayResults(books, searchTerm) {
       resultListEl.innerHTML = ''; 
-      if (books.length === 0 && searchTerm) { // Only show "add new" if there was a search term
+      if (books.length === 0 && searchTerm) { 
         resultListEl.innerHTML = `
             <div class="search-noresult-container">
               <p>Aucun livre trouvé pour « ${searchTerm} ».</p>
-              <div id="add-book-chip" class="search-noresult" style="margin-top: 0.5rem; display: inline-flex; justify-content: center;">
-                Ajouter « <strong id="chip-book-title">${searchTerm}</strong> » comme nouveau livre
+              <div id="add-new-book-chip-from-select" class="search-noresult" style="margin-top: 0.5rem; display: inline-flex; justify-content: center;">
+                Ajouter « <strong id="chip-book-title-from-select">${searchTerm}</strong> » comme nouveau livre
                 <i class="bi bi-plus-circle-fill" style="margin-left: 0.5rem;"></i>
               </div>
             </div>
           `;
+          // AMÉLIORATION: Le clic sur ce chip ouvrira la modale d'ajout de livre
+          const addChip = resultListEl.querySelector('#add-new-book-chip-from-select');
+          if (addChip) {
+              addChip.addEventListener('click', () => {
+                  const titleSuggestion = addChip.querySelector('#chip-book-title-from-select').textContent.trim();
+                  // La variable 'targetBookInputRowId_newSupply' est déjà dans sessionStorage
+                  // si on vient de new-supply.
+                  // On stocke le titre suggéré pour la modale.
+                  sessionStorage.setItem('suggestedNewBookTitle_newSupply', titleSuggestion);
+                  // Le script de la modale `add-book-modal` lira `suggestedNewBookTitle_newSupply`
+                  // et `targetBookInputRowId_newSupply` pour savoir où retourner l'info.
+                  openGlobalAddBookModal(titleSuggestion); // Utiliser la fonction globale
+              });
+          }
+
       } else if (books.length === 0 && !searchTerm) {
          resultListEl.innerHTML = '<p style="padding:1rem; text-align:center;">Aucun livre dans votre catalogue. Ajoutez-en via la section "Approvisionnement".</p>';
       } else {
         books.forEach(bookData => {
           const bookDiv = document.createElement('div');
           bookDiv.className = 'book-card'; 
+          const costToDisplay = bookData.averageCost !== undefined ? bookData.averageCost : (bookData.lastPurchasePrice || 0);
           bookDiv.innerHTML = `
             <h4 class="book-title">${bookData.title}</h4>
-            <p class="book-price">PU Achat: ${(bookData.lastPurchasePrice || bookData.price || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0})}</p>
+            <p class="book-price">Coût Moyen Pondéré: ${costToDisplay.toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0})}</p>
             <p class="book-quantity">En Stock: ${bookData.quantity || 0}</p>
             `;
           bookDiv.addEventListener('click', () => {
-            if (window.currentBookInput) {
-              window.currentBookInput.value = bookData.title;
-              const lineRow = window.currentBookInput.closest('.line-row');
-              if (lineRow) {
-                const costInput = lineRow.querySelector('.line-cost');
-                const qtyInput = lineRow.querySelector('.line-qty');
-                if (costInput) {
-                  const purchasePrice = bookData.lastPurchasePrice || bookData.price || 0;
-                  costInput.value = purchasePrice.toFixed(0); // XOF
-                  costInput.dataset.baseCost = purchasePrice.toFixed(0); 
-                }
-                // if (qtyInput && (!qtyInput.value || qtyInput.value === "0") ) { 
-                //   qtyInput.value = 1;
-                // }
-                // Trigger events after setting values
-                window.currentBookInput.dispatchEvent(new Event('change', { bubbles:true })); // Use 'change' as value is set programmatically
-                if (costInput) costInput.dispatchEvent(new Event('input', { bubbles:true }));
-                if (qtyInput) qtyInput.dispatchEvent(new Event('input', { bubbles:true }));
-
-                setTimeout(() => qtyInput.focus(), 0); // Focus quantity after selecting
-                qtyInput.select();
-
-
-              }
+            // AMÉLIORATION: Utilisation de sessionStorage
+            const targetRowId = sessionStorage.getItem('targetBookInputRowId_newSupply');
+            if (targetRowId) {
+                sessionStorage.setItem('selectedBookTitle_newSupply', bookData.title);
+                sessionStorage.setItem('selectedBookBaseCost_newSupply', (bookData.lastPurchasePrice || 0).toFixed(0));
             }
+            // sessionStorage.removeItem('targetBookInputRowId_newSupply'); // Ne pas supprimer ici, mais dans new-supply
+            sessionStorage.removeItem('currentBookSearchValue_newSupply');
             location.hash = 'new-supply'; 
           });
           resultListEl.appendChild(bookDiv);
         });
       }
   }
-
-})();
-</script>
+  })();
+  </script>
 </main>
 
-<main id="add-book-modal" class="page modal-overlay" aria-hidden="true"> <style>
-#add-book-modal.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-  /* display: none;  Handled by .page and .visible */
-  overflow: hidden; height: 100vh; width: 100vw; 
-  align-items: center; justify-content: center; z-index: 100; 
-}
-/* #add-book-modal.modal-overlay.visible { display: flex; } */ /* Handled by .page.visible */
-#add-book-modal .modal {
-  background: #fff; border-radius: 0.75rem; 
-  width: 90%; max-width: 380px; 
-  max-height: calc(100dvh - env(safe-area-inset-bottom) - 2rem); 
-  overflow-y: auto; display: flex; flex-direction: column;
-  box-shadow: none; border: 1px solid var(--border-color); /* NO SHADOW */
-}
-#add-book-modal .modal header {
-  padding: 1rem 1.25rem; border-bottom: 1px solid #eee;
-  display: flex; justify-content: space-between; align-items: center;
-}
-#add-book-modal .modal header h3 { margin: 0; font-size: 1.15rem; font-weight: 600; }
-#add-book-modal .modal-close {
-  background: none; border: none; font-size: 1.75rem; cursor: pointer;
-  color: var(--secondary-text); padding: 0.25rem; line-height: 1;
-}
-#add-book-modal .modal-content { padding: 0.75rem 1.25rem 1.25rem; }
-#add-book-modal .form-group { margin-bottom: 1rem; }
-#add-book-modal label {
-  display: block; margin-bottom: 0.4rem; font-size: 0.9rem;
-  color: var(--secondary-text); font-weight: 500;
-}
-#add-book-modal input { 
-  width: 100%; padding: 0.8rem; border: 1px solid #ccc;
-  border-radius: var(--border-radius-card); font-size: 1rem; outline: none;
-  transition: border-color 0.2s ease; box-shadow: none;
-}
-#add-book-modal input:focus { border-color: var(--accent); }
-#add-book-modal button[type="submit"] {
-  width: 100%; padding: 0.85rem; font-size: 1rem; font-weight: 600;
-  border: none; border-radius: var(--border-radius-pill); background: var(--accent);
-  color: #fff; cursor: pointer; margin-top: 0.5rem; box-shadow:none;
-}
-#add-book-modal button[type="submit"]:active { background: #014fa5; }
-#add-book-modal .modal { position: relative; transition: transform 0.2s ease-out; }
-body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /* Adjust less aggressively */
-  </style>
-
-  <div class="modal">
+<div id="add-book-modal-overlay" class="modal-overlay-container" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="add-book-modal-title-heading">
     <header>
-      <h3>Ajouter un nouveau livre</h3>
-      <button class="modal-close" data-hash="select-book" aria-label="Fermer">&times;</button> </header>
-    <div class="modal-content"> <form id="form-add-book">
+      <h3 id="add-book-modal-title-heading">Ajouter un nouveau livre</h3>
+      <button id="add-book-modal-close-btn" class="modal-close-btn" aria-label="Fermer">&times;</button>
+    </header>
+    <div class="modal-content">
+      <form id="form-add-book-modal-form">
         <div class="form-group">
-          <label for="new-book-title">Titre du livre</label>
+          <label for="new-book-title-modal-input">Titre du livre</label>
           <input
             type="search" 
-            id="new-book-title"
+            id="new-book-title-modal-input"
             placeholder="Ex: Le Petit Prince"
             autocomplete="off"
             autocorrect="off"
@@ -2821,210 +2901,147 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             required
           >
         </div>
-        <button type="submit">Enregistrer le livre</button>
+        <button type="submit" id="add-book-modal-submit-btn">Enregistrer le livre</button>
       </form>
     </div>
   </div>
-</main>
-  <script>
-  function openAddBookModal(defaultTitle = '') {
-    const modalEl = document.getElementById('add-book-modal');
-    if (!modalEl) return console.error('Modal #add-book-modal introuvable');
+</div>
+
+<script>
+// Script pour la MODALE GLOBALE d'ajout de livre
+const addBookModalOverlayGlobal = document.getElementById('add-book-modal-overlay');
+const addBookModalDialogGlobal = addBookModalOverlayGlobal.querySelector('.modal');
+const formAddBookModalGlobal = document.getElementById('form-add-book-modal-form');
+const titleInputModalGlobal = document.getElementById('new-book-title-modal-input');
+const closeModalBtnModalGlobal = document.getElementById('add-book-modal-close-btn');
+const submitBtnModalGlobal = document.getElementById('add-book-modal-submit-btn');
+let previousActiveElementGlobal; 
+let focusableElementsModalGlobal = [];
+
+function openGlobalAddBookModal(defaultTitle = '') {
+    if (!addBookModalOverlayGlobal) return console.error('Modale #add-book-modal-overlay introuvable');
     
-    // modalEl.classList.add('visible'); // Router handles visibility
-    // modalEl.setAttribute('aria-hidden', 'false');
-    location.hash = 'add-book-modal'; // Let router show the modal "page"
+    previousActiveElementGlobal = document.activeElement; 
+    addBookModalOverlayGlobal.classList.add('visible');
+    addBookModalOverlayGlobal.setAttribute('aria-hidden', 'false');
+    titleInputModalGlobal.value = defaultTitle;
+
+    // Piéger le focus
+    const focusableElementsString = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    focusableElementsModalGlobal = Array.from(addBookModalDialogGlobal.querySelectorAll(focusableElementsString));
+    const firstFocusableElement = focusableElementsModalGlobal[0];
     
-    const titleInputEl = document.getElementById('new-book-title');
-    if (titleInputEl) {
-        titleInputEl.value = defaultTitle; 
-        setTimeout(() => titleInputEl.focus(), 100); // Increased delay for page transition
+    setTimeout(() => { // Laisser le temps à la modale de devenir visible
+        if (firstFocusableElement) firstFocusableElement.focus();
+    }, 100);
+
+
+    document.addEventListener('keydown', trapFocusInModalGlobal);
+    document.addEventListener('keydown', handleEscapeKeyModalGlobal);
+    document.body.style.overflow = 'hidden'; // Empêcher le scroll du body
+}
+
+function closeGlobalAddBookModal() {
+    if (!addBookModalOverlayGlobal) return;
+    addBookModalOverlayGlobal.classList.remove('visible');
+    addBookModalOverlayGlobal.setAttribute('aria-hidden', 'true');
+    
+    document.removeEventListener('keydown', trapFocusInModalGlobal);
+    document.removeEventListener('keydown', handleEscapeKeyModalGlobal);
+    document.body.style.overflow = ''; // Restaurer le scroll du body
+
+    if (previousActiveElementGlobal) {
+        previousActiveElementGlobal.focus(); 
     }
-    // document.body.style.overflow = 'hidden'; // Potentially handled by router or CSS for modal
-  }
+    // Nettoyer le titre suggéré si on vient de select-book
+    sessionStorage.removeItem('suggestedNewBookTitle_newSupply');
+}
 
-  document.addEventListener('click', e => {
-    const chip = e.target.closest('#add-book-chip'); 
-    if (!chip) return;
-    
-    // let suggestedTitle = chip.textContent.trim();
-    // suggestedTitle = suggestedTitle.replace(/^Ajouter\s*«\s*/, '').replace(/\s*»(\s*<i.*)?$/, ''); 
-    const strongTitleEl = chip.querySelector('#chip-book-title');
-    const suggestedTitle = strongTitleEl ? strongTitleEl.textContent.trim() : '';
-
-    openAddBookModal(suggestedTitle);
-  });
-
-  function closeAddBookModal() { // This function might be called by router when navigating away
-    const modalEl = document.getElementById('add-book-modal');
-    // if (modalEl) {
-    //   modalEl.classList.remove('visible');
-    //   modalEl.setAttribute('aria-hidden', 'true');
-    // }
-    // document.body.style.overflow = ''; 
-    // document.body.classList.remove('keyboard-visible'); 
-    if (location.hash === '#add-book-modal') { // If still on modal, go back to select-book
-        location.hash = 'select-book';
+if(closeModalBtnModalGlobal) closeModalBtnModalGlobal.addEventListener('click', closeGlobalAddBookModal);
+addBookModalOverlayGlobal.addEventListener('click', (e) => {
+    if (e.target === addBookModalOverlayGlobal) { 
+        closeGlobalAddBookModal();
     }
-  }
+});
 
-  // Close button inside modal now uses data-hash, handled by main router
-  // const closeBtnEl = document.querySelector('#add-book-modal .modal-close');
-  // if (closeBtnEl) {
-  //  closeBtnEl.addEventListener('click', closeAddBookModal);
-  // }
+function trapFocusInModalGlobal(e) {
+    if (e.key !== 'Tab' || !addBookModalOverlayGlobal.classList.contains('visible')) return;
+    
+    const firstFocusableElement = focusableElementsModalGlobal[0];
+    const lastFocusableElement = focusableElementsModalGlobal[focusableElementsModalGlobal.length - 1];
 
-  // const overlayEl = document.getElementById('add-book-modal');
-  // if (overlayEl) {
-  //  overlayEl.addEventListener('click', e => {
-  //    if (e.target === overlayEl) { 
-  //      closeAddBookModal();
-  //    }
-  //  });
-  // }
-  // window.addEventListener('keydown', (e) => {
-  //  if (e.key === 'Escape' && overlayEl && overlayEl.classList.contains('visible')) {
-  //      closeAddBookModal();
-  //  }
-  // });
-
-  (function() {
-    const modalEl = document.getElementById('add-book-modal');
-    if (!modalEl) return;
-    const modalContentEl = modalEl.querySelector('.modal');
-
-    let initialViewportHeight = window.innerHeight; 
-    let isKeyboardLikelyVisible = false;
-
-    const inputs = modalContentEl.querySelectorAll('input, textarea');
-    inputs.forEach(input => {
-        input.addEventListener('focus', () => {
-            initialViewportHeight = window.innerHeight; 
-            isKeyboardLikelyVisible = true;  
-            setTimeout(() => { // Check after a delay
-              // VisualViewport API is more reliable if available
-              if (window.visualViewport) {
-                if (window.innerHeight - window.visualViewport.height > 150) { // Heuristic for keyboard height
-                    document.body.classList.add('keyboard-visible');
-                }
-              } else if (window.innerHeight < initialViewportHeight * 0.80) { // Fallback
-                document.body.classList.add('keyboard-visible');
-              }
-            }, 100); // Delay to allow keyboard to animate
-        });
-        input.addEventListener('blur', () => {
-            isKeyboardLikelyVisible = false;
-            setTimeout(() => {
-                const activeEl = document.activeElement;
-                if (!modalContentEl.contains(activeEl) || (activeEl.tagName !== 'INPUT' && activeEl.tagName !== 'TEXTAREA')) {
-                    document.body.classList.remove('keyboard-visible');
-                }
-            }, 150);
-        });
-    });
-     window.addEventListener('resize', () => {
-        if (isKeyboardLikelyVisible) { 
-            if (window.visualViewport) {
-                 if (window.innerHeight - window.visualViewport.height > 150) {
-                    document.body.classList.add('keyboard-visible');
-                } else if (Math.abs(window.innerHeight - window.visualViewport.height) < 50) { // Keyboard likely closed
-                    document.body.classList.remove('keyboard-visible');
-                }
-            } else if (window.innerHeight < initialViewportHeight * 0.80) { // Fallback
-                document.body.classList.add('keyboard-visible');
-            } else if (window.innerHeight >= initialViewportHeight * 0.95) { 
-                document.body.classList.remove('keyboard-visible');
-            }
+    if (e.shiftKey) { 
+        if (document.activeElement === firstFocusableElement) {
+            lastFocusableElement.focus();
+            e.preventDefault();
         }
-    });
-  })();
+    } else { 
+        if (document.activeElement === lastFocusableElement) {
+            firstFocusableElement.focus();
+        }
+    }
+}
 
-  const formAddBookEl = document.getElementById('form-add-book');
-  formAddBookEl.addEventListener('submit', async e => {
+function handleEscapeKeyModalGlobal(e) {
+    if (e.key === 'Escape' && addBookModalOverlayGlobal.classList.contains('visible')) {
+        closeGlobalAddBookModal();
+    }
+}
+
+formAddBookModalGlobal.addEventListener('submit', async e => {
     e.preventDefault();
-    const titleInputEl = document.getElementById('new-book-title');
-    const newTitle = titleInputEl.value.trim();
+    const newTitle = titleInputModalGlobal.value.trim();
     
     if (!newTitle) {
-      titleInputEl.style.borderColor = 'var(--ebay-red)';
-      setTimeout(() => titleInputEl.style.borderColor = '', 2000);
-      titleInputEl.focus();
+      titleInputModalGlobal.style.borderColor = 'var(--ebay-red)';
+      setTimeout(() => titleInputModalGlobal.style.borderColor = '', 2000);
+      titleInputModalGlobal.focus();
       return;
     }
     
-    const submitButton = formAddBookEl.querySelector('button[type="submit"]');
-    submitButton.disabled = true;
-    submitButton.textContent = 'Enregistrement...';
+    submitBtnModalGlobal.disabled = true;
+    submitBtnModalGlobal.textContent = 'Enregistrement...';
 
     try {
-      if (!auth.currentUser) {
-        throw new Error("Utilisateur non authentifié.");
-      }
+      if (!auth.currentUser) throw new Error("Utilisateur non authentifié.");
       const uid = auth.currentUser.uid;
       const userBooksRef = db.collection('users').doc(uid).collection('books');
-
-      // Check if book with same title already exists (case-insensitive for better UX)
       const querySnapshot = await userBooksRef.get();
       const existingBook = querySnapshot.docs.find(doc => doc.data().title.toLowerCase() === newTitle.toLowerCase());
 
-      if (existingBook) {
-         throw new Error(`Un livre intitulé "${existingBook.data().title}" existe déjà.`);
-      }
+      if (existingBook) throw new Error(`Un livre intitulé "${existingBook.data().title}" existe déjà.`);
 
       await userBooksRef.add({
         title: newTitle,
         price: 0, 
         quantity: 0, 
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        lastPurchasePrice: 0 
+        lastPurchasePrice: 0, 
+        averageCost: 0 
       });
 
-      // closeAddBookModal(); // Router will handle navigation away
-      location.hash = 'select-book'; // Go back to select book page
+      closeGlobalAddBookModal(); 
+      showGlobalToast(`Livre "${newTitle}" ajouté !`, false, 2500);
 
-      if (window.currentBookInput) { 
-          // location.hash = 'new-supply';  // Already handled by select-book logic on item click
-          window.currentBookInput.value = newTitle;
-          window.currentBookInput.dispatchEvent(new Event('change', { bubbles: true }));
-          
-          const lineRow = window.currentBookInput.closest('.line-row');
-          if (lineRow) {
-              const costInput = lineRow.querySelector('.line-cost');
-              const qtyInput = lineRow.querySelector('.line-qty');
-               if (costInput) { // Set new book base cost to 0, to be filled by user
-                  costInput.value = "0";
-                  costInput.dataset.baseCost = "0";
-                  costInput.dispatchEvent(new Event('input', { bubbles:true }));
-              }
-              if (qtyInput) {
-                  qtyInput.value = "1"; // Default qty to 1 for new book
-                  qtyInput.dispatchEvent(new Event('input', { bubbles:true }));
-                  setTimeout(() => qtyInput.focus(), 0); // Focus quantity
-                  qtyInput.select();
-              }
-          }
+      // AMÉLIORATION: Mettre à jour sessionStorage pour la page new-supply si on vient de là
+      const targetRowIdForNewSupply = sessionStorage.getItem('targetBookInputRowId_newSupply');
+      if (targetRowIdForNewSupply) {
+          sessionStorage.setItem('selectedBookTitle_newSupply', newTitle);
+          sessionStorage.setItem('selectedBookBaseCost_newSupply', "0"); // Nouveau livre, coût 0
+          // Pas besoin de changer le hash ici, applySelectedBookFromStorage_newSupply
+          // sera appelé quand #new-supply redevient visible.
+          // Le routeur principal s'occupera de ramener à #new-supply si #select-book était intermédiaire.
+          if(location.hash === '#select-book') location.hash = 'new-supply';
       }
-      titleInputEl.value = ''; 
-      // Show a success toast
-      const toast=document.createElement('div');
-      toast.className='toast';toast.textContent=`Livre "${newTitle}" ajouté !`;
-      Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)',
-        background:'#333',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1050, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
-      document.body.append(toast);setTimeout(()=>toast.remove(),2500);
-
-
+      titleInputModalGlobal.value = ''; 
     } catch (err) {
       console.error(err);
-      // alert("Erreur: " + err.message); 
-      const toast=document.createElement('div');
-      toast.className='toast error';toast.textContent="Erreur: " + err.message;
-      Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1050, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
-      document.body.append(toast);setTimeout(()=>toast.remove(),3500);
+      showGlobalToast("Erreur: " + err.message, true, 3500);
     } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Enregistrer le livre';
+        submitBtnModalGlobal.disabled = false;
+        submitBtnModalGlobal.textContent = 'Enregistrer le livre';
     }
-  });
+});
 </script>
 
   <main id="orders" class="page">
@@ -3052,24 +3069,21 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
     // Script for Sales History Page
     (function() {
       const salesListEl = document.getElementById('sales-list');
-      // NOUVEAUX ÉLÉMENTS DOM
       const salesSummaryChipEl = document.getElementById('sales-summary-chip');
       const salesSelectedDateDisplayEl = document.getElementById('sales-selected-date-display');
       const salesDateFilterBtnEl = document.getElementById('sales-date-filter-btn');
       const salesDatePickerEl = document.getElementById('sales-date-picker');
 
       let unsubscribeSales = null;
-      let selectedSalesDate = new Date(); // Par défaut à aujourd'hui
+      let selectedSalesDate = new Date(); 
 
-      // Fonction pour formater la date pour l'affichage (JJ/MM/AAAA)
       function formatDateForDisplay(date) {
         const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Mois est 0-indexé
+        const month = String(date.getMonth() + 1).padStart(2, '0'); 
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
       }
       
-      // Fonction pour mettre à jour l'affichage de la date sélectionnée
       function updateSelectedDateDisplay(date) {
           const today = new Date();
           if (date.toDateString() === today.toDateString()) {
@@ -3077,15 +3091,12 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
           } else {
               salesSelectedDateDisplayEl.textContent = formatDateForDisplay(date);
           }
-          // Mettre à jour la valeur du date picker (YYYY-MM-DD)
           const year = date.getFullYear();
           const month = String(date.getMonth() + 1).padStart(2, '0');
           const day = String(date.getDate()).padStart(2, '0');
           salesDatePickerEl.value = `${year}-${month}-${day}`;
       }
 
-
-      // Fonctions pour obtenir le début et la fin du jour pour Firestore
       function getStartOfDayTimestamp(date) {
           const start = new Date(date);
           start.setHours(0, 0, 0, 0);
@@ -3124,7 +3135,6 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             .join('');
         }
         if(salesSummaryChipEl) salesSummaryChipEl.textContent = 'Chargement...';
-
 
         unsubscribeSales = salesRef.onSnapshot(snapshot => {
           if(!salesListEl) return;
@@ -3182,15 +3192,13 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
               `;
               saleCard.addEventListener('click', () => {
                 console.log("Clicked sale:", saleId, sale);
-                alert(`Détails pour la vente ID: ${saleId} (à implémenter) \nClient: ${sale.customerName || 'N/A'} \nTotal: ${totalSaleAmount.toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0})}`);
+                // Remplacer par une modale ou une vue détaillée
+                showGlobalToast(`Détails pour la vente ID: ${saleId} (à implémenter)`, false);
               });
-
               salesListEl.appendChild(saleCard);
             });
           }
-          // Mettre à jour la chip de résumé
           if(salesSummaryChipEl) salesSummaryChipEl.textContent = `${totalBooksSoldOnDate} livre(s) vendu(s)`;
-
         }, err => {
           console.error('Erreur Firestore (sales):', err);
           if(salesListEl) salesListEl.innerHTML = '<p style="padding:1rem;color:var(--ebay-red);text-align:center;">Erreur de chargement des ventes.</p>';
@@ -3205,26 +3213,22 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
         }
       }
       
-      // Écouteur pour le bouton de filtre de date
       if (salesDateFilterBtnEl) {
           salesDateFilterBtnEl.addEventListener('click', () => {
               try {
-                  salesDatePickerEl.showPicker(); // Méthode standard pour afficher le sélecteur de date
+                  salesDatePickerEl.showPicker(); 
               } catch (error) {
-                  // Fallback pour les navigateurs qui ne supportent pas showPicker()
-                  // ou si l'input est d'un type qui ne le supporte pas (peu probable pour type="date")
-                  salesDatePickerEl.focus(); // Tenter de focaliser peut ouvrir le picker sur certains navigateurs
-                  salesDatePickerEl.click(); // Tenter un clic peut aussi aider
+                  salesDatePickerEl.focus(); 
+                  salesDatePickerEl.click(); 
                   console.warn("salesDatePickerEl.showPicker() non supporté ou a échoué, tentative de fallback.", error);
               }
           });
       }
 
-      // Écouteur pour le changement de date dans le picker
       if (salesDatePickerEl) {
           salesDatePickerEl.addEventListener('change', (event) => {
-              const newDate = new Date(event.target.value + 'T00:00:00'); // Assurer que la date est interprétée localement
-              if (!isNaN(newDate.getTime())) { // Vérifier si la date est valide
+              const newDate = new Date(event.target.value + 'T00:00:00'); 
+              if (!isNaN(newDate.getTime())) { 
                   selectedSalesDate = newDate;
                   updateSelectedDateDisplay(selectedSalesDate);
                   setupSalesListener(selectedSalesDate);
@@ -3232,10 +3236,8 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
           });
       }
 
-
-      // Initialisation et gestion des changements de hash/auth
       function initializeSalesPage() {
-          selectedSalesDate = new Date(); // Réinitialiser à aujourd'hui
+          selectedSalesDate = new Date(); 
           updateSelectedDateDisplay(selectedSalesDate);
           if (auth.currentUser) {
               setupSalesListener(selectedSalesDate);
@@ -3255,12 +3257,11 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
       });
 
       auth.onAuthStateChanged(user => {
-        if (location.hash === '#sales') { // Seulement si on est déjà sur la page des ventes
+        if (location.hash === '#sales') { 
             initializeSalesPage();
         }
       });
 
-      // Initial check if page loads on #sales
       if (location.hash === '#sales') {
         initializeSalesPage();
       }
@@ -3347,9 +3348,6 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
 }
 #account .btn-signout:active { background: var(--ebay-red); color: #fff; }
 #account .updates-grid .update-card.full-width { flex: 1 1 100%; max-width: 100%; }
-/* #btn-install { 
-  width: calc(100% - 2rem);  margin: 1rem; 
-} */
   </style>
 
   <header><h2>Mon compte</h2></header>
@@ -3435,11 +3433,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
         window.location.href = 'login.html'; 
       }).catch(error => {
         console.error("Sign out error", error);
-        // alert("Erreur de déconnexion: " + error.message);
-        const toast=document.createElement('div');
-        toast.className='toast error';toast.textContent="Erreur de déconnexion: " + error.message;
-        Object.assign(toast.style,{position:'fixed',bottom:'calc(env(safe-area-inset-bottom) + 20px)',left:'50%',transform:'translateX(-50%)', background:'var(--ebay-red)',color:'#fff',padding:'.8rem 1.4rem',borderRadius:'6px',zIndex:1000, textAlign: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)'});
-        document.body.append(toast);setTimeout(()=>toast.remove(),3000);
+        showGlobalToast("Erreur de déconnexion: " + error.message, true);
       });
     });
   </script>
@@ -3466,17 +3460,17 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
       <div class="info-label">Livres en Stock</div> </div>
     <div class="info-card">
       <div class="info-number" id="total-value-catalog">XOF 0</div>
-      <div class="info-label">Valeur Achat Stock</div> </div>
-  </div>
+      <div class="info-label">Valeur Stock (CMP)</div> </div> </div>
 
   <div id="catalog-results-main"> <div class="books-list"></div> </div>
 
   <script>
+  // Catalog Page Script
   (function() {
     const catalogPage = document.getElementById('catalog'); 
     const booksListEl  = document.querySelector('#catalog-results-main .books-list');
     const totalBooksEl  = document.getElementById('total-books-catalog');
-    const totalValueEl  = document.getElementById('total-value-catalog');
+    const totalValueEl  = document.getElementById('total-value-catalog'); 
     const searchInputCatalogEl = document.getElementById('search-input-catalog');
     const infoCardsEl   = document.getElementById('catalog-info-cards');
     let allBooksCache = []; 
@@ -3484,39 +3478,36 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
 
     searchInputCatalogEl.addEventListener('input', () => {
       const searchTerm = searchInputCatalogEl.value.trim().toLowerCase();
-      infoCardsEl.classList.toggle('fade-out', !!searchTerm);
+      if(infoCardsEl) infoCardsEl.classList.toggle('fade-out', !!searchTerm); // S'assurer que infoCardsEl existe
       renderBooks(searchTerm); 
     });
 
     function renderBooks(searchTerm = '') {
+        if (!booksListEl) return; // S'assurer que l'élément existe
         booksListEl.innerHTML = ''; 
         const filteredBooks = searchTerm
             ? allBooksCache.filter(book => 
                 (book.title && book.title.toLowerCase().includes(searchTerm)) ||
-                (book.author && book.author.toLowerCase().includes(searchTerm)) // Optional: search by author too
+                (book.author && book.author.toLowerCase().includes(searchTerm)) 
               )
             : allBooksCache;
 
         if (filteredBooks.length === 0 && allBooksCache.length > 0 && searchTerm) {
              booksListEl.innerHTML = `<p style="text-align:center; padding:1rem; color:var(--secondary-text);">Aucun livre ne correspond à "${searchInputCatalogEl.value}".</p>`;
         } else if (allBooksCache.length === 0 && !searchTerm) {
-            // This case is handled by the onSnapshot empty check below
+            // Géré par onSnapshot empty check
         }
         
         filteredBooks.forEach(book => {
             const card = document.createElement('div');
             card.className = 'book-card-catalog'; 
             card.dataset.bookId = book.id;
-
             const formattedPriceSell = (book.price || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0});
-            const formattedPricePurchase = (book.lastPurchasePrice || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0});
-            
+            const formattedLastPurchasePrice = (book.lastPurchasePrice || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0});
+            const formattedAverageCost = (book.averageCost !== undefined ? book.averageCost : (book.lastPurchasePrice || 0)).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0});
             let stockClass = 'stock-normal';
-            if (book.quantity <= 0) {
-                stockClass = 'stock-out';
-            } else if (book.quantity <= 5) { // Example threshold for low stock
-                stockClass = 'stock-low';
-            }
+            if (book.quantity <= 0) stockClass = 'stock-out';
+            else if (book.quantity <= 5) stockClass = 'stock-low';
 
             card.innerHTML = `
               <div class="book-card-image-area">
@@ -3530,8 +3521,9 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
                       <p class="book-quantity-stock"><i class="bi bi-box-seam"></i> Stock: <span class="stock-value ${stockClass}">${book.quantity || 0}</span></p>
                   </div>
                   <div class="book-card-secondary-info">
-                      <p class="book-price-purchase"><i class="bi bi-cart-check"></i> Dernier Coût: <span>${formattedPricePurchase}</span></p>
-                      </div>
+                      <p class="book-price-purchase"><i class="bi bi-cart-check"></i> Dernier Coût Achat: <span>${formattedLastPurchasePrice}</span></p>
+                      <p class="book-average-cost"><i class="bi bi-calculator"></i> Coût Moyen Pondéré: <span>${formattedAverageCost}</span></p>
+                  </div>
                   <div class="book-card-actions">
                       <button class="btn-action-icon btn-view-details" data-book-id="${book.id}" aria-label="Voir détails" title="Voir détails"><i class="bi bi-eye-fill"></i></button>
                       <button class="btn-action-icon btn-edit-book" data-book-id="${book.id}" aria-label="Modifier" title="Modifier"><i class="bi bi-pencil-fill"></i></button>
@@ -3542,40 +3534,33 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             booksListEl.appendChild(card);
         });
 
-        // Add event listeners for new action buttons (placeholder for now)
         document.querySelectorAll('.btn-view-details').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const bookId = e.currentTarget.dataset.bookId;
                 console.log('View details for book ID:', bookId);
-                // Future: Open details modal for bookId
-                alert(`Action "Voir Détails" pour livre ID: ${bookId} (à implémenter)`);
+                showGlobalToast(`Action "Voir Détails" pour livre ID: ${bookId} (à implémenter)`, false);
             });
         });
         document.querySelectorAll('.btn-edit-book').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const bookId = e.currentTarget.dataset.bookId;
                 console.log('Edit book ID:', bookId);
-                // Future: Open edit modal for bookId
-                alert(`Action "Modifier" pour livre ID: ${bookId} (à implémenter)`);
+                showGlobalToast(`Action "Modifier" pour livre ID: ${bookId} (à implémenter)`, false);
             });
         });
         document.querySelectorAll('.btn-delete-book').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const bookId = e.currentTarget.dataset.bookId;
                 console.log('Delete book ID:', bookId);
-                // Future: Show confirmation and delete bookId
-                // Remplacer confirm par une modale custom
-                // if(confirm(`Êtes-vous sûr de vouloir supprimer ce livre (ID: ${bookId}) ?`)){
-                //   console.log("Suppression confirmée pour", bookId);
-                // }
-                alert(`Action "Supprimer" pour livre ID: ${bookId} (à implémenter avec confirmation)`);
+                showGlobalToast(`Action "Supprimer" pour livre ID: ${bookId} (à implémenter avec confirmation)`, false);
             });
         });
     }
 
     function setupCatalogListener() {
-        if (unsubscribeCatalog) unsubscribeCatalog(); // Unsubscribe from previous listener
+        if (unsubscribeCatalog) unsubscribeCatalog(); 
         if (!auth.currentUser) return;
+        if (!booksListEl) return; // S'assurer que l'élément existe
 
         const userBooksRef = db 
           .collection('users')
@@ -3583,25 +3568,23 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
           .collection('books')
           .orderBy('title'); 
 
-        // Updated skeleton to be a bit more representative
         booksListEl.innerHTML = Array(3).fill('').map(() => `
             <div class="skeleton-book-card-catalog"></div>
         `).join('');
 
-
         unsubscribeCatalog = userBooksRef.onSnapshot(snapshot => {
           let totalCount = 0;
-          let totalPurchaseValue = 0;
+          let totalStockValueUsingCMP = 0; 
           allBooksCache = []; 
 
           snapshot.forEach(doc => {
             const bookData = doc.data();
             bookData.id = doc.id; 
             allBooksCache.push(bookData);
-
             const quantity = bookData.quantity || 0;
             totalCount += quantity;
-            totalPurchaseValue += (bookData.lastPurchasePrice || 0) * quantity; // Use lastPurchasePrice for value
+            const costForValuation = bookData.averageCost !== undefined ? bookData.averageCost : (bookData.lastPurchasePrice || 0);
+            totalStockValueUsingCMP += costForValuation * quantity;
           });
           
           if (allBooksCache.length === 0) {
@@ -3609,36 +3592,32 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
           } else {
                renderBooks(searchInputCatalogEl.value.trim().toLowerCase()); 
           }
-
-          totalBooksEl.textContent = totalCount.toLocaleString();
-          totalValueEl.textContent = totalPurchaseValue.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
+          if(totalBooksEl) totalBooksEl.textContent = totalCount.toLocaleString();
+          if(totalValueEl) totalValueEl.textContent = totalStockValueUsingCMP.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
         }, err => {
           console.error('Erreur Firestore catalog/books:', err);
-          booksListEl.innerHTML = '<p style="text-align:center; padding:1rem; color:var(--ebay-red);">Erreur de chargement du catalogue.</p>';
+          if(booksListEl) booksListEl.innerHTML = '<p style="text-align:center; padding:1rem; color:var(--ebay-red);">Erreur de chargement du catalogue.</p>';
         });
     }
 
     function cleanupCatalogListener() {
         if (unsubscribeCatalog) {
-          // console.log('Unsubscribing from catalog listener');
           unsubscribeCatalog();
           unsubscribeCatalog = null;
         }
-        allBooksCache = []; // Clear cache
-        if (booksListEl) booksListEl.innerHTML = ''; // Clear display
+        allBooksCache = []; 
+        if (booksListEl) booksListEl.innerHTML = ''; 
         if (totalBooksEl) totalBooksEl.textContent = '0';
         if (totalValueEl) totalValueEl.textContent = 'XOF 0';
     }
     
     auth.onAuthStateChanged(user => {
         if (user) {
-            // If the catalog page is already visible, set up the listener
             if (document.getElementById('catalog')?.classList.contains('visible')) {
                 setupCatalogListener();
             }
         } else {
             cleanupCatalogListener();
-            // Potentially show a "please login" message if catalog page is visible
             if (document.getElementById('catalog')?.classList.contains('visible')) {
                  if (booksListEl) booksListEl.innerHTML = '<p style="text-align:center; padding:1rem;">Veuillez vous connecter pour voir le catalogue.</p>';
             }
@@ -3652,216 +3631,23 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             cleanupCatalogListener();
         }
     });
-    // Initial check in case the page loads on #catalog
     if (location.hash === '#catalog') {
         if (auth.currentUser) setupCatalogListener();
     }
-
   })();
   </script>
 </main>
-<main id="reports" class="page">
-  <style>
-    main#reports header#reports-header {
-      padding: 1rem;
-      background: #fff;
-      border-bottom: 1px solid var(--border-color);
-      position: -webkit-sticky;
-      position: sticky;
-      top: 0;
-      z-index: 25;
-    }
-    main#reports header#reports-header h2 {
-      margin: 0;
-      font-size: 1.3rem;
-      font-weight: 600;
-      color: var(--primary-text);
-    }
-    .reports-active-filter-summary-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.6rem 1rem;
-      background-color: var(--surface);
-      border-bottom: 1px solid var(--border-color);
-      position: -webkit-sticky;
-      position: sticky;
-      top: 57px;
-      z-index: 24;
-      font-size: 0.9rem;
-    }
-    #active-filters-display {
-      color: var(--secondary-text);
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-right: 0.5rem;
-    }
-    #btn-open-reports-filters {
-      background-color: var(--accent-bg-light, rgba(0,100,210,0.1));
-      color: var(--accent);
-      border: 1px solid var(--accent-border, rgba(0,100,210,0.3));
-      padding: 0.4rem 0.8rem;
-      border-radius: var(--border-radius-pill);
-      font-weight: 500;
-      font-size: 0.85rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    #btn-open-reports-filters i { font-size: 1rem; }
-    .reports-content-scrollable {
-      padding: 0.75rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 0.75rem;
-    }
-    .kpi-card {
-      background-color: var(--surface);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius-card);
-      padding: 0.75rem;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.2rem;
-      box-shadow: none;
-    }
-    .kpi-card .kpi-icon {
-      font-size: 1.3rem;
-      color: var(--accent);
-      margin-bottom: 0.2rem;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background-color: rgba(0,100,210,0.1);
-    }
-    .kpi-card .kpi-icon.revenue { color: var(--chart-sales-color); background-color: rgba(0,123,255,0.08); }
-    .kpi-card .kpi-icon.cogs { color: var(--chart-cogs-color); background-color: rgba(255,193,7,0.08); }
-    .kpi-card .kpi-icon.profit { color: var(--chart-profit-color); background-color: rgba(40,167,69,0.08); }
-    .kpi-card .kpi-icon.sales-count { color: var(--ebay-green); background-color: rgba(134,184,23,0.08); }
-    .kpi-card .kpi-icon.items-sold { color: var(--ebay-blue); background-color: rgba(0,100,210,0.08); }
-    .kpi-card .kpi-icon.profit-margin { color: var(--ebay-yellow); background-color: rgba(245,175,2,0.08); }
-    .kpi-card .kpi-value {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: var(--primary-text);
-      line-height: 1.2;
-    }
-    .kpi-card .kpi-value.profit { color: var(--chart-profit-color); }
-    .kpi-card .kpi-value.revenue { color: var(--chart-sales-color); }
-    .kpi-card .kpi-value.cogs { color: var(--chart-cogs-color); }
-    .kpi-card .kpi-label {
-      font-size: 0.75rem;
-      color: var(--secondary-text);
-    }
-    .report-type-placeholder {
-      padding: 1.5rem; text-align: center; color: var(--secondary-text);
-      border: 2px dashed var(--border-color); border-radius: var(--border-radius-card);
-      margin: 0.75rem; font-size: 0.9rem;
-    }
-    .drawer-overlay {
-      position: fixed; top: 0; left: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.3);
-      opacity: 0; visibility: hidden;
-      transition: opacity 0.3s ease-out, visibility 0s 0.3s linear;
-      z-index: 90;
-    }
-    .drawer-overlay.visible {
-      opacity: 1; visibility: visible;
-      transition-delay: 0s;
-    }
-    .report-filter-drawer {
-      position: fixed; bottom: 0; left: 0;
-      width: 100%; max-height: 85vh;
-      background-color: var(--surface);
-      border-top-left-radius: 16px; border-top-right-radius: 16px;
-      box-shadow: 0 -3px 15px rgba(0,0,0,0.15);
-      transform: translateY(100%);
-      transition: transform 0.3s ease-out;
-      z-index: 100; display: flex; flex-direction: column;
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-    .report-filter-drawer.visible { transform: translateY(0%); }
-    .report-filter-drawer .drawer-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);
-    }
-    .report-filter-drawer .drawer-header h4 { margin: 0; font-size: 1.1rem; font-weight: 600; }
-    .report-filter-drawer .close-drawer-btn {
-      background: none; border: none; font-size: 1.5rem; color: var(--secondary-text); cursor: pointer; padding: 0.25rem;
-    }
-    .report-filter-drawer .drawer-body {
-      padding: 1rem; overflow-y: auto; flex-grow: 1;
-    }
-    .report-filter-drawer .filter-group { margin-bottom: 1.25rem; }
-    .report-filter-drawer .filter-group:last-child { margin-bottom: 0; }
-    .report-filter-drawer .filter-group-title {
-      display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;
-      font-weight: 600; color: var(--secondary-text); margin-bottom: 0.6rem;
-      display: flex; align-items: center; gap: 0.4rem;
-    }
-    .report-filter-drawer .filter-group-title i { font-size: 0.9rem; }
-    .report-filter-drawer .filter-options {
-      display: flex; flex-direction: column; gap: 0.75rem;
-    }
-    .report-filter-drawer .filter-options select,
-    .report-filter-drawer .filter-options input[type="date"] {
-      padding: 0.7rem 0.8rem; font-size: 0.95rem;
-      border: 1px solid var(--border-color); border-radius: var(--border-radius-card);
-      background-color: #fff; box-shadow: none; outline: none;
-      width: 100%; height: 42px;
-    }
-    .report-filter-drawer .custom-date-range-inputs {
-      display: none; flex-direction: column; gap: 0.75rem; width: 100%; margin-top: 0.5rem;
-    }
-    .report-filter-drawer .custom-date-range-inputs.visible { display: flex; }
-    .report-filter-drawer .custom-date-inputs-wrapper {
-      display: flex; gap: 0.75rem; width: 100%;
-    }
-    .report-filter-drawer .custom-date-inputs-wrapper > div {
-      flex: 1; display: flex; flex-direction: column;
-    }
-    .report-filter-drawer .custom-date-inputs-wrapper label {
-      font-size: 0.7rem; text-transform: uppercase; color: var(--secondary-text); margin-bottom: 0.25rem;
-    }
-    .report-filter-drawer .drawer-footer {
-      padding: 0.75rem 1rem; border-top: 1px solid var(--border-color);
-      background-color: var(--surface);
-    }
-    .report-filter-drawer .btn-apply-filter.full-width {
-      width: 100%; padding: 0.8rem; background-color: var(--accent); color: #fff;
-      border: none; border-radius: var(--border-radius-pill); font-size: 1rem;
-      font-weight: 500; cursor: pointer; display: flex; align-items: center;
-      justify-content: center; gap: 0.5rem;
-    }
-    .report-filter-drawer .btn-apply-filter.full-width:disabled {
-      background-color: #ccc; cursor: not-allowed;
-    }
-  </style>
 
+<main id="reports" class="page">
   <header id="reports-header">
     <h2>Rapports & Analyses</h2>
   </header>
-
   <div class="reports-active-filter-summary-bar">
     <span id="active-filters-display">Période: 30 derniers jours</span>
     <button id="btn-open-reports-filters">
       <i class="bi bi-funnel-fill"></i> Filtres
     </button>
   </div>
-
   <div class="reports-content-scrollable">
     <div class="reports-data-area" id="reports-data-summary">
       <div class="kpi-grid">
@@ -3935,7 +3721,6 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             </div>
         </div>
       </div>
-
       <div class="filter-group">
         <span class="filter-group-title"><i class="bi bi-file-earmark-text-fill"></i> Type de Rapport</span>
         <div class="filter-options">
@@ -3981,7 +3766,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
     const btnApplyDrawerFiltersEl = document.getElementById('btn-apply-drawer-filters');
     const activeFiltersDisplayEl = document.getElementById('active-filters-display');
 
-    let allBooksDataCache = {};
+    let allBooksDataCache = {}; // Pas utilisé dans cette version simplifiée, mais utile pour des rapports plus complexes
     let currentStartDate, currentEndDate;
     let tempPeriodSettings = {};
 
@@ -3991,7 +3776,6 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             tempPeriodSettings.startDate = dateStartInputEl.value;
             tempPeriodSettings.endDate = dateEndInputEl.value;
             tempPeriodSettings.reportType = reportTypeSelectorEl.value;
-
             filterDrawerEl.classList.add('visible');
             filterOverlayEl.classList.add('visible');
             document.body.style.overflow = 'hidden';
@@ -4032,29 +3816,8 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             const errorMsg = message || "Erreur";
             kpiElements.forEach(el => { if(el) el.textContent = errorMsg; });
         } else if (type === 'noData') {
-             kpiElements.forEach((el, index) => { if(el) el.textContent = defaultValues[index]; });
-             if (message && kpiTotalRevenueEl) kpiTotalRevenueEl.textContent = message;
-        }
-    }
-
-    async function fetchAllBooksDetails() {
-        if (!auth.currentUser) return {};
-        try {
-            const booksSnapshot = await db.collection('users').doc(auth.currentUser.uid).collection('books').get();
-            const booksDetails = {};
-            booksSnapshot.forEach(doc => {
-                const data = doc.data();
-                booksDetails[doc.id] = {
-                    lastPurchasePrice: data.lastPurchasePrice || 0,
-                    title: data.title || 'Titre Inconnu'
-                };
-            });
-            allBooksDataCache = booksDetails;
-            return booksDetails;
-        } catch (error) {
-            console.error("Erreur de récupération des détails des livres:", error);
-            showKpiMessage('error', 'Erreur détails livres.');
-            return {};
+            kpiElements.forEach((el, index) => { if(el) el.textContent = defaultValues[index]; });
+            if (message && kpiTotalRevenueEl) kpiTotalRevenueEl.textContent = message; // Afficher un message spécifique si fourni
         }
     }
     
@@ -4072,21 +3835,14 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
         }
 
         switch (selectedPeriod) {
-            case 'today':
-                break;
+            case 'today': break;
             case 'yesterday':
                 startDate.setDate(today.getDate() - 1);
                 endDate.setDate(today.getDate() - 1);
                 break;
-            case 'last7days':
-                startDate.setDate(today.getDate() - 6);
-                break;
-            case 'last30days':
-                startDate.setDate(today.getDate() - 29);
-                break;
-            case 'thisMonth':
-                startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-                break;
+            case 'last7days': startDate.setDate(today.getDate() - 6); break;
+            case 'last30days': startDate.setDate(today.getDate() - 29); break;
+            case 'thisMonth': startDate = new Date(today.getFullYear(), today.getMonth(), 1); break;
             case 'lastMonth':
                 endDate = new Date(today.getFullYear(), today.getMonth(), 0);
                 startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
@@ -4095,16 +3851,16 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
                 const storedStart = dateStartInputEl.value;
                 const storedEnd = dateEndInputEl.value;
                 if (storedStart && storedEnd) {
-                    startDate = new Date(storedStart + 'T00:00:00');
-                    endDate = new Date(storedEnd + 'T23:59:59');
-                    if (startDate > endDate) {
-                        endDate = new Date(startDate);
+                    startDate = new Date(storedStart + 'T00:00:00'); // Assurer l'interprétation locale
+                    endDate = new Date(storedEnd + 'T23:59:59');   // Assurer l'interprétation locale
+                    if (startDate > endDate) { // Si la date de début est après la date de fin
+                        endDate = new Date(startDate); // Mettre la date de fin égale à la date de début
                         endDate.setHours(23,59,59,999);
-                        dateEndInputEl.valueAsDate = endDate;
+                        dateEndInputEl.valueAsDate = endDate; // Mettre à jour l'input
                     }
                     const formatDate = (d) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
                     displayPeriodText = `Du ${formatDate(startDate)} au ${formatDate(endDate)}`;
-                } else {
+                } else { // Valeurs par défaut si les champs custom sont vides
                     dateEndInputEl.valueAsDate = today;
                     const thirtyDaysAgo = new Date(today);
                     thirtyDaysAgo.setDate(today.getDate() - 29);
@@ -4116,7 +3872,7 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
                 break;
         }
 
-        if (selectedPeriod !== 'custom') {
+        if (selectedPeriod !== 'custom') { // Mettre à jour les inputs de date si pas 'custom'
             const yearStart = startDate.getFullYear();
             const monthStart = String(startDate.getMonth() + 1).padStart(2, '0');
             const dayStart = String(startDate.getDate()).padStart(2, '0');
@@ -4144,9 +3900,8 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
             showKpiMessage('error', "Non connecté.");
             return;
         }
-
         showKpiMessage('loading');
-        await fetchAllBooksDetails();
+        // await fetchAllBooksDetails(); // Pas directement utilisé pour les KPIs agrégés pour l'instant
 
         if (!currentStartDate || !currentEndDate) {
             showKpiMessage('error', "Période invalide.");
@@ -4156,12 +3911,12 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
         try {
             const salesQuery = db.collection('users').doc(auth.currentUser.uid).collection('sales')
                 .where('timestamp', '>=', firebase.firestore.Timestamp.fromDate(currentStartDate))
-                .where('timestamp', '<=', firebase.firestore.Timestamp.fromDate(currentEndDate))
-                .orderBy('timestamp', 'asc');
+                .where('timestamp', '<=', firebase.firestore.Timestamp.fromDate(currentEndDate));
+                // Pas besoin de .orderBy('timestamp', 'asc') pour l'agrégation
             const salesSnapshot = await salesQuery.get();
 
             let totalRevenue = 0;
-            let totalCogs = 0;
+            let totalCogs = 0; // COGS total pour la période
             let totalSalesCount = salesSnapshot.size;
             let totalItemsSoldCount = 0;
 
@@ -4174,13 +3929,8 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
                 const sale = doc.data();
                 totalRevenue += sale.grandTotalAmount || 0;
                 totalItemsSoldCount += sale.totalItemsSold || 0;
-                
-                (sale.items || []).forEach(item => {
-                    const bookDetail = allBooksDataCache[item.bookId];
-                    const purchasePrice = bookDetail ? bookDetail.lastPurchasePrice : 0;
-                    const itemCogs = purchasePrice * (item.quantitySold || 0);
-                    totalCogs += itemCogs;
-                });
+                // Utiliser le totalCostOfGoodsSold stocké dans chaque vente
+                totalCogs += sale.totalCostOfGoodsSold || 0;
             });
 
             const totalProfit = totalRevenue - totalCogs;
@@ -4200,37 +3950,40 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
     }
 
     function applyFiltersAndLoadData() {
-        setDateRange(true);
+        setDateRange(true); // Mettre à jour les dates et l'affichage du filtre actif
         const selectedType = reportTypeSelectorEl.value;
         if (selectedType === 'summary') {
-            reportsDataSummaryEl.style.display = 'flex';
+            reportsDataSummaryEl.style.display = 'block'; // ou 'flex' si .kpi-grid l'exige
             reportsDataPlaceholderEl.style.display = 'none';
             loadReportData();
         } else {
             reportsDataSummaryEl.style.display = 'none';
             reportsDataPlaceholderEl.style.display = 'block';
+             // Vous pouvez ajouter un message spécifique dans le placeholder ici
+            reportsDataPlaceholderEl.innerHTML = `<p>Le rapport "${reportTypeSelectorEl.options[reportTypeSelectorEl.selectedIndex].text}" sera bientôt disponible.</p>`;
         }
-        toggleFilterDrawer(false);
+        toggleFilterDrawer(false); // Fermer le tiroir
     }
     
     if(btnApplyDrawerFiltersEl) btnApplyDrawerFiltersEl.addEventListener('click', applyFiltersAndLoadData);
-    if(periodSelectorEl) periodSelectorEl.addEventListener('change', () => setDateRange(false));
+    if(periodSelectorEl) periodSelectorEl.addEventListener('change', () => setDateRange(false)); // Juste mettre à jour les dates, ne pas charger
     
     if(reportTypeSelectorEl) reportTypeSelectorEl.addEventListener('change', () => {
+        // Pas besoin de recharger les données ici, se fera à l'application des filtres
         const selectedType = reportTypeSelectorEl.value;
         if (selectedType !== 'summary') {
-            reportsDataSummaryEl.style.display = 'none';
-            reportsDataPlaceholderEl.style.display = 'block';
+            // reportsDataSummaryEl.style.display = 'none'; // Géré par applyFiltersAndLoadData
+            // reportsDataPlaceholderEl.style.display = 'block';
         } else {
-            reportsDataSummaryEl.style.display = 'flex';
-            reportsDataPlaceholderEl.style.display = 'none';
+            // reportsDataSummaryEl.style.display = 'block';
+            // reportsDataPlaceholderEl.style.display = 'none';
         }
     });
 
     function initializeReportsPage() {
         if (auth.currentUser) {
-            setDateRange(true); 
-            applyFiltersAndLoadData(); 
+            // setDateRange(true); // Assurer que les dates sont initialisées
+            applyFiltersAndLoadData(); // Charger les données avec les filtres par défaut
         } else {
             showKpiMessage('error', "Non connecté.");
             if(activeFiltersDisplayEl) activeFiltersDisplayEl.textContent = "Non connecté";
@@ -4244,15 +3997,17 @@ body.keyboard-visible #add-book-modal .modal { transform: translateY(-15%); } /*
     });
 
     auth.onAuthStateChanged(user => {
-        if (location.hash === '#reports') {
+        if (location.hash === '#reports') { // Seulement si on est sur la page des rapports
             initializeReportsPage();
         }
     });
 
+    // Initialisation si la page est chargée directement sur #reports
     if (location.hash === '#reports') {
         initializeReportsPage();
     } else {
-        setDateRange(false);
+        // Assurer que les dates sont prêtes même si la page n'est pas active initialement
+        setDateRange(false); 
     }
 
   })();
@@ -4270,7 +4025,7 @@ main#activation.visible { display: flex; }
 .activation-container {
   width: 100%; max-width: 360px;  padding: 1rem; 
   background: #fff; border-radius: var(--border-radius-card);
-  border: 1px solid var(--border-color); box-shadow: none; /* NO SHADOW */
+  border: 1px solid var(--border-color); box-shadow: none; 
 }
 .activation-icon {
   width: 70px; height: 70px; margin: 0 auto 1.25rem; 
@@ -4321,49 +4076,72 @@ main#activation p {
   </div>
 </main>
 
-  <script>
+<main id="not-found" class="page" style="text-align:center; padding: 2rem; justify-content:center; align-items:center;">
+  <div>
+    <i class="bi bi-emoji-frown" style="font-size: 3rem; color: var(--secondary-text); margin-bottom: 1rem;"></i>
+    <h2>Page non trouvée</h2>
+    <p style="color: var(--secondary-text); margin-bottom: 1.5rem;">Désolé, la page que vous cherchez n'existe pas ou a été déplacée.</p>
+    <a href="#home" data-hash="home" class="btn-primary" style="text-decoration: none;">Retour à l'accueil</a>
+  </div>
+</main>
+
+
+<script>
 const btnActivate = document.getElementById('btn-activate');
 const activationCodeInput = document.getElementById('activation-code');
 const activationMessageEl = document.getElementById('activation-message');
 
 if (btnActivate) {
-    btnActivate.addEventListener('click', async () => {
-      const code = activationCodeInput.value.trim();
-      if (!code) {
-        activationMessageEl.textContent = 'Veuillez entrer le code.';
-        activationMessageEl.style.color = 'var(--ebay-red)';
-        activationCodeInput.focus();
-        return;
-      }
-      
-      btnActivate.disabled = true;
-      btnActivate.textContent = 'Vérification...';
-      activationMessageEl.textContent = '';
+  btnActivate.addEventListener('click', async () => {
+    const code = activationCodeInput.value.trim();
+    if (!code) {
+      activationMessageEl.textContent = 'Veuillez entrer le code.';
+      activationMessageEl.style.color = 'var(--ebay-red)';
+      activationCodeInput.focus();
+      return;
+    }
 
-      try {
-        const result = await verifyActivationCode({ code });  
-        await auth.currentUser.getIdToken(true); 
-        location.hash = '#home'; 
-        location.reload(); 
-      } catch (err) {
-        console.error("Activation error:", err);
-        activationMessageEl.textContent = err.message || "Code invalide ou erreur serveur.";
-        if (err.code === 'functions/not-found') {
-             activationMessageEl.textContent = "Fonction d'activation non disponible.";
-        } else if (err.details && err.details.message) {
-             activationMessageEl.textContent = err.details.message;
-        } else if (err.message) {
-             activationMessageEl.textContent = err.message;
-        } else {
-             activationMessageEl.textContent = "Code invalide ou erreur inconnue.";
-        }
+    btnActivate.disabled = true;
+    btnActivate.textContent = 'Vérification...';
+    activationMessageEl.textContent = '';
+
+    try {
+      const result = await verifyActivationCode({ code });
+      if (auth.currentUser) { 
+        await auth.currentUser.getIdToken(true); // Forcer le rafraîchissement du token
+      } else {
+        activationMessageEl.textContent = "Erreur: Utilisateur non connecté. Veuillez vous reconnecter.";
         activationMessageEl.style.color = 'var(--ebay-red)';
         btnActivate.disabled = false;
         btnActivate.textContent = 'Valider le code';
+        setTimeout(() => window.location.replace('login.html'), 3000);
+        return;
       }
-    });
+      window.location.replace('index.html#home'); // Rediriger vers l'accueil
+    } catch (err) {
+      console.error("Activation error:", err);
+      if (err.code === 'functions/not-found') {
+          activationMessageEl.textContent = "Fonction d'activation non disponible.";
+      } else if (err.details && err.details.message) {
+          activationMessageEl.textContent = err.details.message;
+      } else if (err.message) {
+          if (err.message.includes("INVALID_ARGUMENT") || err.message.includes("invalid-argument")) {
+            activationMessageEl.textContent = "Code d'activation invalide ou mal formé.";
+          } else if (err.message.includes("UNAUTHENTICATED") || err.message.includes("permission-denied")) {
+            activationMessageEl.textContent = "Erreur d'authentification. Veuillez vous reconnecter.";
+          } else {
+            activationMessageEl.textContent = "Code invalide ou erreur serveur."; 
+          }
+      } else {
+          activationMessageEl.textContent = "Code invalide ou erreur inconnue.";
+      }
+      activationMessageEl.style.color = 'var(--ebay-red)';
+      btnActivate.disabled = false;
+      btnActivate.textContent = 'Valider le code';
+    }
+  });
 }
-  </script>
+</script>
 
 <nav aria-label="Main navigation">
   <div class="nav-inner">
@@ -4377,8 +4155,36 @@ if (btnActivate) {
   </div>
 </nav>
 
+<div id="global-toast-container" class="toast-notification"></div>
+
 <script>
-  // Service Worker Registration
+// Fonction pour afficher un toast global
+let globalToastTimeout;
+function showGlobalToast(message, isError = false, duration = 3000) {
+    const toastContainer = document.getElementById('global-toast-container');
+    if (!toastContainer) {
+        console.warn("Élément .toast-notification non trouvé. Message:", message);
+        alert((isError ? "Erreur: " : "") + message); // Fallback
+        return;
+    }
+    clearTimeout(globalToastTimeout);
+    toastContainer.textContent = message;
+    toastContainer.className = 'toast-notification'; // Reset classes
+    if (isError) {
+        toastContainer.classList.add('error');
+    } else {
+        toastContainer.classList.add('success'); // ou juste pas de classe error pour le style par défaut
+    }
+    toastContainer.classList.add('visible');
+
+    globalToastTimeout = setTimeout(() => {
+        toastContainer.classList.remove('visible');
+    }, duration);
+}
+</script>
+
+<script>
+  // Service Worker Registration (inchangé)
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js') 
@@ -4402,15 +4208,17 @@ if (btnActivate) {
 </script>
 
 <script>
-/* === PWA install button === */
+/* === PWA install button === (inchangé) */
 let deferredInstallPrompt = null; 
 const installButton = document.getElementById('btn-install');
 
-if (installButton) { // Ensure button exists before adding listeners
+if (installButton) { 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();  
       deferredInstallPrompt = e;  
-      installButton.style.display = 'block'; 
+      installButton.style.display = 'flex'; // Ou block selon votre style
+      installButton.style.alignItems = 'center';
+      installButton.style.justifyContent = 'center';
     });
 
     installButton.addEventListener('click', async () => {
@@ -4427,13 +4235,12 @@ if (installButton) { // Ensure button exists before adding listeners
         installButton.style.display = 'none';
       } else {
         console.log('[PWA] Utilisateur a refusé l\'installation');
-        installButton.style.display = 'block'; 
+        installButton.style.display = 'flex'; 
         installButton.disabled = false;
         installButton.innerHTML = '<i class="bi bi-download" style="margin-right:0.5rem;"></i> Installer l’application';
       }
     });
 }
-
 
 window.addEventListener('appinstalled', () => {
   console.log('[PWA] App installée avec succès 🎉');
@@ -4444,12 +4251,13 @@ window.addEventListener('appinstalled', () => {
 });
 </script>
   <script>
-  // Main Router and Auth Guard
+  // Main Router and Auth Guard - AMÉLIORÉ
   ;(function() {
     const allPages  = document.querySelectorAll('main.page'); 
     const mainNav   = document.querySelector('nav'); 
     let userActivated = false; 
-    let currentAuthUser = null; 
+    let currentAuthUser = undefined; // undefined = état non déterminé
+    document.body.style.visibility = 'hidden'; // Caché jusqu'à ce que l'auth soit prête
 
     function showOnlyPage(pageIdToShow) { 
       let pageFound = false;
@@ -4458,45 +4266,20 @@ window.addEventListener('appinstalled', () => {
         p.classList.toggle('visible', isVisible);
         if (isVisible) {
             pageFound = true;
-            // Specific actions when a page becomes visible
-            if (p.id === 'catalog' && auth.currentUser) {
-              // The catalog's own script will handle setup via hashchange/authstatechange
-            } else if (p.id === 'supply' && auth.currentUser) {
-              // The supply page's own script will handle setup
-            } else if (p.id === 'sales' && auth.currentUser) { 
-              // The sales page's own script will handle setup
-            } else if (p.id === 'reports' && auth.currentUser) { // ADDED FOR REPORTS
-              // The reports page's own script will handle setup via hashchange/authstatechange
-            } else if (p.id === 'sell' && auth.currentUser) {
-              // The sell page's own script (MutationObserver or similar) handles setup
-            } else if (p.id === 'add-book-modal') { // Handle modal "page"
-              // document.body.style.overflow = 'hidden'; // Prevent body scroll when modal is open
-            }
-        } else {
-             // Specific cleanup when a page is hidden
-            if (p.id === 'catalog') {
-              // The catalog's own script will handle cleanup via hashchange
-            } else if (p.id === 'supply') {
-              // The supply page's own script will handle cleanup
-            } else if (p.id === 'sales') { 
-              // The sales page's own script will handle cleanup
-            } else if (p.id === 'reports') { // ADDED FOR REPORTS
-              // The reports page's own script will handle cleanup
-            } else if (p.id === 'add-book-modal') {
-              // document.body.style.overflow = ''; // Restore body scroll
-              // document.body.classList.remove('keyboard-visible');
-            }
+            // Les scripts spécifiques aux pages utilisent maintenant hashchange/authstatechange
+            // ou des MutationObservers pour gérer leur propre initialisation/nettoyage.
         }
       });
 
-      if (!pageFound) { 
-        console.warn(`Page "${pageIdToShow}" not found, redirecting to home.`);
-        location.hash = '#home'; 
-        return; 
+      if (!pageFound && pageIdToShow !== 'add-book-modal-trigger') { // Ne pas rediriger si c'est un trigger de modale
+        // AMÉLIORATION: Afficher la page "not-found"
+        allPages.forEach(p => p.classList.toggle('visible', p.id === 'not-found'));
+        pageIdToShow = 'not-found'; 
       }
       
-      const pagesWithoutNav = ['activation','sell','new-supply','select-book', 'add-book-modal']; 
-      if (mainNav) { // Check if mainNav exists
+      // Pages sans la navigation principale (ex: étapes de vente, activation)
+      const pagesWithoutNav = ['activation','sell','new-supply','select-book']; 
+      if (mainNav) {
         if (pagesWithoutNav.includes(pageIdToShow)) { 
             mainNav.style.display = 'none';
         } else {
@@ -4504,98 +4287,85 @@ window.addEventListener('appinstalled', () => {
         }
       }
 
-
-      document.querySelectorAll('[data-hash]').forEach(el =>
+      // Mettre à jour le lien actif dans la nav
+      document.querySelectorAll('nav [data-hash]').forEach(el =>
         el.classList.toggle('active', el.dataset.hash === pageIdToShow)
       );
 
+      // Scroll to top
       const activePageElement = document.getElementById(pageIdToShow);
-      if (activePageElement && pageIdToShow !== 'add-book-modal') { // Don't scroll for modal overlay
+      if (activePageElement) { 
         activePageElement.scrollTop = 0;
       }
     }
     
+    // AMÉLIORATION: Fonction de routage principale
     async function route() {
-      if (currentAuthUser === undefined) { // Auth state not yet determined
-        document.body.style.visibility = 'hidden'; 
-        return;
+      if (currentAuthUser === undefined) { // État d'auth pas encore déterminé
+        return; // Ne rien faire, on attend onAuthStateChanged
       }
-      document.body.style.visibility = 'visible';
+      document.body.style.visibility = 'visible'; // Rendre visible après la vérification d'auth
 
       let hashKey = location.hash.slice(1) || 'home';
 
-      // Handle modal display logic without breaking back button for non-modal pages
-      if (hashKey === 'add-book-modal') {
-          // Show the modal page, but don't necessarily hide the underlying page (e.g. select-book)
-          // The modal itself is an overlay. We make its 'main.page' container visible.
-          // The underlying page (e.g. select-book) should remain visible if it was the previous route.
-          // This simple router doesn't have a concept of "overlay" routes easily.
-          // For now, `showOnlyPage` will make `add-book-modal` the *only* visible `main.page`.
+      if (!currentAuthUser) { 
+        userActivated = false; 
+        // La redirection vers login.html est déjà gérée par onAuthStateChanged
+        return; 
       }
 
-
-      if (!currentAuthUser) { // User is null (not logged in)
-          userActivated = false; 
-          // Allow access only to login.html (which is not part of this SPA's routing)
-          // Or, if login was a hash route like #login, handle it here.
-          // Since login.html is separate, this router assumes user is logged in if not on login.html
-          // This part is mostly handled by onAuthStateChanged redirect
-          if (window.location.pathname.endsWith('login.html')) {
-              // We are on login page, let it handle itself.
-          } else if (hashKey !== 'activation') { // If somehow past login page without user, redirect
-              // This scenario should be caught by onAuthStateChanged which redirects to login.html
-              // window.location.replace('login.html');
-          }
-          // If login.html isn't the current page, onAuthStateChanged handles redirection.
-          // If it IS login.html, we don't want this router to interfere.
-          return; // Stop further routing if user is not logged in and not on login page
-      }
-
-
-      // User is logged in (currentAuthUser is not null)
+      // Utilisateur connecté, vérifier l'activation
       if (!userActivated && hashKey !== 'activation') {
         if (location.hash !== '#activation') location.hash = '#activation';
         showOnlyPage('activation');
         return;
       }
       if (userActivated && hashKey === 'activation') { 
-         location.hash = '#home';
-         showOnlyPage('home');
+         location.hash = '#home'; // Rediriger de #activation vers #home si déjà activé
+         // showOnlyPage('home') sera appelé par le hashchange
          return;
       }
       
+      // AMÉLIORATION: Les modales ne sont plus des "pages" du routeur
+      // Si vous voulez supporter des "deep links" pour ouvrir une modale,
+      // vous pouvez vérifier le hash ici et appeler openGlobalAddBookModal() par ex.
+      // Exemple: if (hashKey === 'open-add-book-modal') { openGlobalAddBookModal(); return; }
+
       showOnlyPage(hashKey);
     }
 
-    // Set initial auth state to undefined to wait for first onAuthStateChanged
-    currentAuthUser = undefined; 
-    document.body.style.visibility = 'hidden';
-
-
+    // AMÉLIORATION: Gestion de l'état d'authentification
     auth.onAuthStateChanged(async user => {
       currentAuthUser = user; 
       if (!user) {
         userActivated = false; 
+        // Si on n'est pas déjà sur login.html, y rediriger
         if (!window.location.pathname.endsWith('login.html')) {
             window.location.replace('login.html'); 
         } else {
-            document.body.style.visibility = 'visible'; // Make login page visible
+            document.body.style.visibility = 'visible'; // Assurer que login.html est visible
         }
         return;
       }
 
-      // User is logged in, try to get claims
+      // Utilisateur connecté, essayer de récupérer les claims
       try {
         const idTokenResult = await user.getIdTokenResult(true); 
         userActivated = !!idTokenResult.claims.activated;
       } catch (error) {
-        console.error("Error getting ID token result:", error);
+        console.error("Erreur en récupérant idTokenResult:", error);
         userActivated = false; 
-        // If critical error, might sign out or show error page
-        // For now, assume not activated and let logic proceed to activation page if needed
+        // AMÉLIORATION: Gestion d'erreur critique
+        showGlobalToast("Erreur d'authentification. Déconnexion...", true, 4000);
+        setTimeout(() => {
+            auth.signOut().finally(() => { // finally pour s'assurer que la redirection se fait
+                window.location.replace('login.html');
+            });
+        }, 4000);
+        return; // Ne pas continuer le routage si l'état est incertain
       }
       
-      route(); // Call route after auth state and claims are processed
+      route(); // Appeler route après que l'état d'auth et les claims soient traités
     });
 
     window.addEventListener('hashchange', route);
@@ -4620,19 +4390,18 @@ window.addEventListener('appinstalled', () => {
         rippleSpan.addEventListener('animationend', () => rippleSpan.remove(), {once: true});
       }
 
-      if (dataHashElement.tagName === 'A' && dataHashElement.getAttribute('href')?.startsWith('#')) {
-        // e.preventDefault(); // Default is already handled by browser for hash links. We just update state.
-      }
-      // Only change hash if it's different, to prevent re-triggering if already on the page
-      // or if an action within the page (not a nav link) has a data-hash for other purposes.
-      if (location.hash !== '#' + dataHashElement.dataset.hash) {
-         location.hash = dataHashElement.dataset.hash; // This will trigger 'hashchange' and then route()
-      } else if (location.hash === '#' + dataHashElement.dataset.hash && dataHashElement.classList.contains('nav-link')) {
-        // If clicking the active nav link, still call route to ensure page is scrolled to top etc.
-        route();
+      // Permettre la navigation par défaut pour les liens <a> avec href="#"
+      // Le changement de hash déclenchera l'événement 'hashchange' et donc la fonction route().
+      // Si ce n'est pas un <a> mais un <button> ou autre avec data-hash, on met à jour manuellement le hash.
+      if (dataHashElement.tagName !== 'A' || !dataHashElement.getAttribute('href')?.startsWith('#')) {
+          if (location.hash !== '#' + dataHashElement.dataset.hash) {
+              location.hash = dataHashElement.dataset.hash;
+          } else {
+              // Si on clique sur le lien déjà actif, on peut forcer un "re-rendu" si nécessaire
+              route(); 
+          }
       }
     });
-
   })();
   </script>
 
