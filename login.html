@@ -3,126 +3,133 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <!-- Bootstrap Icons CDN -->
-  <link 
-    rel="stylesheet" 
+  <link
+    rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
   >
 
-  <!-- 1) Firebase (compat) SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore-compat.js"></script>
 
 
-
-<!-- 2) Initialisation Firebase & Auth -->
 <script>
-  // Ta config Firebase (même que dans index.html)
+  // Votre configuration Firebase (identique à celle dans index.html)
   const firebaseConfig = {
-    apiKey: "AIzaSyCvNZ5lhKdP_6W-eRle-7zCmFqejSfRuto",
+    apiKey: "AIzaSyCvNZ5lhKdP_6W-eRle-7zCmFqejSfRuto", // IMPORTANT: Sécurisez votre clé API réelle et envisagez des variables d'environnement pour la production
     authDomain: "shoptel-35c7e.firebaseapp.com",
     projectId: "shoptel-35c7e",
-    storageBucket: "shoptel-35c7e.firebasestorage.app",
+    storageBucket: "shoptel-35c7e.appspot.com",
     messagingSenderId: "541177101809",
     appId: "1:541177101809:web:5ae3ea186f198558371850",
     measurementId: "G-VH4MCV6Y6E"
   };
 
-  // Initialise l’app et Auth
+  // Initialiser Firebase App et Auth
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
-  console.log("🔥 Firebase Auth initialisé :", auth);
+  // const db = firebase.firestore(); // Initialiser Firestore si nécessaire plus tard
+  console.log("🔥 Firebase Auth initialisé sur login.html:", auth);
 
+  /**
+   * Fonction utilitaire pour afficher un spinner sur un bouton pendant une action asynchrone.
+   * @param {string} buttonId - L'ID du bouton.
+   * @param {function} actionFn - La fonction asynchrone à exécuter.
+   * @returns {Promise} - La promesse retournée par actionFn.
+   */
   function withSpinner(buttonId, actionFn) {
-  const btn      = document.getElementById(buttonId);
-  const textSpan = btn.querySelector('.btn-text');
-  const spinner  = btn.querySelector('.loader');
+    const btn      = document.getElementById(buttonId);
+    const textSpan = btn.querySelector('.btn-text');
+    const spinner  = btn.querySelector('.loader');
 
-  // démarre le spinner
-  btn.disabled = true;
-  textSpan.style.visibility = 'hidden';
-  spinner.style.display = 'block';
+    // Démarrer le spinner
+    btn.disabled = true;
+    if (textSpan) textSpan.style.visibility = 'hidden'; // Vérifier si textSpan existe
+    if (spinner) spinner.style.display = 'block';    // Vérifier si spinner existe
 
-  return actionFn()
-    .catch(err => {
-      // en cas d'erreur : stop spinner et restaure
-      btn.disabled = false;
-      spinner.style.display = 'none';
-      textSpan.style.visibility = 'visible';
-      throw err;
-    });
+    return actionFn()
+      .catch(err => {
+        // En cas d'erreur : arrêter le spinner et restaurer
+        btn.disabled = false;
+        if (spinner) spinner.style.display = 'none';
+        if (textSpan) textSpan.style.visibility = 'visible';
+        throw err; // Renvoyer l'erreur pour qu'elle soit traitée par l'appelant
+      })
+      .finally(() => { // S'assurer que le bouton est réactivé et le spinner masqué même si actionFn ne retourne pas de promesse ou si elle se résout
+        btn.disabled = false;
+        if (spinner) spinner.style.display = 'none';
+        if (textSpan) textSpan.style.visibility = 'visible';
+      });
 }
 
 </script>
 
   <style>
-
-    
-
     :root {
-      --primary: #1e90ff;
-      --bg: #f5f5f5;
-      --surface: #fff;
-      --text: #333;
-      --muted: #888;
-      --radius: 8px;
-      --transition: 0.3s ease;
+      --primary: #1e90ff; /* Bleu principal */
+      --bg: #f5f5f5;      /* Fond général */
+      --surface: #fff;   /* Fond des cartes/écrans */
+      --text: #333;      /* Couleur de texte principale */
+      --muted: #888;     /* Couleur de texte secondaire/icônes */
+      --radius: 8px;     /* Rayon de bordure standard */
+      --transition: 0.3s ease; /* Transition par défaut */
     }
     * { box-sizing: border-box; margin:0; padding:0; }
     html, body {
       width:100%; height:100%;
-      overflow:hidden;
+      overflow:hidden; /* Empêche le scroll sur le body principal */
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
-      -webkit-tap-highlight-color: transparent;
+      -webkit-tap-highlight-color: transparent; /* Enlève le flash bleu sur mobile au tap */
     }
 
-    /* container 2 écrans */
+    /* Conteneur pour les deux écrans (login et signup) */
     #app {
       display: flex;
-      width:200%;
+      width:200%; /* Permet d'avoir deux écrans côte à côte */
       height:100%;
       transition: transform var(--transition);
-      overscroll-behavior: none;
+      overscroll-behavior: none; /* Empêche le "pull-to-refresh" et autres comportements de défilement natifs gênants */
     }
     .screen {
-      width:100%;
-      padding: 0 24px;
-      padding: 48px 24px 0;
+      width:50%; /* Chaque écran prend la moitié du conteneur #app */
+      height:100%;
+      padding: 48px 24px 24px; /* Padding ajusté pour l'en-tête et les côtés */
       background: var(--surface);
-      overflow-y: auto;
+      overflow-y: auto; /* Permet le scroll vertical si le contenu dépasse */
       overscroll-behavior: none;
-      -ms-overflow-style: none; scrollbar-width: none;
-      display: flex; flex-direction: column; align-items: stretch;
+      -ms-overflow-style: none; scrollbar-width: none; /* Cache la scrollbar sur IE/Edge et Firefox */
+      display: flex; flex-direction: column; align-items: stretch; /* Pour étirer les éléments enfants */
     }
-    .screen::-webkit-scrollbar { display: none; }
-    /* Logo */
+    .screen::-webkit-scrollbar { display: none; } /* Cache la scrollbar sur WebKit (Chrome, Safari) */
+
+    /* Logo et titre */
     .logo {
-      margin: 48px auto 32px;
+      margin: 48px auto 32px; /* Marge en haut, auto pour centrer horizontalement, en bas */
       text-align: center;
     }
-    .logo img { width:48px; height:48px; }
+    .logo img { width:48px; height:48px; } /* Si vous ajoutez une image de logo */
     .logo h1 {
       margin-top:8px;
       font-size:24px;
-      font-weight:400;
+      font-weight:400; /* Police plus légère */
       color: var(--text);
     }
-    /* Form */
+    /* Styles pour les groupes de formulaire */
     .form-group {
-      position: relative;
+      position: relative; /* Pour positionner les icônes à l'intérieur */
       margin-bottom: 20px;
     }
     .form-group label {
       display: block;
       font-size: 14px;
-      color: var(--primary);
+      color: var(--primary); /* Couleur primaire pour les labels */
       margin-bottom: 6px;
     }
     .form-group input {
       width:100%;
-      padding:12px 40px 12px 12px;
+      padding:12px 40px 12px 12px; /* Espace pour l'icône à droite */
       font-size:16px;
       border:1px solid #ccc;
       border-radius: var(--radius);
@@ -131,12 +138,13 @@
     .form-group input:focus {
       outline:none;
       border-color: var(--primary);
-      box-shadow: 0 1px 0 var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-focus, rgba(30, 144, 255, 0.2)); /* Anneau de focus */
     }
-    /* Icons inside inputs */
+    /* Icônes à l'intérieur des champs de saisie (ex: œil pour mot de passe) */
     .form-group .icon {
       position:absolute;
-      top:50%; right:12px;
+      top: calc(50% + 10px); /* Ajustement basé sur la hauteur du label et le padding de l'input */
+      right:12px;
       transform: translateY(-50%);
       font-size:18px;
       color: var(--muted);
@@ -146,51 +154,54 @@
     .form-group .icon:hover {
       color: var(--primary);
     }
-    /* Buttons */
+    /* Styles pour les boutons */
     .btn {
-  display:block;
-  width:100%;
-  padding:14px;
-  margin-top:12px;
-  font-size:16px;
-  font-weight:500;
-  text-align:center;
-  background: var(--primary);
-  color:#fff;
-  border:none;
-  border-radius:30px;
-  cursor:pointer;
-  transition: transform 0.1s ease, background var(--transition);
-  user-select:none;
-  position: relative;
-  overflow: hidden;
-}
-.btn:active {
-  transform: scale(0.97);
-}
+      display:block;
+      width:100%;
+      padding:14px;
+      margin-top:12px;
+      font-size:16px;
+      font-weight:500;
+      text-align:center;
+      background: var(--primary);
+      color:#fff;
+      border:none;
+      border-radius:30px; /* Forme de pilule */
+      cursor:pointer;
+      transition: transform 0.1s ease, background var(--transition);
+      user-select:none; /* Empêche la sélection du texte du bouton */
+      position: relative; /* Pour le positionnement du spinner */
+      overflow: hidden; /* Pour contenir les effets d'animation du spinner si besoin */
+    }
+    .btn:active {
+      transform: scale(0.97); /* Feedback visuel au clic */
+    }
+    .btn:disabled {
+        background-color: #cccccc; /* Gris pour bouton désactivé */
+        cursor: not-allowed;
+    }
 
-/* SPINNER INLINE */
-.btn .loader {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255,255,255,0.6);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: none;
-}
-@keyframes spin {
-  to { transform: translate(-50%, -50%) rotate(360deg); }
-}
+    /* SPINNER INLINE DANS LE BOUTON */
+    .btn .loader {
+      width: 20px;   height: 20px;
+      border: 2px solid rgba(255,255,255,0.6); /* Bordure claire pour le spinner */
+      border-top-color: #fff; /* Couleur principale du spinner */
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%); /* Centrage parfait */
+      display: none; /* Caché par défaut */
+    }
+    @keyframes spin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
 
-    /* Links */
+    /* Liens (ex: "Mot de passe oublié ?", "Créer un compte") */
     .link {
       text-align:center;
-      margin-top:8px;
+      margin-top:16px; /* Marge augmentée */
+      margin-bottom: 16px;
     }
     .link a {
       color: var(--primary);
@@ -198,153 +209,230 @@
       text-decoration:none;
       transition: opacity var(--transition);
     }
-    .link a:active {
-      opacity:0.6;
+    .link a:hover {
+        text-decoration: underline; /* Souligner au survol */
     }
-    /* OR separator */
+    .link a:active {
+      opacity:0.6; /* Réduire l'opacité au clic */
+    }
+    /* Séparateur "OU" */
     .or {
       display:flex;
       align-items:center;
       text-align:center;
       font-size:13px;
       color:#aaa;
-      margin:24px 0;
+      margin:24px 0; /* Marge verticale */
     }
     .or::before, .or::after {
       content:'';
-      flex:1;
+      flex:1; /* Prend l'espace restant */
       height:1px;
-      background:#ddd;
+      background:#ddd; /* Ligne grise */
     }
     .or::before { margin-right:8px; }
     .or::after { margin-left:8px; }
 
-    /* Hérité de .form-group .icon */
-.clear-icon {
-  display: none;      /* caché tant que le champ est vide */
-}
+    /* Icône "effacer" pour les champs de saisie (optionnel, non implémenté en JS ici) */
+    .clear-icon {
+      display: none; /* Caché par défaut */
+      /* Hérite du style de .form-group .icon */
+    }
 
-/* messages d’erreur masqués par défaut */
-.input-error {
-  display: none;
-  color: #e74c3c;
-  font-size: 13px;
-  margin-top: 4px;
-}
+    /* Messages d'erreur sous les champs */
+    .input-error {
+      display: none; /* Caché par défaut */
+      color: #e74c3c; /* Couleur d'erreur (rouge) */
+      font-size: 13px;
+      margin-top: 4px; /* Espace au-dessus du message d'erreur */
+      align-items: center; /* Aligne l'icône et le texte */
+    }
+    .input-error.show {
+      display: flex; /* Afficher quand la classe 'show' est ajoutée */
+    }
+    .input-error i.error-icon { /* Style spécifique pour l'icône d'erreur */
+      margin-right: 6px;
+      font-size: 16px; /* Icône d'erreur légèrement plus petite */
+      color: #e74c3c; /* S'assurer que la couleur de l'icône correspond au texte */
+      position: static; /* Annuler un éventuel positionnement absolu */
+      cursor: default;
+    }
 
-/* quand on veut l’afficher, on ajoute la classe .show */
-.input-error.show {
-  display: flex;
-  align-items: center;
-}
-
-/* icône d’erreur en 18px comme les autres */
-.input-error i {
-  margin-right: 6px;
-  font-size: 18px;
-  /* si jamais .icon met du absolute, on l’annule */
-  position: static;
-  cursor: default;
-  color: inherit;
-}
-
-
+    /* Boîte de message pour les alertes personnalisées */
+    .message-box-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.5); /* Fond semi-transparent */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000; /* Au-dessus de tout le reste */
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .message-box-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    .message-box {
+        background-color: var(--surface);
+        padding: 25px;
+        border-radius: var(--radius);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        text-align: center;
+        max-width: 80%;
+        width: 300px; /* Largeur fixe pour la boîte */
+    }
+    .message-box p {
+        margin-bottom: 20px;
+        font-size: 16px;
+        color: var(--text);
+    }
+    .message-box button {
+        padding: 10px 20px;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius);
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .message-box button:hover {
+        opacity: 0.9;
+    }
 
   </style>
 </head>
 <body>
 
   <div id="app">
-    <!-- LOGIN -->
     <div class="screen" id="login-screen">
-      
-      <!-- === USERNAME === -->
-<div class="form-group">
-  <label for="login-user">Username</label>
-  <input type="text" id="login-user" placeholder="Enter your email or username">
-  <!-- Zone d’erreur spécifique à login-user -->
-  <div class="input-error" id="error-login-user">
-  <i class="bi bi-exclamation-circle-fill error-icon" aria-hidden="true"></i>
-  <span class="error-text"></span>
-</div>
+      <div class="logo">
+        <h1>Welcome Back</h1>
+      </div>
 
-</div>
+      <div class="form-group">
+        <label for="login-user">Email or Username</label>
+        <input type="text" id="login-user" placeholder="Enter your email" autocomplete="email">
+        <div class="input-error" id="error-login-user" role="alert">
+          <i class="bi bi-exclamation-circle-fill error-icon" aria-hidden="true"></i>
+          <span class="error-text"></span>
+        </div>
+      </div>
 
-<!-- === PASSWORD === -->
-<div class="form-group">
-  <label for="login-pw">Password</label>
-  <input type="password" id="login-pw" placeholder="Password">
-  <i class="bi bi-eye icon" id="toggle-login"></i>
-  <!-- Zone d’erreur spécifique à login-pw -->
-  <div class="input-error" id="error-login-pw" aria-live="assertive">
-    <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-    <span class="error-text"></span>
-  </div>
-</div>
+      <div class="form-group">
+        <label for="login-pw">Password</label>
+        <input type="password" id="login-pw" placeholder="Password" autocomplete="current-password">
+        <i class="bi bi-eye icon" id="toggle-login"></i> <div class="input-error" id="error-login-pw" role="alert" aria-live="assertive">
+          <i class="bi bi-exclamation-circle-fill error-icon" aria-hidden="true"></i>
+          <span class="error-text"></span>
+        </div>
+      </div>
 
-
-      <div class="link"><a href="#">Reset Password</a></div>
+      <div class="link"><a href="#" id="reset-pw-link">Reset Password?</a></div>
       <button class="btn" id="btn-login">
-  <span class="btn-text">Sign in with email</span>
-  <div class="loader"></div>
-</button>
-
+        <span class="btn-text">Sign in with email</span>
+        <div class="loader"></div> </button>
 
       <div class="or">OR</div>
       <div class="link"><a href="#" id="to-signup">Create an account</a></div>
     </div>
 
-    <!-- SIGN UP -->
     <div class="screen" id="signup-screen">
+      <div class="logo">
+        <h1>Create Account</h1>
+      </div>
 
       <div class="form-group">
         <label for="signup-first">First Name</label>
-        <input type="text" id="signup-first" placeholder="First Name">
+        <input type="text" id="signup-first" placeholder="First Name" autocomplete="given-name">
+        <div class="input-error" id="error-signup-first" role="alert">
+             <i class="bi bi-exclamation-circle-fill error-icon" aria-hidden="true"></i>
+             <span class="error-text"></span>
+        </div>
       </div>
 
       <div class="form-group">
         <label for="signup-last">Last Name</label>
-        <input type="text" id="signup-last" placeholder="Last Name">
+        <input type="text" id="signup-last" placeholder="Last Name" autocomplete="family-name">
+        <div class="input-error" id="error-signup-last" role="alert">
+             <i class="bi bi-exclamation-circle-fill error-icon" aria-hidden="true"></i>
+             <span class="error-text"></span>
+        </div>
       </div>
 
       <div class="form-group">
         <label for="signup-email">Email</label>
-        <input type="email" id="signup-email" placeholder="Email">
+        <input type="email" id="signup-email" placeholder="Email" autocomplete="email">
+         <div class="input-error" id="error-signup-email" role="alert">
+             <i class="bi bi-exclamation-circle-fill error-icon" aria-hidden="true"></i>
+             <span class="error-text"></span>
+        </div>
       </div>
 
       <div class="form-group">
         <label for="signup-pw">Password</label>
-        <input type="password" id="signup-pw" placeholder="Password">
-        <i class="bi bi-eye icon" id="toggle-signup"></i>
+        <input type="password" id="signup-pw" placeholder="Create a password" autocomplete="new-password">
+        <i class="bi bi-eye icon" id="toggle-signup"></i> <div class="input-error" id="error-signup-pw" role="alert">
+             <i class="bi bi-exclamation-circle-fill error-icon" aria-hidden="true"></i>
+             <span class="error-text"></span>
+        </div>
       </div>
-
 
       <div class="link" style="font-size:13px;line-height:1.4;">
-        By signing up, you agree to our <a href="#">Privacy and Term</a>
+        By signing up, you agree to our <a href="#">Privacy Policy</a> and <a href="#">Terms of Service</a>.
       </div>
       <button class="btn" id="btn-signup">
-  <span class="btn-text">Create an account</span>
-  <div class="loader"></div>
-</button>
-
+        <span class="btn-text">Create an account</span>
+        <div class="loader"></div> </button>
 
       <div class="or">OR</div>
-      <div class="link"><a href="#" id="to-login">Login to your account</a></div>
+      <div class="link"><a href="#" id="to-login">Already have an account? Login</a></div>
+    </div>
+  </div>
+
+  <div class="message-box-overlay" id="message-box-overlay">
+    <div class="message-box">
+        <p id="message-box-text"></p>
+        <button id="message-box-ok">OK</button>
     </div>
   </div>
 
   <script>
     const app = document.getElementById('app');
-    const toSignup = () => app.style.transform = 'translateX(-50%)';
-    const toLogin  = () => app.style.transform = 'translateX(0)';
+    const loginScreen = document.getElementById('login-screen');
+    const signupScreen = document.getElementById('signup-screen');
 
-    document.getElementById('to-signup').onclick = e => { e.preventDefault(); toSignup(); };
-    document.getElementById('to-login').onclick  = e => { e.preventDefault(); toLogin(); };
+    // Fonctions pour naviguer entre les écrans de connexion et d'inscription
+    const toSignup = () => {
+        app.style.transform = 'translateX(-50%)'; // Déplace vers l'écran d'inscription
+        clearAllErrors(); // Efface les erreurs lors du changement d'écran
+        document.title = "Sign Up"; // Met à jour le titre de la page
+    };
+    const toLogin  = () => {
+        app.style.transform = 'translateX(0)'; // Revient à l'écran de connexion
+        clearAllErrors(); // Efface les erreurs
+        document.title = "Login"; // Met à jour le titre de la page
+    };
 
-    // Toggle password visibility
+    // Attache les événements aux liens de navigation
+    document.getElementById('to-signup').addEventListener('click', e => { e.preventDefault(); toSignup(); });
+    document.getElementById('to-login').addEventListener('click',  e => { e.preventDefault(); toLogin(); });
+
+    /**
+     * Gère l'affichage/masquage du mot de passe.
+     * @param {string} btnId - ID du bouton de bascule.
+     * @param {string} inputId - ID du champ de mot de passe.
+     * @param {string} iconVisible - Classe CSS pour l'icône "visible".
+     * @param {string} iconHidden - Classe CSS pour l'icône "caché".
+     */
     function bindToggle(btnId, inputId, iconVisible = 'bi-eye', iconHidden = 'bi-eye-slash') {
       const btn = document.getElementById(btnId);
       const inp = document.getElementById(inputId);
+      if (!btn || !inp) return; // Sécurité si les éléments n'existent pas
+
       btn.addEventListener('click', () => {
         if (inp.type === 'password') {
           inp.type = 'text';
@@ -358,158 +446,331 @@
     bindToggle('toggle-login','login-pw');
     bindToggle('toggle-signup','signup-pw');
 
-
-    // Touch-swipe navigation
+    // Navigation par swipe tactile (pour mobile)
     let startX = 0;
-    app.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
-    app.addEventListener('touchend',   e => {
-      const diff = startX - e.changedTouches[0].clientX;
-      if (diff > 50) toSignup();
-      if (diff < -50) toLogin();
+    let isSwiping = false;
+    app.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+        isSwiping = true;
+    }, { passive: true }); // passive:true pour améliorer la performance du scroll
+
+    app.addEventListener('touchmove', e => {
+        if (!isSwiping) return;
+        // Optionnel : ajouter un retour visuel pendant le swipe si désiré
+    }, { passive: true });
+
+    app.addEventListener('touchend', e => {
+      if (!isSwiping) return;
+      isSwiping = false;
+      const diff = startX - e.changedTouches[0].clientX; // Calcul de la distance de swipe
+      const currentTransform = app.style.transform;
+
+      if (diff > 50 && currentTransform !== 'translateX(-50%)') { // Swipe vers la gauche
+        toSignup();
+      } else if (diff < -50 && currentTransform === 'translateX(-50%)') { // Swipe vers la droite
+        toLogin();
+      }
     });
-  </script>
 
-  <script>
-// Après bindToggle et swipe…
+    // --- Fonction d'alerte personnalisée ---
+    const messageBoxOverlay = document.getElementById('message-box-overlay');
+    const messageBoxText = document.getElementById('message-box-text');
+    const messageBoxOk = document.getElementById('message-box-ok');
 
-// Récupération des inputs
-const loginUser = document.getElementById('login-user');
-const loginPw   = document.getElementById('login-pw');
-const signupFirst = document.getElementById('signup-first');
-const signupLast  = document.getElementById('signup-last');
-const signupEmail = document.getElementById('signup-email');
-const signupPw    = document.getElementById('signup-pw');
-
-// — utilitaires pour chaque champ : —
-function showFieldError(fieldId, message) {
-  const errDiv = document.getElementById(`error-${fieldId}`);
-  errDiv.querySelector('.error-text').textContent = message;
-  errDiv.classList.add('show');
-}
-
-function clearFieldError(fieldId) {
-  const errDiv = document.getElementById(`error-${fieldId}`);
-  errDiv.classList.remove('show');
-  errDiv.querySelector('.error-text').textContent = '';
-}
-
-// Effacer l’erreur dès qu’on retape quelque chose
-[loginUser, loginPw].forEach(input => {
-  input.addEventListener('input', () => clearFieldError(input.id));
-});
-
-// Sign in
-document.getElementById('btn-login').addEventListener('click', () => {
-  // 1) on efface d’éventuelles vieilles erreurs
-  clearFieldError('login-user');
-  clearFieldError('login-pw');
-
-  // 2) on récupère et valide
-  const email = loginUser.value.trim();
-  const pw    = loginPw.value;
-
-  if (!email) {
-    showFieldError('login-user', 'Veuillez entrer votre email.');
-    loginUser.focus(); return;
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showFieldError('login-user', 'Adresse email non valide.');
-    loginUser.focus(); return;
-  }
- if (!pw) {                       // juste vide ?
-  showFieldError('login-pw', 'Veuillez entrer votre mot de passe.');
-  loginPw.focus(); return;
-}
-
-
-  // 3) on appelle Firebase
-  withSpinner('btn-login', () =>
-    auth.signInWithEmailAndPassword(email, pw)
-  )
-  .then(() => window.location.href = 'index.html')
-  .catch(err => {
-  // Pour le débogage, conservez tout de même la trace côté console
-  console.error('[auth] login error', err);
-
-  switch (err.code) {
-    case 'auth/invalid-email':
-      showFieldError('login-user', 'Adresse email non valide.');
-      loginUser.focus();
-      break;
-
-    case 'auth/user-disabled':
-      showFieldError('login-user', 'Ce compte a été désactivé.');
-      break;
-
-    /* Tous les cas "identifiants invalides" regroupés
-       — y compris le nouveau code  auth/invalid-login-credentials */
-    case 'auth/user-not-found':
-    case 'auth/wrong-password':
-    case 'auth/invalid-login-credentials':
-      // On renvoie un message neutre pour ne pas donner d’indice
-      showFieldError('login-pw', 'Email ou mot de passe incorrect.');
-      loginPw.focus();
-      break;
-
-    default:
-      // Message passe-partout si c’est autre chose
-      showFieldError('login-user',
-        'Impossible de vous connecter pour le moment. Réessayez plus tard.');
-  }
-});
-
-});
-
-// Récupère la fonction callable
-
-
-  // SIGNUP
-document.getElementById('btn-signup').addEventListener('click', () => {
-  withSpinner('btn-signup', async () => {
-    const firstname = signupFirst.value.trim();
-    const lastname  = signupLast.value.trim();
-    if (!firstname || !lastname) {
-      alert("Veuillez indiquer votre nom et prénom.");
-      return Promise.reject();
+    /**
+     * Affiche une boîte de message personnalisée.
+     * @param {string} message - Le message à afficher.
+     * @returns {Promise} - Une promesse qui se résout quand l'utilisateur clique sur OK.
+     */
+    function customAlert(message) {
+        messageBoxText.textContent = message;
+        messageBoxOverlay.classList.add('show');
+        return new Promise((resolve) => { // Retourne une promesse pour gérer la fermeture
+            messageBoxOk.onclick = () => {
+                messageBoxOverlay.classList.remove('show');
+                resolve(); // Résout la promesse quand OK est cliqué
+            };
+        });
     }
-    const userCred = await auth.createUserWithEmailAndPassword(
-      signupEmail.value, signupPw.value
-    );
-    await userCred.user.updateProfile({
-      displayName: firstname + ' ' + lastname
-    });
-    await auth.currentUser.getIdToken(true);
-    window.location.href = 'index.html';
-  })
-  .catch(err => {
-    if (err && err.message) alert(err.message);
-  });
-});
-  
-</script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => {
-          console.log('[App] SW enregistré, scope :', reg.scope);
 
-          // Dès qu’on déploie une nouvelle version (CACHE_NAME incrémenté)…
-          reg.addEventListener('updatefound', () => {
-            const newSW = reg.installing;
-            newSW.addEventListener('statechange', () => {
-              // Quand le nouvel SW est prêt et qu’il y avait déjà un SW actif
-              if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('[App] Nouvelle version dispo → reload');
-                window.location.reload();
+    // --- Utilitaires pour les erreurs de champ ---
+    /**
+     * Affiche un message d'erreur sous un champ spécifique.
+     * @param {string} fieldId - L'ID du champ (sans "error-").
+     * @param {string} message - Le message d'erreur.
+     */
+    function showFieldError(fieldId, message) {
+      const errDiv = document.getElementById(`error-${fieldId}`);
+      const inputEl = document.getElementById(fieldId);
+      if (errDiv) {
+        errDiv.querySelector('.error-text').textContent = message;
+        errDiv.classList.add('show');
+      }
+      if (inputEl) { // Pour l'accessibilité
+          inputEl.setAttribute('aria-invalid', 'true');
+          inputEl.setAttribute('aria-describedby', `error-${fieldId}`);
+      }
+    }
+
+    /**
+     * Efface le message d'erreur d'un champ spécifique.
+     * @param {string} fieldId - L'ID du champ.
+     */
+    function clearFieldError(fieldId) {
+      const errDiv = document.getElementById(`error-${fieldId}`);
+      const inputEl = document.getElementById(fieldId);
+      if (errDiv) {
+        errDiv.classList.remove('show');
+        errDiv.querySelector('.error-text').textContent = '';
+      }
+      if (inputEl) { // Pour l'accessibilité
+          inputEl.removeAttribute('aria-invalid');
+          inputEl.removeAttribute('aria-describedby');
+      }
+    }
+
+    /** Efface tous les messages d'erreur des champs. */
+    function clearAllErrors() {
+        const errorFields = [
+            'login-user', 'login-pw',
+            'signup-first', 'signup-last', 'signup-email', 'signup-pw'
+        ];
+        errorFields.forEach(clearFieldError);
+    }
+
+
+    // Efface l'erreur d'un champ dès que l'utilisateur commence à y écrire
+    const allInputs = document.querySelectorAll('#login-screen input, #signup-screen input');
+    allInputs.forEach(input => {
+      input.addEventListener('input', () => clearFieldError(input.id));
+    });
+
+
+    // --- Logique de Connexion ---
+    const loginUser = document.getElementById('login-user');
+    const loginPw   = document.getElementById('login-pw');
+    const btnLogin  = document.getElementById('btn-login');
+
+    if (btnLogin) {
+        btnLogin.addEventListener('click', () => {
+          // 1) Effacer les anciennes erreurs
+          clearFieldError('login-user');
+          clearFieldError('login-pw');
+
+          // 2) Récupérer et valider les valeurs
+          const email = loginUser.value.trim();
+          const pw    = loginPw.value;
+          let isValid = true;
+
+          if (!email) {
+            showFieldError('login-user', 'Please enter your email.');
+            loginUser.focus();
+            isValid = false;
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { // Validation basique de l'email
+            showFieldError('login-user', 'Invalid email address format.');
+            loginUser.focus();
+            isValid = false;
+          }
+
+          if (!pw) {
+            showFieldError('login-pw', 'Please enter your password.');
+            if (isValid) loginPw.focus(); // Focus seulement si l'email était valide
+            isValid = false;
+          }
+
+          if (!isValid) return; // Arrêter si la validation échoue
+
+          // 3) Appeler Firebase avec le spinner
+          withSpinner('btn-login', () =>
+            auth.signInWithEmailAndPassword(email, pw)
+          )
+          .then(() => {
+            console.log('User logged in successfully');
+            // REDIRECTION: Remplace l'état de l'historique pour empêcher le retour à la page de login
+            window.location.replace('index.html#home');
+          })
+          .catch(err => {
+            console.error('[Auth] Login error:', err.code, err.message);
+            // Gérer les erreurs spécifiques de Firebase Auth
+            switch (err.code) {
+              case 'auth/invalid-email':
+                showFieldError('login-user', 'Invalid email address format.');
+                loginUser.focus();
+                break;
+              case 'auth/user-disabled':
+                showFieldError('login-user', 'This account has been disabled.');
+                loginUser.focus();
+                break;
+              case 'auth/user-not-found':
+              case 'auth/wrong-password':
+              case 'auth/invalid-credential': // Utilisé par les versions plus récentes de Firebase
+              case 'auth/invalid-login-credentials': // Selon votre code original
+                showFieldError('login-pw', 'Incorrect email or password.');
+                loginPw.focus();
+                break;
+              default:
+                // Pour les autres erreurs, afficher un message générique
+                // customAlert('Login failed: ' + err.message); // Optionnel: utiliser customAlert
+                showFieldError('login-user', 'Login failed. Please try again.');
+            }
+          });
+        });
+    }
+
+
+    // --- Logique d'Inscription ---
+    const signupFirst = document.getElementById('signup-first');
+    const signupLast  = document.getElementById('signup-last');
+    const signupEmail = document.getElementById('signup-email');
+    const signupPw    = document.getElementById('signup-pw');
+    const btnSignup   = document.getElementById('btn-signup');
+
+    if (btnSignup) {
+        btnSignup.addEventListener('click', () => {
+            clearAllErrors(); // Effacer les erreurs précédentes
+
+            const firstname = signupFirst.value.trim();
+            const lastname  = signupLast.value.trim();
+            const email     = signupEmail.value.trim();
+            const password  = signupPw.value;
+            let isValid = true;
+
+            // Validations des champs d'inscription
+            if (!firstname) {
+                showFieldError('signup-first', 'Please enter your first name.');
+                if(isValid) signupFirst.focus();
+                isValid = false;
+            }
+            if (!lastname) {
+                showFieldError('signup-last', 'Please enter your last name.');
+                if(isValid) signupLast.focus();
+                isValid = false;
+            }
+            if (!email) {
+                showFieldError('signup-email', 'Please enter your email address.');
+                if(isValid) signupEmail.focus();
+                isValid = false;
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showFieldError('signup-email', 'Invalid email address format.');
+                if(isValid) signupEmail.focus();
+                isValid = false;
+            }
+            if (!password) {
+                showFieldError('signup-pw', 'Please create a password.');
+                if(isValid) signupPw.focus();
+                isValid = false;
+            } else if (password.length < 6) {
+                showFieldError('signup-pw', 'Password must be at least 6 characters.');
+                 if(isValid) signupPw.focus();
+                isValid = false;
+            }
+
+            if (!isValid) return; // Arrêter si la validation échoue
+
+
+            // Appeler Firebase avec le spinner
+            withSpinner('btn-signup', async () => {
+                try {
+                    const userCred = await auth.createUserWithEmailAndPassword(email, password);
+                    // Mettre à jour le profil de l'utilisateur avec le nom et prénom
+                    await userCred.user.updateProfile({
+                        displayName: `${firstname} ${lastname}`
+                    });
+                    // Forcer le rafraîchissement du token pour que les claims (ex: 'activated')
+                    // soient potentiellement à jour lors du chargement de index.html.
+                    await auth.currentUser.getIdToken(true);
+
+                    console.log('User signed up and profile updated');
+                    // REDIRECTION: Remplace l'état de l'historique et redirige vers la page d'activation
+                    window.location.replace('index.html#activation');
+
+                } catch (err) {
+                    console.error('[Auth] Signup error:', err.code, err.message);
+                    // Cette erreur sera renvoyée par withSpinner et traitée par le .catch ci-dessous
+                    throw err;
+                }
+            })
+            .catch(err => {
+                // Gérer les erreurs de createUserWithEmailAndPassword ou updateProfile
+                switch (err.code) {
+                    case 'auth/email-already-in-use':
+                        showFieldError('signup-email', 'This email is already registered.');
+                        signupEmail.focus();
+                        break;
+                    case 'auth/invalid-email':
+                        showFieldError('signup-email', 'Invalid email address format.');
+                        signupEmail.focus();
+                        break;
+                    case 'auth/weak-password':
+                        showFieldError('signup-pw', 'Password is too weak. Min 6 characters.');
+                        signupPw.focus();
+                        break;
+                    default:
+                        // Utiliser customAlert pour les erreurs génériques non liées à un champ spécifique
+                        customAlert(err.message || 'Signup failed. Please try again.');
+                }
+            });
+        });
+    }
+
+    // --- Lien de Réinitialisation de Mot de Passe (Placeholder) ---
+    const resetPwLink = document.getElementById('reset-pw-link');
+    if(resetPwLink) {
+        resetPwLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            customAlert('Password reset functionality will be implemented here. For now, please contact support or try signing up if you forgot your details.');
+            // TODO: Implémenter le flux de réinitialisation de mot de passe
+            // Exemple:
+            // const email = loginUser.value.trim();
+            // if (!email) {
+            //   customAlert('Please enter your email address in the email field first.');
+            //   loginUser.focus();
+            //   return;
+            // }
+            // auth.sendPasswordResetEmail(email)
+            //   .then(() => customAlert('Password reset email sent! Check your inbox.'))
+            //   .catch(err => customAlert('Error sending reset email: ' + err.message));
+        });
+    }
+
+
+    // --- Enregistrement du Service Worker ---
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js') // S'assurer que sw.js est à la racine
+          .then(reg => {
+            console.log('[App] SW enregistré, scope :', reg.scope);
+
+            // Écoute les mises à jour du Service Worker
+            reg.addEventListener('updatefound', () => {
+              const newSW = reg.installing;
+              if (newSW) {
+                newSW.addEventListener('statechange', () => {
+                  if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('[App] Nouvelle version disponible → rechargement');
+                    // Optionnel : Afficher une notification à l'utilisateur avant de recharger
+                    // if (confirm("A new version is available. Reload now?")) {
+                    //   window.location.reload();
+                    // }
+                    customAlert("A new version of the app is available and will be applied.").then(() => {
+                        window.location.reload(); // Recharge la page pour appliquer la nouvelle version
+                    });
+                  }
+                });
               }
             });
-          });
-        })
-        .catch(err => console.error('[App] Échec enregistrement SW :', err));
-    });
-  }
-</script>
+          })
+          .catch(err => console.error('[App] Échec enregistrement SW :', err));
+      });
+    }
 
+    // Définir le titre initial du document en fonction de l'écran affiché
+    if (app.style.transform === 'translateX(-50%)') { // Si l'écran d'inscription est affiché
+        document.title = "Sign Up";
+    } else { // Sinon, l'écran de connexion est affiché
+        document.title = "Login";
+    }
+
+  </script>
 </body>
 </html>
