@@ -57,6 +57,7 @@
       width: 100%;                /* toute la largeur */
       overflow-y: auto;           /* scroll interne si besoin */
       /* padding-bottom pour laisser la place à la nav en bas */
+      /* Ce padding sera ajusté par le script pour les pages SANS nav principale */
       padding-bottom: calc(56px + env(safe-area-inset-bottom));
     }
 
@@ -911,6 +912,36 @@
     .toast-notification.success {
         background-color: var(--ebay-green);
     }
+
+    /* Classe générique pour les boutons de retour en haut de page */
+    .btn-page-back, .btn-page-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem; /* Ajustez la taille de l'icône */
+      color: var(--primary-text);
+      cursor: pointer;
+      padding: 0.25rem 0.5rem; /* Petit padding pour la zone cliquable */
+      line-height: 1; /* Important pour l'alignement vertical de l'icône */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      outline: none;
+    }
+
+    /* Ajustement pour les headers qui contiennent ces boutons */
+    main.page > header:has(.btn-page-back),
+    main.page > header:has(.btn-page-close) {
+      display: flex;
+      align-items: center;
+      /* gap: 0.75rem; /* Espace entre le bouton et le titre si besoin */
+    }
+
+    main.page > header:has(.btn-page-back) h2,
+    main.page > header:has(.btn-page-close) h2 {
+      margin: 0; /* Enlève la marge par défaut du h2 pour un meilleur alignement */
+      margin-left: 0.5rem; /* Espace entre le bouton retour et le titre */
+      flex-grow: 1; /* Permet au titre de prendre l'espace restant */
+    }
   </style>
 </head>
 
@@ -1033,12 +1064,12 @@
     justify-content: space-between; 
   }
   .sell-step h3.step-title #btn-clear-sell-cart-step2 {
-    background: none;          
-    border: none;              
-    padding: 0.25rem;          
-    margin: 0;                 
-    cursor: pointer;           
-    font-size: 1.3rem;         
+    background: none;         
+    border: none;             
+    padding: 0.25rem;         
+    margin: 0;                
+    cursor: pointer;          
+    font-size: 1.3rem;        
     line-height: 1;           
     color: var(--ebay-red);   
   }
@@ -1742,7 +1773,7 @@
 <main id="supply" class="page">
   <style>
     header#supply-header {
-      padding: 1rem;
+      /* padding: 1rem; // Géré par le style flex et gap */
       background: #fff; 
       border-bottom: 1px solid var(--border-color); 
       position: -webkit-sticky; 
@@ -1750,12 +1781,12 @@
       top: 0; 
       z-index: 15; 
     }
-    header#supply-header h2 {
+    /* header#supply-header h2 { // Géré par le style :has() global
       margin: 0;
       font-size: 1.3rem;
       font-weight: 600;
       color: var(--primary-text);
-    }
+    } */
     main#supply .books-list { 
         display: flex;
         flex-direction: column;
@@ -1853,7 +1884,7 @@
     }
     .fab {
       position: fixed;
-      bottom: calc(56px + env(safe-area-inset-bottom) + 1rem);
+      bottom: calc(env(safe-area-inset-bottom) + 1rem); /* Ajusté car la nav principale est cachée sur cette page */
       right: 1rem;
       width: 56px;
       height: 56px;
@@ -1876,8 +1907,10 @@
     }
   </style>
 
-  <header id="supply-header">
-    <h2>Approvisionnement</h2>
+  <header id="supply-header" style="padding: 1rem;"> <button class="btn-page-back" data-hash="home" aria-label="Retour à l'accueil">
+          <i class="bi bi-arrow-left"></i>
+      </button>
+      <h2>Approvisionnement</h2>
   </header>
   <div id="supply-list" class="books-list">
     </div>
@@ -1932,7 +1965,7 @@
             const totalBatch = supply.totalCost || 0; 
             const batchCard = document.createElement('div');
             batchCard.className = 'supply-batch-card';
-            
+           
             batchCard.innerHTML = `
               <header>
                 <div class="supplier-info">
@@ -1966,7 +1999,7 @@
           supplyListEl.innerHTML = '<p style="padding:1rem;color:#e53238;text-align:center;">Erreur de chargement des approvisionnements.</p>';
         });
     }
-    
+   
     function cleanupSupplyListener() {
         if (unsubscribeSupplies) {
           unsubscribeSupplies();
@@ -1993,7 +2026,7 @@
     #new-supply {display:none;flex-direction:column;height:100vh;background:var(--surface)}
     #new-supply.visible{display:flex}
 
-    .step{display:none;flex:1;padding:1rem 1rem calc(56px + env(safe-area-inset-bottom) + 50px); }
+    .step{display:none;flex:1;padding:1rem 1rem calc(env(safe-area-inset-bottom) + 50px); /* Ajusté pour le wizard-nav seul */ }
     .step.active{display:flex;flex-direction:column}
     #new-supply h2{font-size:1.25rem;font-weight:500;margin-bottom:1rem}
 
@@ -2014,7 +2047,7 @@
         position:fixed;
         right:1rem;
         /* Ajustement pour être au-dessus de .wizard-nav */
-        bottom:calc(env(safe-area-inset-bottom) + 50px + 1rem + 56px); /* 50px wizard-nav + 1rem marge + 56px hauteur FAB */
+        bottom:calc(env(safe-area-inset-bottom) + 50px + 1rem + 10px); /* 50px wizard-nav + 1rem marge + 10px petit espace supplémentaire */
         width:56px;height:56px;
         border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:1.7rem;
         display:flex;align-items:center;justify-content:center;
@@ -2099,15 +2132,42 @@
       color: var(--accent);
     }
     /* Style pour le contenu scrollable dans chaque étape */
-    .step > div:not(.wizard-nav):not(.fab) {
+    .step > div:not(.wizard-nav):not(.fab) { /* Exclure le FAB du calcul de scroll */
         flex-grow: 1;
         overflow-y: auto;
         /* padding-bottom: 1rem; /* Espace pour ne pas être caché par le FAB ou wizard-nav */
     }
-    #lines-container {
+    #lines-container { /* Conteneur spécifique des lignes */
         padding-bottom: 70px; /* Espace pour le FAB */
     }
+    /* En-tête pour le processus new-supply (si on en ajoute un) */
+    #new-supply > header.wizard-main-header {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: #fff;
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        z-index: 55; /* Au-dessus du contenu, en dessous des modales */
+    }
+    #new-supply > header.wizard-main-header .btn-page-close {
+        margin-right: 0.75rem;
+    }
+    #new-supply > header.wizard-main-header h2.wizard-main-title {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
   </style>
+  <!-- <header class="wizard-main-header">
+    <button class="btn-page-close" data-hash="supply" aria-label="Annuler l'approvisionnement">
+        <i class="bi bi-x-lg"></i>
+    </button>
+    <h2 class="wizard-main-title">Nouvel Approvisionnement</h2>
+  </header> -->
+
 
   <template id="tmpl-line">
     <div class="line-row" data-id="">
@@ -2129,8 +2189,7 @@
 
   <div class="step active" data-step="1">
     <h2>Articles</h2>
-    <div id="lines-container">
-      </div>
+    <div id="lines-container"> </div>
     <button id="add-line-btn" class="fab" aria-label="Ajouter une ligne">+</button>
     <div class="wizard-nav">
       <button class="btn primary" data-next disabled>Suivant →</button>
@@ -2142,15 +2201,15 @@
     <div style="flex-grow: 1; overflow-y: auto;"> <div class="form-group">
         <label for="additional-cost">Coût supplémentaire (XOF)</label>
         <input
-            id="additional-cost"
-            type="number"
-            step="50"
-            min="0"
-            placeholder="0"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="none"
-            spellcheck="false"
+          id="additional-cost"
+          type="number"
+          step="50"
+          min="0"
+          placeholder="0"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="none"
+          spellcheck="false"
         >
         </div>
         <div class="cost-allocation-list">
@@ -2168,7 +2227,7 @@
         <div class="form-group">
         <label for="supplier-search">Nom du fournisseur</label>
         <input id="supplier-search" type="search" placeholder="Rechercher ou saisir" autocomplete="off"
-                autocorrect="off" autocapitalize="none" spellcheck="false">
+               autocorrect="off" autocapitalize="none" spellcheck="false">
         </div>
     </div>
     <div class="wizard-nav">
@@ -2207,7 +2266,7 @@
         if (activeStepEl) {
             const firstInput = activeStepEl.querySelector('input:not([type=hidden]):not([readonly]), textarea, select');
             if (firstInput && activeStepEl.id !== 'lines-container' && activeStepEl.dataset.step !== "1") { // Ne pas focus sur l'étape 1 (lignes)
-                 setTimeout(() => firstInput.focus(), 50); 
+                setTimeout(() => firstInput.focus(), 50); 
             }
         }
       }
@@ -2243,7 +2302,7 @@
         const row = document.importNode(tmplLine,true).firstElementChild;
         row.dataset.id=lineIdCounter; // ID unique pour la ligne
         const bookI=row.querySelector('.book-search');
-        
+       
         bookI.addEventListener('click', () => {
           // AMÉLIORATION: Utilisation de sessionStorage
           sessionStorage.setItem('targetBookInputRowId_newSupply', row.dataset.id); 
@@ -2288,7 +2347,7 @@
         updateLineTotals(); 
         toggleNextButtonForStep1();
         if (linesC.children.length === 1 && !bookI.value) {
-            // Ne pas auto-cliquer, laisser l'utilisateur cliquer sur le champ ou le FAB
+          // Ne pas auto-cliquer, laisser l'utilisateur cliquer sur le champ ou le FAB
         } else if (bookI.value) { 
           qtyI.focus();
           qtyI.select();
@@ -2313,11 +2372,11 @@
                     costInput.value = selectedCost;
                     costInput.dataset.baseCost = selectedCost; // Mettre à jour le baseCost
                 }
-                
+               
                 // Déclencher 'change' sur bookInput pour que updateLineTotals soit appelé si nécessaire
                 if (bookInput) bookInput.dispatchEvent(new Event('change', { bubbles: true }));
                 if (costInput) costInput.dispatchEvent(new Event('input', { bubbles: true })); // Pour recalculer
-                
+               
                 if (qtyInput) {
                     if (!qtyInput.value || qtyInput.value === "0") qtyInput.value = 1;
                     qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -2342,7 +2401,7 @@
       if (location.hash === '#new-supply' && main.classList.contains('visible')) {
           applySelectedBookFromStorage_newSupply();
       }
-       // Observer pour détecter quand la page devient visible et appliquer les données de sessionStorage
+        // Observer pour détecter quand la page devient visible et appliquer les données de sessionStorage
       const newSupplyObserver = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
             if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
@@ -2388,7 +2447,7 @@
 
         const step2NextBtn = main.querySelector('[data-step="2"] [data-next]');
         if (step2NextBtn) step2NextBtn.disabled = addCost < 0 || rows.length === 0;
-        
+       
         if (rows.length > 0 && addCost >= 0 && currentStep === 4) {
            updateSummary();
         }
@@ -2515,7 +2574,7 @@
 
         const totalQuantityFinal = supplyLinesData.reduce((sum, ln) => sum + ln.quantity, 0);
         const totalCostFinal = supplyLinesData.reduce((sum, ln) => sum + ln.quantity * ln.unitCost, 0);
-        
+       
         const batch=db.batch();
         const supplyRef=db.collection('users').doc(user.uid).collection('supplies').doc();
         batch.set(supplyRef,{
@@ -2537,7 +2596,7 @@
           if (!bookQuerySnapshot.empty) { 
             const bookDocRef = bookQuerySnapshot.docs[0].ref;
             const bookData = bookQuerySnapshot.docs[0].data();
-            
+           
             const currentQuantity = bookData.quantity || 0;
             const currentAverageCost = bookData.averageCost !== undefined ? bookData.averageCost : (bookData.lastPurchasePrice || 0); 
             const newQuantity = currentQuantity + ln.quantity;
@@ -2609,7 +2668,7 @@
         if (currentWizardNav) currentWizardNav.style.bottom = '';
         if (currentStepEl) currentStepEl.style.paddingBottom = ''; // Réinitialiser le padding
       }
-      
+     
       // Stocker les références pour le removeEventListener
       let currentStepElForKeyboard, currentWizardNavForKeyboard, focusedInputForKeyboard;
 
@@ -2762,7 +2821,7 @@
           performBookSearch(); 
       }
     });
-     // Exécuter aussi si la page est déjà visible au chargement initial (ex: refresh)
+      // Exécuter aussi si la page est déjà visible au chargement initial (ex: refresh)
     if (location.hash === '#select-book' && selectBookPage.classList.contains('visible')) {
         setTimeout(() => searchInputEl.focus(), 50);
         const prefillSearch = sessionStorage.getItem('currentBookSearchValue_newSupply');
@@ -2919,42 +2978,42 @@ let previousActiveElementGlobal;
 let focusableElementsModalGlobal = [];
 
 function openGlobalAddBookModal(defaultTitle = '') {
-    if (!addBookModalOverlayGlobal) return console.error('Modale #add-book-modal-overlay introuvable');
-    
-    previousActiveElementGlobal = document.activeElement; 
-    addBookModalOverlayGlobal.classList.add('visible');
-    addBookModalOverlayGlobal.setAttribute('aria-hidden', 'false');
-    titleInputModalGlobal.value = defaultTitle;
+  if (!addBookModalOverlayGlobal) return console.error('Modale #add-book-modal-overlay introuvable');
+ 
+  previousActiveElementGlobal = document.activeElement; 
+  addBookModalOverlayGlobal.classList.add('visible');
+  addBookModalOverlayGlobal.setAttribute('aria-hidden', 'false');
+  titleInputModalGlobal.value = defaultTitle;
 
-    // Piéger le focus
-    const focusableElementsString = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-    focusableElementsModalGlobal = Array.from(addBookModalDialogGlobal.querySelectorAll(focusableElementsString));
-    const firstFocusableElement = focusableElementsModalGlobal[0];
-    
-    setTimeout(() => { // Laisser le temps à la modale de devenir visible
-        if (firstFocusableElement) firstFocusableElement.focus();
-    }, 100);
+  // Piéger le focus
+  const focusableElementsString = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  focusableElementsModalGlobal = Array.from(addBookModalDialogGlobal.querySelectorAll(focusableElementsString));
+  const firstFocusableElement = focusableElementsModalGlobal[0];
+ 
+  setTimeout(() => { // Laisser le temps à la modale de devenir visible
+      if (firstFocusableElement) firstFocusableElement.focus();
+  }, 100);
 
 
-    document.addEventListener('keydown', trapFocusInModalGlobal);
-    document.addEventListener('keydown', handleEscapeKeyModalGlobal);
-    document.body.style.overflow = 'hidden'; // Empêcher le scroll du body
+  document.addEventListener('keydown', trapFocusInModalGlobal);
+  document.addEventListener('keydown', handleEscapeKeyModalGlobal);
+  document.body.style.overflow = 'hidden'; // Empêcher le scroll du body
 }
 
 function closeGlobalAddBookModal() {
-    if (!addBookModalOverlayGlobal) return;
-    addBookModalOverlayGlobal.classList.remove('visible');
-    addBookModalOverlayGlobal.setAttribute('aria-hidden', 'true');
-    
-    document.removeEventListener('keydown', trapFocusInModalGlobal);
-    document.removeEventListener('keydown', handleEscapeKeyModalGlobal);
-    document.body.style.overflow = ''; // Restaurer le scroll du body
+  if (!addBookModalOverlayGlobal) return;
+  addBookModalOverlayGlobal.classList.remove('visible');
+  addBookModalOverlayGlobal.setAttribute('aria-hidden', 'true');
+ 
+  document.removeEventListener('keydown', trapFocusInModalGlobal);
+  document.removeEventListener('keydown', handleEscapeKeyModalGlobal);
+  document.body.style.overflow = ''; // Restaurer le scroll du body
 
-    if (previousActiveElementGlobal) {
-        previousActiveElementGlobal.focus(); 
-    }
-    // Nettoyer le titre suggéré si on vient de select-book
-    sessionStorage.removeItem('suggestedNewBookTitle_newSupply');
+  if (previousActiveElementGlobal) {
+      previousActiveElementGlobal.focus(); 
+  }
+  // Nettoyer le titre suggéré si on vient de select-book
+  sessionStorage.removeItem('suggestedNewBookTitle_newSupply');
 }
 
 if(closeModalBtnModalGlobal) closeModalBtnModalGlobal.addEventListener('click', closeGlobalAddBookModal);
@@ -2966,7 +3025,7 @@ addBookModalOverlayGlobal.addEventListener('click', (e) => {
 
 function trapFocusInModalGlobal(e) {
     if (e.key !== 'Tab' || !addBookModalOverlayGlobal.classList.contains('visible')) return;
-    
+   
     const firstFocusableElement = focusableElementsModalGlobal[0];
     const lastFocusableElement = focusableElementsModalGlobal[focusableElementsModalGlobal.length - 1];
 
@@ -2991,14 +3050,14 @@ function handleEscapeKeyModalGlobal(e) {
 formAddBookModalGlobal.addEventListener('submit', async e => {
     e.preventDefault();
     const newTitle = titleInputModalGlobal.value.trim();
-    
+   
     if (!newTitle) {
       titleInputModalGlobal.style.borderColor = 'var(--ebay-red)';
       setTimeout(() => titleInputModalGlobal.style.borderColor = '', 2000);
       titleInputModalGlobal.focus();
       return;
     }
-    
+   
     submitBtnModalGlobal.disabled = true;
     submitBtnModalGlobal.textContent = 'Enregistrement...';
 
@@ -3045,8 +3104,13 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
 </script>
 
   <main id="orders" class="page">
-    <header><h2 style="padding:1rem">My Orders</h2></header>
-    <p style="padding:0 1rem 6rem; text-align:center;">Your recent orders will appear here…</p>
+    <header style="padding:1rem;">
+        <button class="btn-page-back" data-hash="account" aria-label="Retour au compte">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h2>My Orders</h2>
+    </header>
+    <p style="padding:0 1rem 1rem; text-align:center;">Your recent orders will appear here…</p>
   </main>
 
   <main id="sales" class="page">
@@ -3083,7 +3147,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
       }
-      
+     
       function updateSelectedDateDisplay(date) {
           const today = new Date();
           if (date.toDateString() === today.toDateString()) {
@@ -3212,7 +3276,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
           unsubscribeSales = null;
         }
       }
-      
+     
       if (salesDateFilterBtnEl) {
           salesDateFilterBtnEl.addEventListener('click', () => {
               try {
@@ -3247,7 +3311,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
               if(salesSummaryChipEl) salesSummaryChipEl.textContent = '0 livre(s) vendu(s)';
           }
       }
-      
+     
       window.addEventListener('hashchange', () => {
         if (location.hash === '#sales') {
           initializeSalesPage();
@@ -3270,7 +3334,12 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
 </main>
 
   <main id="cart" class="page">
-    <header><h2 style="padding:1rem">Panier</h2></header>
+    <header style="padding:1rem;">
+        <button class="btn-page-back" data-hash="home" aria-label="Retour à l'accueil">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h2>Panier</h2>
+    </header>
     <div style="padding:1rem; text-align:center;">
       <p>Votre panier est actuellement vide.</p>
       </div>
@@ -3497,7 +3566,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
         } else if (allBooksCache.length === 0 && !searchTerm) {
             // Géré par onSnapshot empty check
         }
-        
+       
         filteredBooks.forEach(book => {
             const card = document.createElement('div');
             card.className = 'book-card-catalog'; 
@@ -3586,7 +3655,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
             const costForValuation = bookData.averageCost !== undefined ? bookData.averageCost : (bookData.lastPurchasePrice || 0);
             totalStockValueUsingCMP += costForValuation * quantity;
           });
-          
+         
           if (allBooksCache.length === 0) {
                booksListEl.innerHTML = '<p style="text-align:center; padding:1rem; color:var(--secondary-text);">Votre catalogue est vide. Commencez par ajouter des livres via un approvisionnement.</p>';
           } else {
@@ -3610,7 +3679,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
         if (totalBooksEl) totalBooksEl.textContent = '0';
         if (totalValueEl) totalValueEl.textContent = 'XOF 0';
     }
-    
+   
     auth.onAuthStateChanged(user => {
         if (user) {
             if (document.getElementById('catalog')?.classList.contains('visible')) {
@@ -3619,7 +3688,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
         } else {
             cleanupCatalogListener();
             if (document.getElementById('catalog')?.classList.contains('visible')) {
-                 if (booksListEl) booksListEl.innerHTML = '<p style="text-align:center; padding:1rem;">Veuillez vous connecter pour voir le catalogue.</p>';
+                if (booksListEl) booksListEl.innerHTML = '<p style="text-align:center; padding:1rem;">Veuillez vous connecter pour voir le catalogue.</p>';
             }
         }
     });
@@ -3639,8 +3708,10 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
 </main>
 
 <main id="reports" class="page">
-  <header id="reports-header">
-    <h2>Rapports & Analyses</h2>
+  <header id="reports-header" style="padding: 1rem;"> <button class="btn-page-back" data-hash="home" aria-label="Retour à l'accueil">
+          <i class="bi bi-arrow-left"></i>
+      </button>
+      <h2>Rapports & Analyses</h2>
   </header>
   <div class="reports-active-filter-summary-bar">
     <span id="active-filters-display">Période: 30 derniers jours</span>
@@ -3749,13 +3820,13 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
     const kpiTotalSalesCountEl = document.getElementById('kpi-total-sales-count');
     const kpiTotalItemsSoldEl = document.getElementById('kpi-total-items-sold');
     const kpiAvgProfitMarginEl = document.getElementById('kpi-avg-profit-margin');
-    
+   
     const periodSelectorEl = document.getElementById('reports-period-selector');
     const reportTypeSelectorEl = document.getElementById('reports-type-selector');
     const customDateInputsEl = document.getElementById('custom-date-inputs-reports');
     const dateStartInputEl = document.getElementById('reports-date-start');
     const dateEndInputEl = document.getElementById('reports-date-end');
-    
+   
     const reportsDataSummaryEl = document.getElementById('reports-data-summary');
     const reportsDataPlaceholderEl = document.getElementById('reports-data-placeholder');
 
@@ -3802,7 +3873,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
     if(filterOverlayEl) filterOverlayEl.addEventListener('click', () => {
         if (btnCloseFiltersEl) btnCloseFiltersEl.click();
     });
-    
+   
     function showKpiMessage(type, message = "") {
         const kpiElements = [
             kpiTotalRevenueEl, kpiTotalCogsEl, kpiTotalProfitEl,
@@ -3820,7 +3891,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
             if (message && kpiTotalRevenueEl) kpiTotalRevenueEl.textContent = message; // Afficher un message spécifique si fourni
         }
     }
-    
+   
     function setDateRange(updateDisplayOnly = false) {
         const selectedPeriod = periodSelectorEl.value;
         const today = new Date();
@@ -3883,10 +3954,10 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
             const dayEnd = String(endDate.getDate()).padStart(2, '0');
             dateEndInputEl.value = `${yearEnd}-${monthEnd}-${dayEnd}`;
         }
-        
+       
         startDate.setHours(0, 0, 0, 0);
         endDate.setHours(23, 59, 59, 999);
-        
+       
         currentStartDate = startDate;
         currentEndDate = endDate;
 
@@ -3907,7 +3978,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
             showKpiMessage('error', "Période invalide.");
             return;
         }
-        
+       
         try {
             const salesQuery = db.collection('users').doc(auth.currentUser.uid).collection('sales')
                 .where('timestamp', '>=', firebase.firestore.Timestamp.fromDate(currentStartDate))
@@ -3964,10 +4035,10 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
         }
         toggleFilterDrawer(false); // Fermer le tiroir
     }
-    
+   
     if(btnApplyDrawerFiltersEl) btnApplyDrawerFiltersEl.addEventListener('click', applyFiltersAndLoadData);
     if(periodSelectorEl) periodSelectorEl.addEventListener('change', () => setDateRange(false)); // Juste mettre à jour les dates, ne pas charger
-    
+   
     if(reportTypeSelectorEl) reportTypeSelectorEl.addEventListener('change', () => {
         // Pas besoin de recharger les données ici, se fera à l'application des filtres
         const selectedType = reportTypeSelectorEl.value;
@@ -3989,7 +4060,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
             if(activeFiltersDisplayEl) activeFiltersDisplayEl.textContent = "Non connecté";
         }
     }
-    
+   
     window.addEventListener('hashchange', () => {
         if (location.hash === '#reports') {
             initializeReportsPage();
@@ -4276,14 +4347,34 @@ window.addEventListener('appinstalled', () => {
         allPages.forEach(p => p.classList.toggle('visible', p.id === 'not-found'));
         pageIdToShow = 'not-found'; 
       }
-      
-      // Pages sans la navigation principale (ex: étapes de vente, activation)
-      const pagesWithoutNav = ['activation','sell','new-supply','select-book']; 
+     
+      // Pages sans la navigation principale
+      const pagesWithoutNav = [
+        'activation',
+        'sell',        // Processus de vente (pas de nav principale, a son propre "X")
+        'supply',      // Liste des approvisionnements (pas de nav principale, aura un bouton retour)
+        'new-supply',  // Processus d'approvisionnement (pas de nav principale, a sa propre navigation)
+        'select-book', // Sélection de livre (pas de nav principale, a son propre "X")
+        'orders',      // Commandes (pas de nav principale, aura un bouton retour)
+        'reports',     // Rapports (pas de nav principale, aura un bouton retour)
+        'cart',        // Panier (pas de nav principale, aura un bouton retour)
+        'not-found'   // Page 404 (pas de nav principale, a son bouton retour à l'accueil)
+      ]; 
       if (mainNav) {
         if (pagesWithoutNav.includes(pageIdToShow)) { 
             mainNav.style.display = 'none';
+            // Pour les pages sans nav principale, s'assurer que le padding-bottom est retiré ou ajusté
+            const activePageElement = document.getElementById(pageIdToShow);
+            if (activePageElement) {
+                activePageElement.style.paddingBottom = 'env(safe-area-inset-bottom)'; // Ou 0 si pas de safe area
+            }
         } else {
             mainNav.style.removeProperty('display');
+            // Restaurer le padding pour les pages AVEC nav principale
+            const activePageElement = document.getElementById(pageIdToShow);
+            if (activePageElement) {
+                 activePageElement.style.paddingBottom = 'calc(56px + env(safe-area-inset-bottom))';
+            }
         }
       }
 
@@ -4298,7 +4389,7 @@ window.addEventListener('appinstalled', () => {
         activePageElement.scrollTop = 0;
       }
     }
-    
+   
     // AMÉLIORATION: Fonction de routage principale
     async function route() {
       if (currentAuthUser === undefined) { // État d'auth pas encore déterminé
@@ -4322,10 +4413,10 @@ window.addEventListener('appinstalled', () => {
       }
       if (userActivated && hashKey === 'activation') { 
          location.hash = '#home'; // Rediriger de #activation vers #home si déjà activé
-         // showOnlyPage('home') sera appelé par le hashchange
+        // showOnlyPage('home') sera appelé par le hashchange
          return;
       }
-      
+     
       // AMÉLIORATION: Les modales ne sont plus des "pages" du routeur
       // Si vous voulez supporter des "deep links" pour ouvrir une modale,
       // vous pouvez vérifier le hash ici et appeler openGlobalAddBookModal() par ex.
@@ -4364,7 +4455,7 @@ window.addEventListener('appinstalled', () => {
         }, 4000);
         return; // Ne pas continuer le routage si l'état est incertain
       }
-      
+     
       route(); // Appeler route après que l'état d'auth et les claims soient traités
     });
 
@@ -4382,10 +4473,10 @@ window.addEventListener('appinstalled', () => {
         rippleSpan.style.width = rippleSpan.style.height = rippleSize + 'px';
         rippleSpan.style.left = (e.clientX - rect.left - rippleSize/2) + 'px';
         rippleSpan.style.top  = (e.clientY - rect.top  - rippleSize/2) + 'px';
-        
+       
         const existingRipple = dataHashElement.querySelector('.ripple');
         if (existingRipple) existingRipple.remove();
-        
+       
         dataHashElement.appendChild(rippleSpan);
         rippleSpan.addEventListener('animationend', () => rippleSpan.remove(), {once: true});
       }
