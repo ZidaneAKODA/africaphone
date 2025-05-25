@@ -9,47 +9,53 @@
   >
 
   <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore-compat.js"></script>
 
 
 <script>
-  // Your Firebase config (same as in index.html)
+  // Votre configuration Firebase (identique à celle dans index.html)
   const firebaseConfig = {
-    apiKey: "AIzaSyCvNZ5lhKdP_6W-eRle-7zCmFqejSfRuto", // IMPORTANT: Keep your actual API key secure and consider environment variables for production
+    apiKey: "AIzaSyCvNZ5lhKdP_6W-eRle-7zCmFqejSfRuto", // IMPORTANT: Sécurisez votre clé API réelle et envisagez des variables d'environnement pour la production
     authDomain: "shoptel-35c7e.firebaseapp.com",
     projectId: "shoptel-35c7e",
-    storageBucket: "shoptel-35c7e.appspot.com", // Corrected: .appspot.com is typical for storageBucket
+    storageBucket: "shoptel-35c7e.appspot.com",
     messagingSenderId: "541177101809",
     appId: "1:541177101809:web:5ae3ea186f198558371850",
     measurementId: "G-VH4MCV6Y6E"
   };
 
-  // Initialize app and Auth
+  // Initialiser Firebase App et Auth
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
-  // const db = firebase.firestore(); // Initialize Firestore if needed later
-  console.log("🔥 Firebase Auth initialisé :", auth);
+  // const db = firebase.firestore(); // Initialiser Firestore si nécessaire plus tard
+  console.log("🔥 Firebase Auth initialisé sur login.html:", auth);
 
+  /**
+   * Fonction utilitaire pour afficher un spinner sur un bouton pendant une action asynchrone.
+   * @param {string} buttonId - L'ID du bouton.
+   * @param {function} actionFn - La fonction asynchrone à exécuter.
+   * @returns {Promise} - La promesse retournée par actionFn.
+   */
   function withSpinner(buttonId, actionFn) {
     const btn      = document.getElementById(buttonId);
     const textSpan = btn.querySelector('.btn-text');
     const spinner  = btn.querySelector('.loader');
 
-    // Start spinner
+    // Démarrer le spinner
     btn.disabled = true;
-    if (textSpan) textSpan.style.visibility = 'hidden'; // Check if textSpan exists
-    if (spinner) spinner.style.display = 'block'; // Check if spinner exists
+    if (textSpan) textSpan.style.visibility = 'hidden'; // Vérifier si textSpan existe
+    if (spinner) spinner.style.display = 'block';    // Vérifier si spinner existe
 
     return actionFn()
       .catch(err => {
-        // In case of error: stop spinner and restore
+        // En cas d'erreur : arrêter le spinner et restaurer
         btn.disabled = false;
         if (spinner) spinner.style.display = 'none';
         if (textSpan) textSpan.style.visibility = 'visible';
-        throw err; // Re-throw the error to be caught by the caller
+        throw err; // Renvoyer l'erreur pour qu'elle soit traitée par l'appelant
       })
-      .finally(() => { // Ensure button is re-enabled and spinner hidden even if actionFn doesn't return a promise or if it resolves
+      .finally(() => { // S'assurer que le bouton est réactivé et le spinner masqué même si actionFn ne retourne pas de promesse ou si elle se résout
         btn.disabled = false;
         if (spinner) spinner.style.display = 'none';
         if (textSpan) textSpan.style.visibility = 'visible';
@@ -60,70 +66,70 @@
 
   <style>
     :root {
-      --primary: #1e90ff;
-      --bg: #f5f5f5;
-      --surface: #fff;
-      --text: #333;
-      --muted: #888;
-      --radius: 8px;
-      --transition: 0.3s ease;
+      --primary: #1e90ff; /* Bleu principal */
+      --bg: #f5f5f5;      /* Fond général */
+      --surface: #fff;   /* Fond des cartes/écrans */
+      --text: #333;      /* Couleur de texte principale */
+      --muted: #888;     /* Couleur de texte secondaire/icônes */
+      --radius: 8px;     /* Rayon de bordure standard */
+      --transition: 0.3s ease; /* Transition par défaut */
     }
     * { box-sizing: border-box; margin:0; padding:0; }
     html, body {
       width:100%; height:100%;
-      overflow:hidden;
+      overflow:hidden; /* Empêche le scroll sur le body principal */
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
-      -webkit-tap-highlight-color: transparent;
+      -webkit-tap-highlight-color: transparent; /* Enlève le flash bleu sur mobile au tap */
     }
 
-    /* container 2 écrans */
+    /* Conteneur pour les deux écrans (login et signup) */
     #app {
       display: flex;
-      width:200%; /* Allows for two screens side-by-side */
+      width:200%; /* Permet d'avoir deux écrans côte à côte */
       height:100%;
       transition: transform var(--transition);
-      overscroll-behavior: none; /* Prevents pull-to-refresh issues */
+      overscroll-behavior: none; /* Empêche le "pull-to-refresh" et autres comportements de défilement natifs gênants */
     }
     .screen {
-      width:50%; /* Each screen takes half of the #app container */
+      width:50%; /* Chaque écran prend la moitié du conteneur #app */
       height:100%;
-      padding: 48px 24px 24px; /* Adjusted padding */
+      padding: 48px 24px 24px; /* Padding ajusté pour l'en-tête et les côtés */
       background: var(--surface);
-      overflow-y: auto;
+      overflow-y: auto; /* Permet le scroll vertical si le contenu dépasse */
       overscroll-behavior: none;
-      -ms-overflow-style: none; scrollbar-width: none; /* Hide scrollbar */
-      display: flex; flex-direction: column; align-items: stretch;
+      -ms-overflow-style: none; scrollbar-width: none; /* Cache la scrollbar sur IE/Edge et Firefox */
+      display: flex; flex-direction: column; align-items: stretch; /* Pour étirer les éléments enfants */
     }
-    .screen::-webkit-scrollbar { display: none; } /* Hide scrollbar for WebKit */
+    .screen::-webkit-scrollbar { display: none; } /* Cache la scrollbar sur WebKit (Chrome, Safari) */
 
-    /* Logo */
+    /* Logo et titre */
     .logo {
-      margin: 48px auto 32px;
+      margin: 48px auto 32px; /* Marge en haut, auto pour centrer horizontalement, en bas */
       text-align: center;
     }
-    .logo img { width:48px; height:48px; }
+    .logo img { width:48px; height:48px; } /* Si vous ajoutez une image de logo */
     .logo h1 {
       margin-top:8px;
       font-size:24px;
-      font-weight:400;
+      font-weight:400; /* Police plus légère */
       color: var(--text);
     }
-    /* Form */
+    /* Styles pour les groupes de formulaire */
     .form-group {
-      position: relative;
+      position: relative; /* Pour positionner les icônes à l'intérieur */
       margin-bottom: 20px;
     }
     .form-group label {
       display: block;
       font-size: 14px;
-      color: var(--primary);
+      color: var(--primary); /* Couleur primaire pour les labels */
       margin-bottom: 6px;
     }
     .form-group input {
       width:100%;
-      padding:12px 40px 12px 12px; /* Space for icon */
+      padding:12px 40px 12px 12px; /* Espace pour l'icône à droite */
       font-size:16px;
       border:1px solid #ccc;
       border-radius: var(--radius);
@@ -132,12 +138,12 @@
     .form-group input:focus {
       outline:none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 2px var(--primary-focus, rgba(30, 144, 255, 0.2)); /* Focus ring */
+      box-shadow: 0 0 0 2px var(--primary-focus, rgba(30, 144, 255, 0.2)); /* Anneau de focus */
     }
-    /* Icons inside inputs */
+    /* Icônes à l'intérieur des champs de saisie (ex: œil pour mot de passe) */
     .form-group .icon {
       position:absolute;
-      top: calc(50% + 10px); /* Adjust based on label height and input padding */
+      top: calc(50% + 10px); /* Ajustement basé sur la hauteur du label et le padding de l'input */
       right:12px;
       transform: translateY(-50%);
       font-size:18px;
@@ -148,7 +154,7 @@
     .form-group .icon:hover {
       color: var(--primary);
     }
-    /* Buttons */
+    /* Styles pour les boutons */
     .btn {
       display:block;
       width:100%;
@@ -160,43 +166,41 @@
       background: var(--primary);
       color:#fff;
       border:none;
-      border-radius:30px; /* Pill shape */
+      border-radius:30px; /* Forme de pilule */
       cursor:pointer;
       transition: transform 0.1s ease, background var(--transition);
-      user-select:none; /* Prevent text selection */
-      position: relative; /* For spinner positioning */
-      overflow: hidden; /* To contain spinner animation effects if any */
+      user-select:none; /* Empêche la sélection du texte du bouton */
+      position: relative; /* Pour le positionnement du spinner */
+      overflow: hidden; /* Pour contenir les effets d'animation du spinner si besoin */
     }
     .btn:active {
-      transform: scale(0.97); /* Click feedback */
+      transform: scale(0.97); /* Feedback visuel au clic */
     }
     .btn:disabled {
-        background-color: #cccccc;
+        background-color: #cccccc; /* Gris pour bouton désactivé */
         cursor: not-allowed;
     }
 
-    /* SPINNER INLINE */
+    /* SPINNER INLINE DANS LE BOUTON */
     .btn .loader {
-      width: 20px;
-      height: 20px;
-      border: 2px solid rgba(255,255,255,0.6);
-      border-top-color: #fff; /* Spinner color */
+      width: 20px;   height: 20px;
+      border: 2px solid rgba(255,255,255,0.6); /* Bordure claire pour le spinner */
+      border-top-color: #fff; /* Couleur principale du spinner */
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: none; /* Hidden by default */
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%); /* Centrage parfait */
+      display: none; /* Caché par défaut */
     }
     @keyframes spin {
       to { transform: translate(-50%, -50%) rotate(360deg); }
     }
 
-    /* Links */
+    /* Liens (ex: "Mot de passe oublié ?", "Créer un compte") */
     .link {
       text-align:center;
-      margin-top:16px; /* Increased margin */
+      margin-top:16px; /* Marge augmentée */
       margin-bottom: 16px;
     }
     .link a {
@@ -206,66 +210,64 @@
       transition: opacity var(--transition);
     }
     .link a:hover {
-        text-decoration: underline;
+        text-decoration: underline; /* Souligner au survol */
     }
     .link a:active {
-      opacity:0.6;
+      opacity:0.6; /* Réduire l'opacité au clic */
     }
-    /* OR separator */
+    /* Séparateur "OU" */
     .or {
       display:flex;
       align-items:center;
       text-align:center;
       font-size:13px;
       color:#aaa;
-      margin:24px 0;
+      margin:24px 0; /* Marge verticale */
     }
     .or::before, .or::after {
       content:'';
-      flex:1;
+      flex:1; /* Prend l'espace restant */
       height:1px;
-      background:#ddd;
+      background:#ddd; /* Ligne grise */
     }
     .or::before { margin-right:8px; }
     .or::after { margin-left:8px; }
 
-    /* Clear icon for input fields (optional) */
+    /* Icône "effacer" pour les champs de saisie (optionnel, non implémenté en JS ici) */
     .clear-icon {
-      display: none; /* Hidden by default */
-      /* Inherits styling from .form-group .icon */
+      display: none; /* Caché par défaut */
+      /* Hérite du style de .form-group .icon */
     }
 
-    /* Error messages */
+    /* Messages d'erreur sous les champs */
     .input-error {
-      display: none; /* Hidden by default */
-      color: #e74c3c; /* Error color */
+      display: none; /* Caché par défaut */
+      color: #e74c3c; /* Couleur d'erreur (rouge) */
       font-size: 13px;
-      margin-top: 4px;
-      align-items: center; /* Align icon and text */
+      margin-top: 4px; /* Espace au-dessus du message d'erreur */
+      align-items: center; /* Aligne l'icône et le texte */
     }
     .input-error.show {
-      display: flex; /* Show when class is added */
+      display: flex; /* Afficher quand la classe 'show' est ajoutée */
     }
-    .input-error i.error-icon { /* Specific styling for error icon */
+    .input-error i.error-icon { /* Style spécifique pour l'icône d'erreur */
       margin-right: 6px;
-      font-size: 16px; /* Slightly smaller error icon */
-      color: #e74c3c; /* Ensure icon color matches text */
-      position: static; /* Override potential absolute positioning */
+      font-size: 16px; /* Icône d'erreur légèrement plus petite */
+      color: #e74c3c; /* S'assurer que la couleur de l'icône correspond au texte */
+      position: static; /* Annuler un éventuel positionnement absolu */
       cursor: default;
     }
 
-    /* Message Box for alerts */
+    /* Boîte de message pour les alertes personnalisées */
     .message-box-overlay {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.5);
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.5); /* Fond semi-transparent */
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 1000;
+        z-index: 1000; /* Au-dessus de tout le reste */
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -281,7 +283,7 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         text-align: center;
         max-width: 80%;
-        width: 300px;
+        width: 300px; /* Largeur fixe pour la boîte */
     }
     .message-box p {
         margin-bottom: 20px;
@@ -323,8 +325,7 @@
       <div class="form-group">
         <label for="login-pw">Password</label>
         <input type="password" id="login-pw" placeholder="Password" autocomplete="current-password">
-        <i class="bi bi-eye icon" id="toggle-login"></i>
-        <div class="input-error" id="error-login-pw" role="alert" aria-live="assertive">
+        <i class="bi bi-eye icon" id="toggle-login"></i> <div class="input-error" id="error-login-pw" role="alert" aria-live="assertive">
           <i class="bi bi-exclamation-circle-fill error-icon" aria-hidden="true"></i>
           <span class="error-text"></span>
         </div>
@@ -333,8 +334,7 @@
       <div class="link"><a href="#" id="reset-pw-link">Reset Password?</a></div>
       <button class="btn" id="btn-login">
         <span class="btn-text">Sign in with email</span>
-        <div class="loader"></div>
-      </button>
+        <div class="loader"></div> </button>
 
       <div class="or">OR</div>
       <div class="link"><a href="#" id="to-signup">Create an account</a></div>
@@ -375,8 +375,7 @@
       <div class="form-group">
         <label for="signup-pw">Password</label>
         <input type="password" id="signup-pw" placeholder="Create a password" autocomplete="new-password">
-        <i class="bi bi-eye icon" id="toggle-signup"></i>
-        <div class="input-error" id="error-signup-pw" role="alert">
+        <i class="bi bi-eye icon" id="toggle-signup"></i> <div class="input-error" id="error-signup-pw" role="alert">
              <i class="bi bi-exclamation-circle-fill error-icon" aria-hidden="true"></i>
              <span class="error-text"></span>
         </div>
@@ -387,8 +386,7 @@
       </div>
       <button class="btn" id="btn-signup">
         <span class="btn-text">Create an account</span>
-        <div class="loader"></div>
-      </button>
+        <div class="loader"></div> </button>
 
       <div class="or">OR</div>
       <div class="link"><a href="#" id="to-login">Already have an account? Login</a></div>
@@ -407,25 +405,33 @@
     const loginScreen = document.getElementById('login-screen');
     const signupScreen = document.getElementById('signup-screen');
 
+    // Fonctions pour naviguer entre les écrans de connexion et d'inscription
     const toSignup = () => {
-        app.style.transform = 'translateX(-50%)';
-        clearAllErrors(); // Clear errors when switching screens
-        document.title = "Sign Up";
+        app.style.transform = 'translateX(-50%)'; // Déplace vers l'écran d'inscription
+        clearAllErrors(); // Efface les erreurs lors du changement d'écran
+        document.title = "Sign Up"; // Met à jour le titre de la page
     };
     const toLogin  = () => {
-        app.style.transform = 'translateX(0)';
-        clearAllErrors(); // Clear errors when switching screens
-        document.title = "Login";
+        app.style.transform = 'translateX(0)'; // Revient à l'écran de connexion
+        clearAllErrors(); // Efface les erreurs
+        document.title = "Login"; // Met à jour le titre de la page
     };
 
+    // Attache les événements aux liens de navigation
     document.getElementById('to-signup').addEventListener('click', e => { e.preventDefault(); toSignup(); });
     document.getElementById('to-login').addEventListener('click',  e => { e.preventDefault(); toLogin(); });
 
-    // Toggle password visibility
+    /**
+     * Gère l'affichage/masquage du mot de passe.
+     * @param {string} btnId - ID du bouton de bascule.
+     * @param {string} inputId - ID du champ de mot de passe.
+     * @param {string} iconVisible - Classe CSS pour l'icône "visible".
+     * @param {string} iconHidden - Classe CSS pour l'icône "caché".
+     */
     function bindToggle(btnId, inputId, iconVisible = 'bi-eye', iconHidden = 'bi-eye-slash') {
       const btn = document.getElementById(btnId);
       const inp = document.getElementById(inputId);
-      if (!btn || !inp) return; // Guard against missing elements
+      if (!btn || !inp) return; // Sécurité si les éléments n'existent pas
 
       btn.addEventListener('click', () => {
         if (inp.type === 'password') {
@@ -440,49 +446,59 @@
     bindToggle('toggle-login','login-pw');
     bindToggle('toggle-signup','signup-pw');
 
-    // Touch-swipe navigation
+    // Navigation par swipe tactile (pour mobile)
     let startX = 0;
     let isSwiping = false;
     app.addEventListener('touchstart', e => {
         startX = e.touches[0].clientX;
         isSwiping = true;
-    }, { passive: true });
+    }, { passive: true }); // passive:true pour améliorer la performance du scroll
 
     app.addEventListener('touchmove', e => {
         if (!isSwiping) return;
-        // Optional: Add visual feedback during swipe if desired
+        // Optionnel : ajouter un retour visuel pendant le swipe si désiré
     }, { passive: true });
 
     app.addEventListener('touchend', e => {
       if (!isSwiping) return;
       isSwiping = false;
-      const diff = startX - e.changedTouches[0].clientX;
+      const diff = startX - e.changedTouches[0].clientX; // Calcul de la distance de swipe
       const currentTransform = app.style.transform;
 
-      if (diff > 50 && currentTransform !== 'translateX(-50%)') { // Swipe left
+      if (diff > 50 && currentTransform !== 'translateX(-50%)') { // Swipe vers la gauche
         toSignup();
-      } else if (diff < -50 && currentTransform === 'translateX(-50%)') { // Swipe right
+      } else if (diff < -50 && currentTransform === 'translateX(-50%)') { // Swipe vers la droite
         toLogin();
       }
     });
 
-    // --- Custom Alert Function ---
+    // --- Fonction d'alerte personnalisée ---
     const messageBoxOverlay = document.getElementById('message-box-overlay');
     const messageBoxText = document.getElementById('message-box-text');
     const messageBoxOk = document.getElementById('message-box-ok');
 
+    /**
+     * Affiche une boîte de message personnalisée.
+     * @param {string} message - Le message à afficher.
+     * @returns {Promise} - Une promesse qui se résout quand l'utilisateur clique sur OK.
+     */
     function customAlert(message) {
         messageBoxText.textContent = message;
         messageBoxOverlay.classList.add('show');
-        return new Promise((resolve) => { // Return a promise that resolves when OK is clicked
+        return new Promise((resolve) => { // Retourne une promesse pour gérer la fermeture
             messageBoxOk.onclick = () => {
                 messageBoxOverlay.classList.remove('show');
-                resolve();
+                resolve(); // Résout la promesse quand OK est cliqué
             };
         });
     }
 
-    // --- Field Error Utilities ---
+    // --- Utilitaires pour les erreurs de champ ---
+    /**
+     * Affiche un message d'erreur sous un champ spécifique.
+     * @param {string} fieldId - L'ID du champ (sans "error-").
+     * @param {string} message - Le message d'erreur.
+     */
     function showFieldError(fieldId, message) {
       const errDiv = document.getElementById(`error-${fieldId}`);
       const inputEl = document.getElementById(fieldId);
@@ -490,12 +506,16 @@
         errDiv.querySelector('.error-text').textContent = message;
         errDiv.classList.add('show');
       }
-      if (inputEl) {
+      if (inputEl) { // Pour l'accessibilité
           inputEl.setAttribute('aria-invalid', 'true');
           inputEl.setAttribute('aria-describedby', `error-${fieldId}`);
       }
     }
 
+    /**
+     * Efface le message d'erreur d'un champ spécifique.
+     * @param {string} fieldId - L'ID du champ.
+     */
     function clearFieldError(fieldId) {
       const errDiv = document.getElementById(`error-${fieldId}`);
       const inputEl = document.getElementById(fieldId);
@@ -503,12 +523,13 @@
         errDiv.classList.remove('show');
         errDiv.querySelector('.error-text').textContent = '';
       }
-      if (inputEl) {
+      if (inputEl) { // Pour l'accessibilité
           inputEl.removeAttribute('aria-invalid');
           inputEl.removeAttribute('aria-describedby');
       }
     }
 
+    /** Efface tous les messages d'erreur des champs. */
     function clearAllErrors() {
         const errorFields = [
             'login-user', 'login-pw',
@@ -518,25 +539,25 @@
     }
 
 
-    // Clear error on input
+    // Efface l'erreur d'un champ dès que l'utilisateur commence à y écrire
     const allInputs = document.querySelectorAll('#login-screen input, #signup-screen input');
     allInputs.forEach(input => {
       input.addEventListener('input', () => clearFieldError(input.id));
     });
 
 
-    // --- Sign In Logic ---
+    // --- Logique de Connexion ---
     const loginUser = document.getElementById('login-user');
     const loginPw   = document.getElementById('login-pw');
     const btnLogin  = document.getElementById('btn-login');
 
     if (btnLogin) {
         btnLogin.addEventListener('click', () => {
-          // 1) Clear old errors
+          // 1) Effacer les anciennes erreurs
           clearFieldError('login-user');
           clearFieldError('login-pw');
 
-          // 2) Get and validate values
+          // 2) Récupérer et valider les valeurs
           const email = loginUser.value.trim();
           const pw    = loginPw.value;
           let isValid = true;
@@ -545,7 +566,7 @@
             showFieldError('login-user', 'Please enter your email.');
             loginUser.focus();
             isValid = false;
-          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { // Basic email validation
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { // Validation basique de l'email
             showFieldError('login-user', 'Invalid email address format.');
             loginUser.focus();
             isValid = false;
@@ -553,23 +574,24 @@
 
           if (!pw) {
             showFieldError('login-pw', 'Please enter your password.');
-            if (isValid) loginPw.focus(); // Only focus if email was valid
+            if (isValid) loginPw.focus(); // Focus seulement si l'email était valide
             isValid = false;
           }
 
-          if (!isValid) return;
+          if (!isValid) return; // Arrêter si la validation échoue
 
-          // 3) Call Firebase with spinner
+          // 3) Appeler Firebase avec le spinner
           withSpinner('btn-login', () =>
             auth.signInWithEmailAndPassword(email, pw)
           )
           .then(() => {
             console.log('User logged in successfully');
-            // MODIFIED LINE: Replace history state
+            // REDIRECTION: Remplace l'état de l'historique pour empêcher le retour à la page de login
             window.location.replace('index.html#home');
           })
           .catch(err => {
             console.error('[Auth] Login error:', err.code, err.message);
+            // Gérer les erreurs spécifiques de Firebase Auth
             switch (err.code) {
               case 'auth/invalid-email':
                 showFieldError('login-user', 'Invalid email address format.');
@@ -581,12 +603,14 @@
                 break;
               case 'auth/user-not-found':
               case 'auth/wrong-password':
-              case 'auth/invalid-credential': // More recent Firebase versions use this
-              case 'auth/invalid-login-credentials': // As per your original code
+              case 'auth/invalid-credential': // Utilisé par les versions plus récentes de Firebase
+              case 'auth/invalid-login-credentials': // Selon votre code original
                 showFieldError('login-pw', 'Incorrect email or password.');
                 loginPw.focus();
                 break;
               default:
+                // Pour les autres erreurs, afficher un message générique
+                // customAlert('Login failed: ' + err.message); // Optionnel: utiliser customAlert
                 showFieldError('login-user', 'Login failed. Please try again.');
             }
           });
@@ -594,7 +618,7 @@
     }
 
 
-    // --- Sign Up Logic ---
+    // --- Logique d'Inscription ---
     const signupFirst = document.getElementById('signup-first');
     const signupLast  = document.getElementById('signup-last');
     const signupEmail = document.getElementById('signup-email');
@@ -603,7 +627,7 @@
 
     if (btnSignup) {
         btnSignup.addEventListener('click', () => {
-            clearAllErrors(); // Clear previous errors
+            clearAllErrors(); // Effacer les erreurs précédentes
 
             const firstname = signupFirst.value.trim();
             const lastname  = signupLast.value.trim();
@@ -611,6 +635,7 @@
             const password  = signupPw.value;
             let isValid = true;
 
+            // Validations des champs d'inscription
             if (!firstname) {
                 showFieldError('signup-first', 'Please enter your first name.');
                 if(isValid) signupFirst.focus();
@@ -640,32 +665,33 @@
                 isValid = false;
             }
 
-            if (!isValid) return;
+            if (!isValid) return; // Arrêter si la validation échoue
 
 
+            // Appeler Firebase avec le spinner
             withSpinner('btn-signup', async () => {
                 try {
                     const userCred = await auth.createUserWithEmailAndPassword(email, password);
+                    // Mettre à jour le profil de l'utilisateur avec le nom et prénom
                     await userCred.user.updateProfile({
                         displayName: `${firstname} ${lastname}`
                     });
-                    // It's crucial to wait for the token to be refreshed
-                    // so that claims (like 'activated') are potentially up-to-date
-                    // when index.html is loaded.
-                    await auth.currentUser.getIdToken(true); // Force refresh token
+                    // Forcer le rafraîchissement du token pour que les claims (ex: 'activated')
+                    // soient potentiellement à jour lors du chargement de index.html.
+                    await auth.currentUser.getIdToken(true);
 
                     console.log('User signed up and profile updated');
-                    // MODIFIED LINE: Replace history state and redirect to activation
+                    // REDIRECTION: Remplace l'état de l'historique et redirige vers la page d'activation
                     window.location.replace('index.html#activation');
 
                 } catch (err) {
                     console.error('[Auth] Signup error:', err.code, err.message);
-                    // This error will be re-thrown by withSpinner and caught by the .catch below
+                    // Cette erreur sera renvoyée par withSpinner et traitée par le .catch ci-dessous
                     throw err;
                 }
             })
             .catch(err => {
-                // Handle errors from createUserWithEmailAndPassword or updateProfile
+                // Gérer les erreurs de createUserWithEmailAndPassword ou updateProfile
                 switch (err.code) {
                     case 'auth/email-already-in-use':
                         showFieldError('signup-email', 'This email is already registered.');
@@ -680,21 +706,21 @@
                         signupPw.focus();
                         break;
                     default:
-                        // Use customAlert for generic errors not tied to a specific field
+                        // Utiliser customAlert pour les erreurs génériques non liées à un champ spécifique
                         customAlert(err.message || 'Signup failed. Please try again.');
                 }
             });
         });
     }
 
-    // --- Reset Password Link (Placeholder) ---
+    // --- Lien de Réinitialisation de Mot de Passe (Placeholder) ---
     const resetPwLink = document.getElementById('reset-pw-link');
     if(resetPwLink) {
         resetPwLink.addEventListener('click', (e) => {
             e.preventDefault();
             customAlert('Password reset functionality will be implemented here. For now, please contact support or try signing up if you forgot your details.');
-            // TODO: Implement password reset flow
-            // Example:
+            // TODO: Implémenter le flux de réinitialisation de mot de passe
+            // Exemple:
             // const email = loginUser.value.trim();
             // if (!email) {
             //   customAlert('Please enter your email address in the email field first.');
@@ -708,25 +734,26 @@
     }
 
 
-    // --- Service Worker Registration ---
+    // --- Enregistrement du Service Worker ---
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js') // Ensure sw.js is in the root directory
+        navigator.serviceWorker.register('/sw.js') // S'assurer que sw.js est à la racine
           .then(reg => {
             console.log('[App] SW enregistré, scope :', reg.scope);
 
+            // Écoute les mises à jour du Service Worker
             reg.addEventListener('updatefound', () => {
               const newSW = reg.installing;
               if (newSW) {
                 newSW.addEventListener('statechange', () => {
                   if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                    console.log('[App] Nouvelle version dispo → reload');
-                    // Optional: Show a notification to the user before reloading
+                    console.log('[App] Nouvelle version disponible → rechargement');
+                    // Optionnel : Afficher une notification à l'utilisateur avant de recharger
                     // if (confirm("A new version is available. Reload now?")) {
                     //   window.location.reload();
                     // }
                     customAlert("A new version of the app is available and will be applied.").then(() => {
-                        window.location.reload();
+                        window.location.reload(); // Recharge la page pour appliquer la nouvelle version
                     });
                   }
                 });
@@ -737,10 +764,10 @@
       });
     }
 
-    // Set initial document title
-    if (app.style.transform === 'translateX(-50%)') {
+    // Définir le titre initial du document en fonction de l'écran affiché
+    if (app.style.transform === 'translateX(-50%)') { // Si l'écran d'inscription est affiché
         document.title = "Sign Up";
-    } else {
+    } else { // Sinon, l'écran de connexion est affiché
         document.title = "Login";
     }
 
