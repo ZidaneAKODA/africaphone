@@ -3507,206 +3507,710 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
     });
   </script>
 </main>
+<main id="catalog" class="page">
+  <style>
+    /* Styles spécifiques pour la page Catalogue */
+    #catalog {
+      padding: 0; /* Pas de padding global sur main, géré par les sections internes */
+    }
 
-<main id="catalog" class="page"> 
-  <header> 
-    <div class="search-wrapper">
-        <i class="bi bi-search"></i>
-        <input
-          type="search"
-          id="search-input-catalog" placeholder="Rechercher dans le catalogue"
-          aria-label="Recherche catalogue"
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="none"
-          spellcheck="false"
-        >
+    #catalog-main-header {
+      padding: 1rem;
+      background: #fff;
+      border-bottom: 1px solid var(--border-color);
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      z-index: 20; /* Au-dessus du contenu scrollable mais en dessous des modales/drawers */
+    }
+    #catalog-main-header h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--primary-text);
+    }
+
+    .catalog-content-wrapper {
+      padding: 0 0 calc(56px + env(safe-area-inset-bottom) + 70px); /* Espace pour nav + FAB */
+      /* S'assurer que ce padding est bien géré par rapport à la nav principale si elle réapparaît */
+    }
+
+    /* Section Statistiques */
+    .catalog-stats-overview {
+      padding: 1rem;
+      background-color: #f8f9fa; /* Légèrement différent pour se démarquer */
+      border-bottom: 1px solid var(--border-color);
+    }
+    .catalog-stats-overview h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--primary-text);
+      margin: 0 0 1rem 0;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .stat-card {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-card);
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start; /* Pour aligner l'icône en haut */
+      gap: 0.3rem;
+    }
+    .stat-card .stat-icon {
+      font-size: 1.4rem; /* Taille de l'icône */
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+      width: 32px; /* Conteneur carré pour l'icône */
+      height: 32px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0,100,210,0.1); /* Fond léger pour l'icône */
+    }
+    /* Couleurs spécifiques pour certaines icônes de stats */
+    .stat-card .stat-icon.value { color: var(--ebay-green); background-color: rgba(134,184,23,0.08); }
+    .stat-card .stat-icon.low-stock { color: var(--stock-low-color); background-color: rgba(245,175,2,0.08); }
+
+    .stat-card .stat-value {
+      font-size: 1.5rem; /* Chiffre plus grand */
+      font-weight: 600;
+      color: var(--primary-text);
+      line-height: 1.2;
+    }
+    .stat-card .stat-label {
+      font-size: 0.8rem; /* Libellé plus petit */
+      color: var(--secondary-text);
+    }
+    .btn-primary.full-width { /* Pour le bouton PDF */
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1rem;
+    }
+
+
+    .catalog-list-header { /* Barre de recherche et bouton de tri */
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background-color: #fff;
+      border-bottom: 1px solid var(--border-color);
+      position: -webkit-sticky;
+      position: sticky;
+      /* Doit être en dessous du header principal de la page catalogue */
+      top: 57px; /* Hauteur approx. de #catalog-main-header (ajuster si nécessaire) */
+      z-index: 15;
+    }
+    .catalog-list-header .search-wrapper {
+      flex-grow: 1;
+      margin-top: 0; /* Override du style global pour search-wrapper */
+    }
+    #btn-open-catalog-drawer {
+      flex-shrink: 0;
+      background-color: var(--accent-bg-light, rgba(0,100,210,0.1));
+      color: var(--accent);
+      border: 1px solid var(--accent-border, rgba(0,100,210,0.3));
+      padding: 0.5rem 0.8rem; /* Un peu plus compact */
+      border-radius: var(--border-radius-pill);
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    #btn-open-catalog-drawer i { font-size: 1.1rem; }
+
+    #catalog-results-main .books-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem; /* Padding pour la liste elle-même */
+    }
+    /* Styles pour .book-card-catalog, .book-card-image-area etc. sont déjà dans le code global */
+    /* Assurez-vous que .book-card-catalog n'a pas de box-shadow */
+    .book-card-catalog { box-shadow: none !important; }
+
+    /* FAB pour Ajouter un Livre */
+    #btn-add-new-book-catalog {
+      position: fixed;
+      bottom: calc(env(safe-area-inset-bottom) + 1rem + 56px); /* Au-dessus de la nav principale */
+      right: 1rem;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--ebay-green);
+      color: #fff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem; /* Icône plus grande */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15); /* Légère ombre pour le FAB */
+      z-index: 100; /* Au-dessus du contenu */
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    #btn-add-new-book-catalog:active {
+      background-color: #76a416; /* Vert plus foncé */
+      transform: scale(0.95);
+    }
+
+    /* Tiroir de Tri/Filtre pour Catalogue */
+    .catalog-drawer-overlay { /* Identique à .drawer-overlay */
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.3);
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.3s ease-out, visibility 0s 0.3s linear;
+      z-index: 200;
+    }
+    .catalog-drawer-overlay.visible {
+      opacity: 1; visibility: visible;
+      transition-delay: 0s;
+    }
+    .catalog-sort-drawer { /* Identique à .report-filter-drawer */
+      position: fixed; bottom: 0; left: 0;
+      width: 100%; max-height: 75vh; /* Max 75% de la hauteur */
+      background-color: var(--surface);
+      border-top-left-radius: 16px; border-top-right-radius: 16px;
+      box-shadow: 0 -3px 15px rgba(0,0,0,0.15);
+      transform: translateY(100%);
+      transition: transform 0.3s ease-out;
+      z-index: 210;
+      display: flex; flex-direction: column;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .catalog-sort-drawer.visible { transform: translateY(0%); }
+    .catalog-sort-drawer .drawer-header { /* Identique */
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);
+    }
+    .catalog-sort-drawer .drawer-header h4 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+    .catalog-sort-drawer .close-drawer-btn { /* Identique */
+      background: none; border: none; font-size: 1.5rem; color: var(--secondary-text); cursor: pointer; padding: 0.25rem;
+    }
+    .catalog-sort-drawer .drawer-body { /* Identique */
+      padding: 1rem; overflow-y: auto; flex-grow: 1;
+    }
+    .catalog-sort-drawer .filter-group { margin-bottom: 1.25rem; } /* Réutilisé pour "sort-group" */
+    .catalog-sort-drawer .filter-group:last-child { margin-bottom: 0; }
+    .catalog-sort-drawer .filter-group-title { /* Identique */
+      display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;
+      font-weight: 600; color: var(--secondary-text); margin-bottom: 0.6rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .catalog-sort-drawer .filter-group-title i { font-size: 0.9rem; }
+    .catalog-sort-drawer .sort-options-list { /* Pour les options de tri */
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .catalog-sort-drawer .sort-option {
+        display: flex;
+        align-items: center;
+        padding: 0.6rem 0.25rem;
+        border-radius: var(--border-radius-card);
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+    }
+    .catalog-sort-drawer .sort-option:hover {
+        background-color: #f0f0f0;
+    }
+    .catalog-sort-drawer .sort-option input[type="radio"] {
+        margin-right: 0.75rem;
+        transform: scale(1.1);
+        accent-color: var(--accent);
+    }
+    .catalog-sort-drawer .sort-option label {
+        font-size: 0.95rem;
+        color: var(--primary-text);
+        flex-grow: 1;
+    }
+    .catalog-sort-drawer .drawer-footer { /* Identique */
+      padding: 0.75rem 1rem; border-top: 1px solid var(--border-color);
+      background-color: var(--surface);
+    }
+    .catalog-sort-drawer .btn-apply-sort.full-width { /* Adapté de .btn-apply-filter */
+      width: 100%; padding: 0.8rem; background-color: var(--accent); color: #fff;
+      border: none; border-radius: var(--border-radius-pill); font-size: 1rem;
+      font-weight: 500; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; gap: 0.5rem;
+    }
+    .catalog-sort-drawer .btn-apply-sort.full-width:disabled {
+      background-color: #ccc; cursor: not-allowed;
+    }
+    /* Placeholder si la liste est vide après filtrage par recherche */
+    .catalog-no-results-message {
+        text-align:center; padding:1.5rem 1rem; color:var(--secondary-text); font-size: 0.95rem;
+    }
+
+  </style>
+
+  <header id="catalog-main-header">
+    <h2>Catalogue</h2>
+  </header>
+
+  <div class="catalog-content-wrapper">
+    <section class="catalog-stats-overview">
+      <h3>Aperçu du Catalogue</h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <i class="bi bi-journal-text stat-icon"></i>
+          <div class="stat-value" id="stat-unique-titles">0</div>
+          <div class="stat-label">Titres Uniques</div>
+        </div>
+        <div class="stat-card">
+          <i class="bi bi-boxes stat-icon"></i>
+          <div class="stat-value" id="stat-total-books-stock">0</div>
+          <div class="stat-label">Livres en Stock</div>
+        </div>
+        <div class="stat-card">
+          <i class="bi bi-cash-stack stat-icon value"></i>
+          <div class="stat-value" id="stat-total-stock-value">XOF 0</div>
+          <div class="stat-label">Valeur Stock (CMP)</div>
+        </div>
+        <div class="stat-card">
+          <i class="bi bi-graph-up stat-icon"></i> <div class="stat-value" id="stat-avg-selling-price">XOF 0</div>
+          <div class="stat-label">Prix Vente Moyen</div>
+        </div>
+        <div class="stat-card">
+          <i class="bi bi-exclamation-triangle-fill stat-icon low-stock"></i>
+          <div class="stat-value" id="stat-low-stock-items">0</div>
+          <div class="stat-label">Articles à faible stock</div>
+        </div>
       </div>
-    </header>
+      <button id="btn-download-catalog-pdf" class="btn-primary full-width">
+        <i class="bi bi-file-earmark-pdf-fill"></i> Télécharger l'Inventaire (PDF)
+      </button>
+    </section>
 
-  <div class="info-cards" id="catalog-info-cards"> <div class="info-card">
-      <div class="info-number" id="total-books-catalog">0</div>
-      <div class="info-label">Livres en Stock</div> </div>
-    <div class="info-card">
-      <div class="info-number" id="total-value-catalog">XOF 0</div>
-      <div class="info-label">Valeur Stock (CMP)</div> </div> </div>
+    <section class="catalog-list-section">
+      <header class="catalog-list-header sticky-header">
+        <div class="search-wrapper">
+          <i class="bi bi-search"></i>
+          <input
+            type="search"
+            id="search-input-catalog-page"
+            placeholder="Rechercher dans le catalogue..."
+            aria-label="Recherche catalogue"
+            autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+          >
+        </div>
+        <button id="btn-open-catalog-drawer" aria-label="Trier ou filtrer le catalogue">
+          <i class="bi bi-funnel-fill"></i> Trier
+        </button>
+      </header>
+      <div id="catalog-results-main">
+        <div class="books-list">
+          </div>
+      </div>
+    </section>
+  </div>
 
-  <div id="catalog-results-main"> <div class="books-list"></div> </div>
+  <button id="btn-add-new-book-catalog" class="fab" aria-label="Ajouter un nouveau livre">
+    <i class="bi bi-plus-lg"></i>
+  </button>
+
+  <div class="catalog-drawer-overlay" id="catalog-drawer-overlay"></div>
+  <div class="catalog-sort-drawer" id="catalog-sort-drawer-content">
+    <div class="drawer-header">
+      <h4>Trier le Catalogue</h4>
+      <button id="btn-close-catalog-drawer" class="close-drawer-btn" aria-label="Fermer le tiroir de tri"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="drawer-body">
+      <div class="filter-group"> <span class="filter-group-title"><i class="bi bi-sort-alpha-down"></i> Options de Tri</span>
+        <div class="sort-options-list" id="catalog-sort-options-container">
+          <div class="sort-option">
+            <input type="radio" id="sort-title-asc" name="catalog_sort" value="title_asc" checked>
+            <label for="sort-title-asc">Titre (A-Z)</label>
+          </div>
+          <div class="sort-option">
+            <input type="radio" id="sort-title-desc" name="catalog_sort" value="title_desc">
+            <label for="sort-title-desc">Titre (Z-A)</label>
+          </div>
+          <div class="sort-option">
+            <input type="radio" id="sort-quantity-asc" name="catalog_sort" value="quantity_asc">
+            <label for="sort-quantity-asc">Stock (Croissant)</label>
+          </div>
+          <div class="sort-option">
+            <input type="radio" id="sort-quantity-desc" name="catalog_sort" value="quantity_desc">
+            <label for="sort-quantity-desc">Stock (Décroissant)</label>
+          </div>
+          <div class="sort-option">
+            <input type="radio" id="sort-price-asc" name="catalog_sort" value="price_asc">
+            <label for="sort-price-asc">Prix Vente (Croissant)</label>
+          </div>
+          <div class="sort-option">
+            <input type="radio" id="sort-price-desc" name="catalog_sort" value="price_desc">
+            <label for="sort-price-desc">Prix Vente (Décroissant)</label>
+          </div>
+           <div class="sort-option">
+            <input type="radio" id="sort-date-desc" name="catalog_sort" value="date_desc">
+            <label for="sort-date-desc">Date Ajout (Plus récent)</label>
+          </div>
+          <div class="sort-option">
+            <input type="radio" id="sort-date-asc" name="catalog_sort" value="date_asc">
+            <label for="sort-date-asc">Date Ajout (Plus ancien)</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-footer">
+        <button id="btn-apply-catalog-sort" class="btn-apply-sort full-width"><i class="bi bi-check-circle-fill"></i>Appliquer le Tri</button>
+    </div>
+  </div>
 
   <script>
-  // Catalog Page Script
+  // Catalog Page Script (Enhanced)
   (function() {
-    const catalogPage = document.getElementById('catalog'); 
-    const booksListEl  = document.querySelector('#catalog-results-main .books-list');
-    const totalBooksEl  = document.getElementById('total-books-catalog');
-    const totalValueEl  = document.getElementById('total-value-catalog'); 
-    const searchInputCatalogEl = document.getElementById('search-input-catalog');
-    const infoCardsEl   = document.getElementById('catalog-info-cards');
-    let allBooksCache = []; 
-    let unsubscribeCatalog = null; 
+    const catalogPageEl = document.getElementById('catalog');
+    if (!catalogPageEl) return;
 
-    searchInputCatalogEl.addEventListener('input', () => {
-      const searchTerm = searchInputCatalogEl.value.trim().toLowerCase();
-      if(infoCardsEl) infoCardsEl.classList.toggle('fade-out', !!searchTerm); // S'assurer que infoCardsEl existe
-      renderBooks(searchTerm); 
-    });
+    // --- Elements DOM ---
+    const booksListEl = catalogPageEl.querySelector('#catalog-results-main .books-list');
+    const searchInputEl = catalogPageEl.querySelector('#search-input-catalog-page');
 
-    function renderBooks(searchTerm = '') {
-        if (!booksListEl) return; // S'assurer que l'élément existe
-        booksListEl.innerHTML = ''; 
-        const filteredBooks = searchTerm
-            ? allBooksCache.filter(book => 
-                (book.title && book.title.toLowerCase().includes(searchTerm)) ||
-                (book.author && book.author.toLowerCase().includes(searchTerm)) 
-              )
-            : allBooksCache;
+    // Stats elements
+    const statUniqueTitlesEl = catalogPageEl.querySelector('#stat-unique-titles');
+    const statTotalBooksStockEl = catalogPageEl.querySelector('#stat-total-books-stock');
+    const statTotalStockValueEl = catalogPageEl.querySelector('#stat-total-stock-value');
+    const statAvgSellingPriceEl = catalogPageEl.querySelector('#stat-avg-selling-price');
+    const statLowStockItemsEl = catalogPageEl.querySelector('#stat-low-stock-items');
+    const btnDownloadPdfEl = catalogPageEl.querySelector('#btn-download-catalog-pdf');
 
-        if (filteredBooks.length === 0 && allBooksCache.length > 0 && searchTerm) {
-             booksListEl.innerHTML = `<p style="text-align:center; padding:1rem; color:var(--secondary-text);">Aucun livre ne correspond à "${searchInputCatalogEl.value}".</p>`;
-        } else if (allBooksCache.length === 0 && !searchTerm) {
-            // Géré par onSnapshot empty check
-        }
-       
-        filteredBooks.forEach(book => {
-            const card = document.createElement('div');
-            card.className = 'book-card-catalog'; 
-            card.dataset.bookId = book.id;
-            const formattedPriceSell = (book.price || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0});
-            const formattedLastPurchasePrice = (book.lastPurchasePrice || 0).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0});
-            const formattedAverageCost = (book.averageCost !== undefined ? book.averageCost : (book.lastPurchasePrice || 0)).toLocaleString('fr-FR',{style:'currency', currency:'XOF', minimumFractionDigits:0});
-            let stockClass = 'stock-normal';
-            if (book.quantity <= 0) stockClass = 'stock-out';
-            else if (book.quantity <= 5) stockClass = 'stock-low';
+    // Drawer elements
+    const btnOpenDrawerEl = catalogPageEl.querySelector('#btn-open-catalog-drawer');
+    const btnCloseDrawerEl = catalogPageEl.querySelector('#btn-close-catalog-drawer');
+    const drawerOverlayEl = catalogPageEl.querySelector('#catalog-drawer-overlay');
+    const drawerContentEl = catalogPageEl.querySelector('#catalog-sort-drawer-content');
+    const btnApplySortEl = catalogPageEl.querySelector('#btn-apply-catalog-sort');
+    const sortOptionsContainerEl = catalogPageEl.querySelector('#catalog-sort-options-container');
 
-            card.innerHTML = `
-              <div class="book-card-image-area">
-                  <i class="bi bi-book book-placeholder-icon"></i>
-              </div>
-              <div class="book-card-content-area">
-                  <div class="book-card-main-info">
-                      <h4 class="book-title">${book.title || 'Titre inconnu'}</h4>
-                      <p class="book-author"><i class="bi bi-person"></i> <span>${book.author || 'Auteur inconnu'}</span></p>
-                      <p class="book-price-sell"><i class="bi bi-tag-fill"></i> Prix Vente: <span>${formattedPriceSell}</span></p>
-                      <p class="book-quantity-stock"><i class="bi bi-box-seam"></i> Stock: <span class="stock-value ${stockClass}">${book.quantity || 0}</span></p>
-                  </div>
-                  <div class="book-card-secondary-info">
-                      <p class="book-price-purchase"><i class="bi bi-cart-check"></i> Dernier Coût Achat: <span>${formattedLastPurchasePrice}</span></p>
-                      <p class="book-average-cost"><i class="bi bi-calculator"></i> Coût Moyen Pondéré: <span>${formattedAverageCost}</span></p>
-                  </div>
-                  <div class="book-card-actions">
-                      <button class="btn-action-icon btn-view-details" data-book-id="${book.id}" aria-label="Voir détails" title="Voir détails"><i class="bi bi-eye-fill"></i></button>
-                      <button class="btn-action-icon btn-edit-book" data-book-id="${book.id}" aria-label="Modifier" title="Modifier"><i class="bi bi-pencil-fill"></i></button>
-                      <button class="btn-action-icon btn-delete-book" data-book-id="${book.id}" aria-label="Supprimer" title="Supprimer"><i class="bi bi-trash3-fill"></i></button>
-                  </div>
-              </div>
-            `;
-            booksListEl.appendChild(card);
-        });
+    // FAB
+    const btnAddNewBookFabEl = catalogPageEl.querySelector('#btn-add-new-book-catalog');
 
-        document.querySelectorAll('.btn-view-details').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const bookId = e.currentTarget.dataset.bookId;
-                console.log('View details for book ID:', bookId);
-                showGlobalToast(`Action "Voir Détails" pour livre ID: ${bookId} (à implémenter)`, false);
-            });
-        });
-        document.querySelectorAll('.btn-edit-book').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const bookId = e.currentTarget.dataset.bookId;
-                console.log('Edit book ID:', bookId);
-                showGlobalToast(`Action "Modifier" pour livre ID: ${bookId} (à implémenter)`, false);
-            });
-        });
-        document.querySelectorAll('.btn-delete-book').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const bookId = e.currentTarget.dataset.bookId;
-                console.log('Delete book ID:', bookId);
-                showGlobalToast(`Action "Supprimer" pour livre ID: ${bookId} (à implémenter avec confirmation)`, false);
-            });
-        });
-    }
+    // --- State ---
+    let allBooksCache = [];
+    let unsubscribeCatalog = null;
+    let currentSortCriteria = { field: 'title', direction: 'asc' }; // Default sort
+    const LOW_STOCK_THRESHOLD = 5; // Seuil pour les articles à faible stock
 
-    function setupCatalogListener() {
-        if (unsubscribeCatalog) unsubscribeCatalog(); 
-        if (!auth.currentUser) return;
-        if (!booksListEl) return; // S'assurer que l'élément existe
-
-        const userBooksRef = db 
-          .collection('users')
-          .doc(auth.currentUser.uid)
-          .collection('books')
-          .orderBy('title'); 
-
-        booksListEl.innerHTML = Array(3).fill('').map(() => `
-            <div class="skeleton-book-card-catalog"></div>
-        `).join('');
-
-        unsubscribeCatalog = userBooksRef.onSnapshot(snapshot => {
-          let totalCount = 0;
-          let totalStockValueUsingCMP = 0; 
-          allBooksCache = []; 
-
-          snapshot.forEach(doc => {
-            const bookData = doc.data();
-            bookData.id = doc.id; 
-            allBooksCache.push(bookData);
-            const quantity = bookData.quantity || 0;
-            totalCount += quantity;
-            const costForValuation = bookData.averageCost !== undefined ? bookData.averageCost : (bookData.lastPurchasePrice || 0);
-            totalStockValueUsingCMP += costForValuation * quantity;
-          });
-         
-          if (allBooksCache.length === 0) {
-               booksListEl.innerHTML = '<p style="text-align:center; padding:1rem; color:var(--secondary-text);">Votre catalogue est vide. Commencez par ajouter des livres via un approvisionnement.</p>';
-          } else {
-               renderBooks(searchInputCatalogEl.value.trim().toLowerCase()); 
-          }
-          if(totalBooksEl) totalBooksEl.textContent = totalCount.toLocaleString();
-          if(totalValueEl) totalValueEl.textContent = totalStockValueUsingCMP.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
-        }, err => {
-          console.error('Erreur Firestore catalog/books:', err);
-          if(booksListEl) booksListEl.innerHTML = '<p style="text-align:center; padding:1rem; color:var(--ebay-red);">Erreur de chargement du catalogue.</p>';
-        });
-    }
-
-    function cleanupCatalogListener() {
-        if (unsubscribeCatalog) {
-          unsubscribeCatalog();
-          unsubscribeCatalog = null;
-        }
-        allBooksCache = []; 
-        if (booksListEl) booksListEl.innerHTML = ''; 
-        if (totalBooksEl) totalBooksEl.textContent = '0';
-        if (totalValueEl) totalValueEl.textContent = 'XOF 0';
-    }
-   
+    // --- Initialization and Listeners ---
     auth.onAuthStateChanged(user => {
-        if (user) {
-            if (document.getElementById('catalog')?.classList.contains('visible')) {
-                setupCatalogListener();
-            }
-        } else {
-            cleanupCatalogListener();
-            if (document.getElementById('catalog')?.classList.contains('visible')) {
-                if (booksListEl) booksListEl.innerHTML = '<p style="text-align:center; padding:1rem;">Veuillez vous connecter pour voir le catalogue.</p>';
-            }
+      if (user) {
+        if (catalogPageEl.classList.contains('visible')) {
+          setupCatalogListener();
         }
+      } else {
+        cleanupCatalogListener();
+        if (catalogPageEl.classList.contains('visible')) {
+          if (booksListEl) booksListEl.innerHTML = '<p class="catalog-no-results-message">Veuillez vous connecter pour voir le catalogue.</p>';
+          resetStats();
+        }
+      }
     });
 
     window.addEventListener('hashchange', () => {
-        if (location.hash === '#catalog') {
-            if (auth.currentUser) setupCatalogListener();
-        } else {
-            cleanupCatalogListener();
-        }
-    });
-    if (location.hash === '#catalog') {
+      if (location.hash === '#catalog') {
         if (auth.currentUser) setupCatalogListener();
+        else { // Si l'utilisateur n'est pas connecté mais navigue vers #catalog
+            cleanupCatalogListener();
+            if (booksListEl) booksListEl.innerHTML = '<p class="catalog-no-results-message">Veuillez vous connecter pour voir le catalogue.</p>';
+            resetStats();
+        }
+      } else {
+        cleanupCatalogListener();
+      }
+    });
+
+    // Initial load if already on #catalog
+    if (location.hash === '#catalog') {
+      if (auth.currentUser) {
+          setupCatalogListener();
+      } else {
+          if (booksListEl) booksListEl.innerHTML = '<p class="catalog-no-results-message">Veuillez vous connecter pour voir le catalogue.</p>';
+          resetStats();
+      }
     }
+
+    // --- Event Handlers ---
+    if (searchInputEl) {
+        searchInputEl.addEventListener('input', () => renderBooks(searchInputEl.value.trim().toLowerCase()));
+    }
+
+    if (btnDownloadPdfEl) {
+        btnDownloadPdfEl.addEventListener('click', () => {
+            showGlobalToast("Fonctionnalité de téléchargement PDF en cours de développement.", false, 2500);
+            // Ici, vous implémenteriez la logique de génération PDF avec jsPDF ou autre.
+            // Exemple : generateCatalogPDF(allBooksCache);
+        });
+    }
+
+    if (btnAddNewBookFabEl) {
+        btnAddNewBookFabEl.addEventListener('click', () => {
+            // Assurez-vous que `openGlobalAddBookModal` est défini globalement
+            if (typeof openGlobalAddBookModal === 'function') {
+                sessionStorage.removeItem('targetBookInputRowId_newSupply'); // Nettoyer au cas où
+                sessionStorage.removeItem('suggestedNewBookTitle_newSupply');
+                openGlobalAddBookModal(''); // Ouvrir avec un titre vide
+            } else {
+                showGlobalToast("Erreur: La fonction d'ajout de livre n'est pas disponible.", true);
+            }
+        });
+    }
+
+    // Drawer Logic
+    if (btnOpenDrawerEl) btnOpenDrawerEl.addEventListener('click', () => toggleDrawer(true));
+    if (btnCloseDrawerEl) btnCloseDrawerEl.addEventListener('click', () => toggleDrawer(false));
+    if (drawerOverlayEl) drawerOverlayEl.addEventListener('click', () => toggleDrawer(false));
+    if (btnApplySortEl) {
+        btnApplySortEl.addEventListener('click', () => {
+            const selectedSortInput = sortOptionsContainerEl.querySelector('input[name="catalog_sort"]:checked');
+            if (selectedSortInput) {
+                const [field, direction] = selectedSortInput.value.split('_');
+                currentSortCriteria = { field, direction };
+                renderBooks(searchInputEl.value.trim().toLowerCase());
+            }
+            toggleDrawer(false);
+        });
+    }
+
+    // --- Core Functions ---
+    function setupCatalogListener() {
+      if (unsubscribeCatalog) unsubscribeCatalog();
+      if (!auth.currentUser || !booksListEl) return;
+
+      const userBooksRef = db
+        .collection('users')
+        .doc(auth.currentUser.uid)
+        .collection('books');
+        // Le tri initial se fera côté client après la récupération complète.
+        // Si la collection devient très grande, envisager un tri Firestore + pagination.
+
+      showLoadingSkeletons();
+
+      unsubscribeCatalog = userBooksRef.onSnapshot(snapshot => {
+        allBooksCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        updateCatalogStats();
+        renderBooks(searchInputEl.value.trim().toLowerCase());
+      }, err => {
+        console.error('Erreur Firestore catalog/books:', err);
+        if (booksListEl) booksListEl.innerHTML = '<p class="catalog-no-results-message" style="color:var(--ebay-red);">Erreur de chargement du catalogue.</p>';
+        resetStats();
+      });
+    }
+
+    function cleanupCatalogListener() {
+      if (unsubscribeCatalog) {
+        unsubscribeCatalog();
+        unsubscribeCatalog = null;
+      }
+      allBooksCache = [];
+      if (booksListEl) booksListEl.innerHTML = '';
+      resetStats();
+      if(searchInputEl) searchInputEl.value = '';
+      // currentSortCriteria reste tel quel pour la prochaine ouverture
+    }
+
+    function resetStats() {
+        if(statUniqueTitlesEl) statUniqueTitlesEl.textContent = '0';
+        if(statTotalBooksStockEl) statTotalBooksStockEl.textContent = '0';
+        if(statTotalStockValueEl) statTotalStockValueEl.textContent = 'XOF 0';
+        if(statAvgSellingPriceEl) statAvgSellingPriceEl.textContent = 'XOF 0';
+        if(statLowStockItemsEl) statLowStockItemsEl.textContent = '0';
+    }
+
+    function showLoadingSkeletons() {
+        if (!booksListEl) return;
+        booksListEl.innerHTML = Array(5).fill('').map(() => `
+            <div class="skeleton-book-card-catalog" style="height: 150px; background: #f0f0f0; border-radius: var(--border-radius-card); animation: pulse 1.5s infinite ease-in-out;"></div>
+        `).join('');
+        // Mettre les stats en mode chargement aussi
+        if(statUniqueTitlesEl) statUniqueTitlesEl.textContent = '...';
+        if(statTotalBooksStockEl) statTotalBooksStockEl.textContent = '...';
+        if(statTotalStockValueEl) statTotalStockValueEl.textContent = '...';
+        if(statAvgSellingPriceEl) statAvgSellingPriceEl.textContent = '...';
+        if(statLowStockItemsEl) statLowStockItemsEl.textContent = '...';
+    }
+
+    function updateCatalogStats() {
+      if (!allBooksCache.length) {
+        resetStats();
+        return;
+      }
+
+      const uniqueTitles = allBooksCache.length;
+      const totalBooksInStock = allBooksCache.reduce((sum, book) => sum + (book.quantity || 0), 0);
+      const totalStockValue = allBooksCache.reduce((sum, book) => {
+        const cost = book.averageCost !== undefined ? book.averageCost : (book.lastPurchasePrice || 0);
+        return sum + (cost * (book.quantity || 0));
+      }, 0);
+
+      let totalSellingPriceSum = 0;
+      let booksWithPriceCount = 0;
+      allBooksCache.forEach(book => {
+        if (typeof book.price === 'number' && book.quantity > 0) { // Consider only in-stock items with a price
+          totalSellingPriceSum += book.price * book.quantity; // Weighted by quantity
+          booksWithPriceCount += book.quantity;
+        }
+      });
+      const avgSellingPrice = booksWithPriceCount > 0 ? totalSellingPriceSum / booksWithPriceCount : 0;
+
+      const lowStockItems = allBooksCache.filter(book => book.quantity > 0 && book.quantity <= LOW_STOCK_THRESHOLD).length;
+
+      if(statUniqueTitlesEl) statUniqueTitlesEl.textContent = uniqueTitles.toLocaleString();
+      if(statTotalBooksStockEl) statTotalBooksStockEl.textContent = totalBooksInStock.toLocaleString();
+      if(statTotalStockValueEl) statTotalStockValueEl.textContent = totalStockValue.toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 });
+      if(statAvgSellingPriceEl) statAvgSellingPriceEl.textContent = avgSellingPrice.toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 });
+      if(statLowStockItemsEl) statLowStockItemsEl.textContent = lowStockItems.toLocaleString();
+    }
+
+    function sortBooks(books) {
+        const { field, direction } = currentSortCriteria;
+        return [...books].sort((a, b) => {
+            let valA, valB;
+
+            if (field === 'title') {
+                valA = (a.title || '').toLowerCase();
+                valB = (b.title || '').toLowerCase();
+            } else if (field === 'quantity') {
+                valA = a.quantity || 0;
+                valB = b.quantity || 0;
+            } else if (field === 'price') {
+                valA = a.price || 0;
+                valB = b.price || 0;
+            } else if (field === 'date') { // Assuming 'createdAt' is a Firestore Timestamp
+                valA = a.createdAt?.toMillis() || 0;
+                valB = b.createdAt?.toMillis() || 0;
+            } else {
+                return 0;
+            }
+
+            if (valA < valB) return direction === 'asc' ? -1 : 1;
+            if (valA > valB) return direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
+    function renderBooks(searchTerm = '') {
+      if (!booksListEl) return;
+      booksListEl.innerHTML = '';
+
+      const filteredBooksUnsorted = searchTerm
+        ? allBooksCache.filter(book =>
+            (book.title && book.title.toLowerCase().includes(searchTerm)) ||
+            (book.author && book.author.toLowerCase().includes(searchTerm))
+          )
+        : allBooksCache;
+
+      const sortedBooks = sortBooks(filteredBooksUnsorted);
+
+      if (sortedBooks.length === 0) {
+        if (searchTerm) {
+            booksListEl.innerHTML = `<p class="catalog-no-results-message">Aucun livre ne correspond à "${searchTerm}".</p>`;
+        } else if (allBooksCache.length > 0) {
+             // This case should ideally not happen if allBooksCache has items and searchTerm is empty,
+             // unless sortBooks somehow empties it, which it shouldn't.
+            booksListEl.innerHTML = `<p class="catalog-no-results-message">Aucun livre à afficher avec les critères actuels.</p>`;
+        } else {
+            // This is when allBooksCache is empty initially
+            booksListEl.innerHTML = '<p class="catalog-no-results-message">Votre catalogue est vide. Ajoutez des livres via "Approvisionnement".</p>';
+        }
+        return;
+      }
+
+      sortedBooks.forEach(book => {
+        const card = document.createElement('div');
+        card.className = 'book-card-catalog';
+        card.dataset.bookId = book.id;
+
+        const formattedPriceSell = (book.price || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 });
+        const formattedLastPurchasePrice = (book.lastPurchasePrice || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 });
+        const averageCost = book.averageCost !== undefined ? book.averageCost : (book.lastPurchasePrice || 0);
+        const formattedAverageCost = averageCost.toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 });
+
+        let stockClass = 'stock-normal';
+        if (book.quantity <= 0) stockClass = 'stock-out';
+        else if (book.quantity <= LOW_STOCK_THRESHOLD) stockClass = 'stock-low';
+
+        card.innerHTML = `
+          <div class="book-card-image-area">
+            <i class="bi bi-book book-placeholder-icon"></i>
+          </div>
+          <div class="book-card-content-area">
+            <div class="book-card-main-info">
+              <h4 class="book-title">${book.title || 'Titre inconnu'}</h4>
+              <p class="book-author"><i class="bi bi-person"></i> <span>${book.author || 'Auteur inconnu'}</span></p>
+              <p class="book-price-sell"><i class="bi bi-tag-fill"></i> Prix Vente: <span>${formattedPriceSell}</span></p>
+              <p class="book-quantity-stock"><i class="bi bi-box-seam"></i> Stock: <span class="stock-value ${stockClass}">${book.quantity || 0}</span></p>
+            </div>
+            <div class="book-card-secondary-info">
+              <p class="book-price-purchase"><i class="bi bi-cart-check"></i> Dernier Coût: <span>${formattedLastPurchasePrice}</span></p>
+              <p class="book-average-cost"><i class="bi bi-calculator"></i> Coût Moyen P.: <span>${formattedAverageCost}</span></p>
+            </div>
+            <div class="book-card-actions">
+              <button class="btn-action-icon btn-view-details-catalog" data-book-id="${book.id}" aria-label="Voir détails" title="Voir détails"><i class="bi bi-eye-fill"></i></button>
+              <button class="btn-action-icon btn-edit-book-catalog" data-book-id="${book.id}" aria-label="Modifier" title="Modifier"><i class="bi bi-pencil-fill"></i></button>
+              <button class="btn-action-icon btn-delete-book-catalog" data-book-id="${book.id}" aria-label="Supprimer" title="Supprimer"><i class="bi bi-trash3-fill"></i></button>
+            </div>
+          </div>
+        `;
+        booksListEl.appendChild(card);
+      });
+
+      // Add event listeners for new buttons
+      catalogPageEl.querySelectorAll('.btn-view-details-catalog').forEach(btn => btn.addEventListener('click', handleBookAction));
+      catalogPageEl.querySelectorAll('.btn-edit-book-catalog').forEach(btn => btn.addEventListener('click', handleBookAction));
+      catalogPageEl.querySelectorAll('.btn-delete-book-catalog').forEach(btn => btn.addEventListener('click', handleBookAction));
+    }
+
+    function handleBookAction(e) {
+        const button = e.currentTarget;
+        const bookId = button.dataset.bookId;
+        const action = button.classList.contains('btn-view-details-catalog') ? 'view' :
+                       button.classList.contains('btn-edit-book-catalog') ? 'edit' : 'delete';
+
+        // Placeholder actions
+        showGlobalToast(`Action "${action}" pour livre ID: ${bookId} (à implémenter).`, false);
+        if (action === 'delete') {
+            // Exemple: if(confirm("Supprimer ce livre ?")) { db.collection...delete()... }
+        } else if (action === 'edit') {
+            // Exemple: openEditBookModal(bookId);
+        }
+    }
+
+    function toggleDrawer(show) {
+        if (!drawerContentEl || !drawerOverlayEl) return;
+        if (show) {
+            // Pré-sélectionner le critère de tri actuel dans le tiroir
+            const currentSortInput = drawerContentEl.querySelector(`input[name="catalog_sort"][value="${currentSortCriteria.field}_${currentSortCriteria.direction}"]`);
+            if (currentSortInput) currentSortInput.checked = true;
+
+            drawerContentEl.classList.add('visible');
+            drawerOverlayEl.classList.add('visible');
+            document.body.style.overflow = 'hidden';
+        } else {
+            drawerContentEl.classList.remove('visible');
+            drawerOverlayEl.classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+    }
+
   })();
   </script>
 </main>
-
 <main id="reports" class="page">
   <header id="reports-header" style="padding: 1rem;"> <button class="btn-page-back" data-hash="home" aria-label="Retour à l'accueil">
           <i class="bi bi-arrow-left"></i>
