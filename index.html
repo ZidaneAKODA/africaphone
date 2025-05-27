@@ -1138,12 +1138,10 @@
         text-align:center; padding:1.5rem 1rem; color:var(--secondary-text); font-size: 0.95rem;
     }
 
-
   </style>
 </head>
 
 <body>
-
   <script>
   // Web component pour input (inchangé)
   class AppInput extends HTMLElement {
@@ -2446,7 +2444,12 @@
   </template>
 
   <div class="step active" data-step="1">
-    <h2>Articles</h2>
+   <header style="display: flex; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); background: var(--surface); position: sticky; top: 0; z-index: 10;">
+    <button class="btn-page-back" data-hash="supply" aria-label="Retour aux approvisionnements">
+        <i class="bi bi-arrow-left"></i>
+    </button>
+    <h2 style="margin: 0; margin-left: 0.75rem; flex-grow: 1; font-size: 1.25rem; font-weight: 600; color: var(--primary-text);">Articles</h2>
+   </header>
     <div id="lines-container"> </div>
     <button id="add-line-btn" class="fab" aria-label="Ajouter une ligne">+</button>
     <div class="wizard-nav">
