@@ -5406,62 +5406,86 @@ const activationCodeInput = document.getElementById('activation-code');
 const activationMessageEl = document.getElementById('activation-message');
 
 if (btnActivate) {
-  btnActivate.addEventListener('click', async () => {
-    const code = activationCodeInput.value.trim();
-    if (!code) {
-      activationMessageEl.textContent = 'Veuillez entrer le code.';
-      activationMessageEl.style.color = 'var(--ebay-red)';
-      activationCodeInput.focus();
-      return;
-    }
+  btnActivate.addEventListener('click', async () => {
+    const code = activationCodeInput.value.trim();
+    if (!code) {
+      activationMessageEl.textContent = 'Veuillez entrer le code.';
+      activationMessageEl.style.color = 'var(--ebay-red)';
+      activationCodeInput.focus();
+      return;
+    }
 
-    btnActivate.disabled = true;
-    btnActivate.textContent = 'Vérification...';
-    activationMessageEl.textContent = '';
+    btnActivate.disabled = true;
+    btnActivate.textContent = 'Vérification...';
+    activationMessageEl.textContent = '';
 
-    try {
-      const result = await verifyActivationCode({ code }); // La fonction Cloud met à jour les claims serveur
+    try {
+      const result = await verifyActivationCode({ code }); // La fonction Cloud met à jour les claims serveur
 
-      if (auth.currentUser) {
-        await auth.currentUser.getIdToken(true); // Force le client à rafraîchir son token et ses claims
-        // À ce stade, onAuthStateChanged dans votre routeur principal sera déclenché.
-        // Il verra que userActivated est true et que le hash est #activation,
-        // et devrait donc gérer la redirection vers #home.
-        // Si onAuthStateChanged ne redirige pas assez vite, on peut forcer le hash ici.
-        // if (location.hash !== '#home') location.hash = '#home'; // Optionnel, car onAuthStateChanged devrait gérer
-      } else {
-        activationMessageEl.textContent = "Erreur: Utilisateur non connecté. Veuillez vous reconnecter.";
-        activationMessageEl.style.color = 'var(--ebay-red)';
-        btnActivate.disabled = false;
-        btnActivate.textContent = 'Valider le code';
-        setTimeout(() => window.location.replace('login.html'), 3000);
-        return;
-      }
-    } catch (err) {
-      console.error("Activation error:", err);
-      if (err.code === 'functions/not-found') {
-          activationMessageEl.textContent = "Fonction d'activation non disponible.";
-      } else if (err.details && err.details.message) {
-          activationMessageEl.textContent = err.details.message;
-      } else if (err.message) {
-          if (err.message.includes("INVALID_ARGUMENT") || err.message.includes("invalid-argument")) {
-            activationMessageEl.textContent = "Code d'activation invalide ou mal formé.";
-          } else if (err.message.includes("UNAUTHENTICATED") || err.message.includes("permission-denied")) {
-            activationMessageEl.textContent = "Erreur d'authentification. Veuillez vous reconnecter.";
-          } else {
-            activationMessageEl.textContent = "Code invalide ou erreur serveur.";
-          }
-      } else {
-          activationMessageEl.textContent = "Code invalide ou erreur inconnue.";
-      }
-      activationMessageEl.style.color = 'var(--ebay-red)';
-      btnActivate.disabled = false;
-      btnActivate.textContent = 'Valider le code';
-    }
-  });
+      if (auth.currentUser) {
+        await auth.currentUser.getIdToken(true); // Force le client à rafraîchir son token et ses claims
+        
+        // ---- MODIFICATION COMMENCE ICI ----
+        // Afficher un message de succès avant la redirection pour une meilleure UX
+        if (result && result.message) {
+            showGlobalToast(result.message, false, 2500); // Affiche le message de succès pendant 2.5s
+        } else {
+            showGlobalToast('Activation réussie ! Redirection...', false, 2500);
+        }
+
+        // Attendre un court instant pour que l'utilisateur voie le toast
+        // puis changer le hash pour déclencher le routeur.
+        setTimeout(() => {
+            if (location.hash !== '#home') {
+                location.hash = '#home';
+            } else {
+                // Si, pour une raison quelconque, le hash est déjà '#home',
+                // le fait de le réassigner peut ne pas déclencher 'hashchange'.
+                // Dans ce cas, on pourrait envisager d'appeler manuellement
+                // la fonction de routage si elle est accessible globalement,
+                // ou de recharger, mais le routeur principal devrait déjà
+                // gérer l'affichage correct de la page #home grâce à onAuthStateChanged.
+                // Le plus simple est de s'assurer que le hash est '#home'.
+                // Le routeur (via onAuthStateChanged qui appelle route())
+                // verra que userActivated est true et que le hash est '#home'
+                // et affichera la page d'accueil.
+                location.hash = '#home'; // Assure que le routeur est bien sur #home
+            }
+        }, 500); // Délai de 500ms pour la visibilité du toast
+        // ---- MODIFICATION FINIT ICI ----
+
+      } else {
+        activationMessageEl.textContent = "Erreur: Utilisateur non connecté. Veuillez vous reconnecter.";
+        activationMessageEl.style.color = 'var(--ebay-red)';
+        btnActivate.disabled = false;
+        btnActivate.textContent = 'Valider le code';
+        setTimeout(() => window.location.replace('login.html'), 3000);
+        return;
+      }
+    } catch (err) {
+      console.error("Activation error:", err);
+      if (err.code === 'functions/not-found') {
+          activationMessageEl.textContent = "Fonction d'activation non disponible.";
+      } else if (err.details && err.details.message) {
+          activationMessageEl.textContent = err.details.message;
+      } else if (err.message) {
+          if (err.message.includes("INVALID_ARGUMENT") || err.message.includes("invalid-argument")) {
+            activationMessageEl.textContent = "Code d'activation invalide ou mal formé.";
+          } else if (err.message.includes("UNAUTHENTICATED") || err.message.includes("permission-denied")) {
+            activationMessageEl.textContent = "Erreur d'authentification. Veuillez vous reconnecter.";
+          } else {
+            activationMessageEl.textContent = "Code invalide ou erreur serveur.";
+          }
+      } else {
+          activationMessageEl.textContent = "Code invalide ou erreur inconnue.";
+      }
+      activationMessageEl.style.color = 'var(--ebay-red)';
+      btnActivate.disabled = false;
+      btnActivate.textContent = 'Valider le code';
+    }
+  });
 }
 </script>
-
 <nav aria-label="Main navigation">
   <div class="nav-inner">
     <a href="#home"    data-hash="home"    class="nav-link active" aria-label="Home">
