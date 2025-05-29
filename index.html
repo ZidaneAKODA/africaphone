@@ -1167,25 +1167,30 @@
   </script>
 
   <main id="home" class="page visible">
-    <header><h2 style="padding:1rem">Accueil</h2></header>
-    <div class="home-actions">
-      <button class="btn-action btn-sell" data-hash="sell" aria-label="Sell">
-        <i class="bi bi-tag-fill"></i><span>Vendre</span>
-      </button>
-      <button class="btn-action btn-buy" data-hash="supply" aria-label="Approvisionnement">
-        <i class="bi bi-cart-fill"></i><span>Approvisionnement</span>
-      </button>
-      <a href="#reports" data-hash="reports" class="btn-reports-card" aria-label="Rapports et Analyses">
-          <i class="bi bi-graph-up-arrow"></i>
-          <span>Rapports & Analyses</span>
-      </a>
-    </div>
-    <button id="btn-install" class="btn-primary"
-        style="display:none; margin:1rem auto; width: calc(100% - 2rem);">
-      <i class="bi bi-download" style="margin-right:0.5rem;"></i>
-      Installer l’application
+  <header><h2 style="padding:1rem">Accueil</h2></header>
+  <div class="home-actions">
+    <button class="btn-action btn-sell" data-hash="sell" aria-label="Sell">
+      <i class="bi bi-tag-fill"></i><span>Vendre</span>
     </button>
-  </main>
+    <button class="btn-action btn-buy" data-hash="supply" aria-label="Approvisionnement">
+      <i class="bi bi-cart-fill"></i><span>Approvisionnement</span>
+    </button>
+    <a href="#reports" data-hash="reports" class="btn-reports-card" aria-label="Rapports et Analyses">
+        <i class="bi bi-graph-up-arrow"></i>
+        <span>Rapports & Analyses</span>
+    </a>
+    <a href="#expenses" data-hash="expenses" class="btn-reports-card" 
+       aria-label="Gestion des Dépenses">
+        <i class="bi bi-wallet2"></i> 
+        <span>Gestion des Dépenses</span>
+    </a>
+  </div>
+  <button id="btn-install" class="btn-primary"
+        style="display:none; margin:1rem auto; width: calc(100% - 2rem);">
+    <i class="bi bi-download" style="margin-right:0.5rem;"></i>
+    Installer l’application
+  </button>
+</main>
 
 <main id="sell" class="page">
   <style>
@@ -2275,6 +2280,587 @@
     }
   });
 </script>
+</main>
+
+<main id="expenses" class="page">
+  <style>
+    /* Styles spécifiques pour la page #expenses */
+    main#expenses header { /* Le header de la page expenses */
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem; /* Ajusté pour aligner avec les autres headers de page */
+      background: #fff;
+      border-bottom: 1px solid var(--border-color);
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      z-index: 15; /* Au-dessus du contenu scrollable */
+    }
+    main#expenses header h2 {
+      margin: 0 0 0 0.75rem; /* Marge à gauche du titre */
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--primary-text);
+      flex-grow: 1;
+    }
+
+    #expenses-summary-filter-container {
+      padding: 0.75rem 1rem;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      position: -webkit-sticky;
+      position: sticky;
+      top: 57px; /* Hauteur approx. du header de page */
+      z-index: 14; /* En dessous du header de page */
+    }
+    #expenses-total-chip {
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.4rem 0.8rem;
+      background-color: var(--ebay-red); /* Couleur pour les dépenses */
+      color: white;
+      border-radius: var(--border-radius-pill);
+      white-space: nowrap;
+    }
+    #expenses-filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    #expenses-selected-date-display {
+        font-size: 0.85rem;
+        color: var(--secondary-text);
+        font-weight: 500;
+        text-align: right;
+    }
+    #expenses-date-filter-btn {
+        background-color: #fff;
+        border: 1px solid var(--border-color);
+        color: var(--primary-text);
+        border-radius: 50%;
+        width: 32px; height: 32px;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 1rem; cursor: pointer; box-shadow: none; padding:0;
+    }
+    #expenses-date-picker { /* Caché, pour être déclenché par le bouton */
+        opacity: 0; width: 1px; height: 1px; position: absolute;
+    }
+
+    .expenses-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+    }
+    .expense-card {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-card);
+      padding: 1rem;
+      box-shadow: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .expense-card header { /* Header à l'intérieur de la carte */
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 0 0 0.5rem 0; /* Pas de padding horizontal, déjà dans la carte */
+      border-bottom: 1px solid #efefef;
+      position: static; /* Annuler sticky pour les headers de carte */
+      z-index: auto;
+      background: transparent;
+    }
+    .expense-card header .info strong {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--primary-text);
+      display: block;
+      margin-bottom: 0.15rem;
+    }
+    .expense-card header .info small {
+      font-size: 0.8rem;
+      color: var(--secondary-text);
+    }
+    .expense-card header .amount {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ebay-red); /* Dépenses en rouge */
+      white-space: nowrap;
+    }
+    .expense-card .details {
+      font-size: 0.9rem;
+      color: var(--secondary-text);
+      line-height: 1.4;
+    }
+    .expense-card .actions {
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+    /* Utilisation de .btn-action-icon existant pour les boutons d'action de la carte */
+
+    .expenses-list .skeleton-expense-card {
+      background: #f9f9f9;
+      height: 100px; /* Ajustez selon le contenu typique d'une carte */
+      border-radius: var(--border-radius-card);
+      animation: pulse 1.5s infinite ease-in-out;
+      border: 1px solid var(--border-color);
+    }
+    .expenses-list .no-expenses-message {
+        text-align:center; padding:1.5rem 1rem; color:var(--secondary-text); font-size: 0.95rem;
+    }
+
+    /* Styles pour la modale d'ajout/modification de dépense (simple pour l'instant) */
+    #expense-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none; /* Caché par défaut */
+      align-items: center;
+      justify-content: center;
+      z-index: 1000; /* Au-dessus de tout */
+      padding: 1rem;
+    }
+    #expense-modal-overlay.visible {
+      display: flex;
+    }
+    #expense-modal-overlay .modal-content {
+      background: var(--surface);
+      padding: 1.5rem;
+      border-radius: var(--border-radius-card);
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+    #expense-modal-overlay .modal-content h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    #expense-modal-overlay .form-group {
+      margin-bottom: 1rem;
+    }
+    #expense-modal-overlay label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--secondary-text);
+      margin-bottom: 0.3rem;
+    }
+    #expense-modal-overlay input[type="date"],
+    #expense-modal-overlay input[type="text"],
+    #expense-modal-overlay input[type="number"],
+    #expense-modal-overlay select,
+    #expense-modal-overlay textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-card);
+      font-size: 1rem;
+      box-sizing: border-box; /* Important */
+    }
+    #expense-modal-overlay textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+    #expense-modal-overlay .modal-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+    /* Utiliser .btn-primary et .btn-outline existants pour les actions de la modale */
+
+  </style>
+
+  <header>
+    <button class="btn-page-back" data-hash="home" aria-label="Retour à l'accueil">
+      <i class="bi bi-arrow-left"></i>
+    </button>
+    <h2>Mes Dépenses</h2>
+  </header>
+
+  <div id="expenses-summary-filter-container">
+    <span id="expenses-total-chip">Chargement...</span>
+    <div id="expenses-filter-group">
+      <span id="expenses-selected-date-display">Aujourd'hui</span>
+      <button id="expenses-date-filter-btn" aria-label="Choisir une date">
+        <i class="bi bi-calendar3"></i>
+      </button>
+      <input type="date" id="expenses-date-picker">
+    </div>
+  </div>
+
+  <div id="expenses-list-container" class="expenses-list">
+    </div>
+
+  <button id="btn-add-new-expense" class="fab" aria-label="Ajouter une nouvelle dépense">
+    <i class="bi bi-plus-lg"></i>
+  </button>
+
+  <div id="expense-modal-overlay">
+    <div class="modal-content">
+      <h3 id="expense-modal-title">Ajouter une Dépense</h3>
+      <form id="form-add-edit-expense">
+        <input type="hidden" id="expense-id"> <div class="form-group">
+          <label for="expense-date">Date</label>
+          <input type="date" id="expense-date" required>
+        </div>
+        <div class="form-group">
+          <label for="expense-description">Description</label>
+          <input type="text" id="expense-description" placeholder="Ex: Loyer Mars" required>
+        </div>
+        <div class="form-group">
+          <label for="expense-category">Catégorie</label>
+          <select id="expense-category" required>
+            <option value="">Choisir...</option>
+            <option value="Achats Livres (hors stock principal)">Achats Livres (hors stock principal)</option>
+            <option value="Loyer & Charges Local">Loyer & Charges Local</option>
+            <option value="Factures (énergie, internet)">Factures (énergie, internet)</option>
+            <option value="Fournitures (bureau, emballage)">Fournitures (bureau, emballage)</option>
+            <option value="Frais de Port & Livraison">Frais de Port & Livraison</option>
+            <option value="Marketing & Publicité">Marketing & Publicité</option>
+            <option value="Logiciels & Abonnements">Logiciels & Abonnements</option>
+            <option value="Frais Bancaires">Frais Bancaires</option>
+            <option value="Salaires & Charges Sociales">Salaires & Charges Sociales</option>
+            <option value="Déplacements & Représentation">Déplacements & Représentation</option>
+            <option value="Maintenance & Réparations">Maintenance & Réparations</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="expense-amount">Montant (XOF)</label>
+          <input type="number" id="expense-amount" placeholder="0" min="0" step="50" required>
+        </div>
+        <div class="form-group">
+          <label for="expense-notes">Notes (Optionnel)</label>
+          <textarea id="expense-notes" placeholder="Détails supplémentaires..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="btn-cancel-expense-modal" class="btn-outline">Annuler</button>
+          <button type="submit" id="btn-save-expense-modal" class="btn-primary">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Script pour la page #expenses
+    (function() {
+      const expensesPage = document.getElementById('expenses');
+      if (!expensesPage) return;
+
+      // Éléments du DOM
+      const expensesListContainerEl = document.getElementById('expenses-list-container');
+      const btnAddNewExpenseEl = document.getElementById('btn-add-new-expense');
+      
+      const expenseModalOverlayEl = document.getElementById('expense-modal-overlay');
+      const expenseModalTitleEl = document.getElementById('expense-modal-title');
+      const formAddEditExpenseEl = document.getElementById('form-add-edit-expense');
+      const expenseIdInputEl = document.getElementById('expense-id');
+      const expenseDateInputEl = document.getElementById('expense-date');
+      const expenseDescriptionInputEl = document.getElementById('expense-description');
+      const expenseCategoryInputEl = document.getElementById('expense-category');
+      const expenseAmountInputEl = document.getElementById('expense-amount');
+      const expenseNotesInputEl = document.getElementById('expense-notes');
+      const btnCancelExpenseModalEl = document.getElementById('btn-cancel-expense-modal');
+      // const btnSaveExpenseModalEl = document.getElementById('btn-save-expense-modal'); // Le submit du formulaire est géré
+
+      const expensesTotalChipEl = document.getElementById('expenses-total-chip');
+      const expensesSelectedDateDisplayEl = document.getElementById('expenses-selected-date-display');
+      const expensesDateFilterBtnEl = document.getElementById('expenses-date-filter-btn');
+      const expensesDatePickerEl = document.getElementById('expenses-date-picker');
+      
+      let currentEditingExpenseId = null;
+      let unsubscribeExpenses = null;
+      let selectedExpensesDate = new Date(); // Par défaut aujourd'hui
+
+      // --- Gestion de la Modale ---
+      function openExpenseModal(expense = null) {
+        formAddEditExpenseEl.reset(); // Réinitialiser le formulaire
+        if (expense) {
+          currentEditingExpenseId = expense.id;
+          expenseModalTitleEl.textContent = 'Modifier la Dépense';
+          expenseIdInputEl.value = expense.id;
+          // Convertir le timestamp Firestore en YYYY-MM-DD pour l'input date
+          const dateFromTimestamp = expense.date.toDate ? expense.date.toDate() : new Date(expense.date);
+          expenseDateInputEl.value = dateFromTimestamp.toISOString().split('T')[0];
+          expenseDescriptionInputEl.value = expense.description || '';
+          expenseCategoryInputEl.value = expense.category || '';
+          expenseAmountInputEl.value = expense.amount || '';
+          expenseNotesInputEl.value = expense.notes || '';
+        } else {
+          currentEditingExpenseId = null;
+          expenseModalTitleEl.textContent = 'Ajouter une Dépense';
+          expenseIdInputEl.value = '';
+          expenseDateInputEl.valueAsDate = new Date(); // Date du jour par défaut
+        }
+        expenseModalOverlayEl.classList.add('visible');
+        document.body.style.overflow = 'hidden'; // Empêcher le scroll du body
+        expenseDescriptionInputEl.focus();
+      }
+
+      function closeExpenseModal() {
+        expenseModalOverlayEl.classList.remove('visible');
+        document.body.style.overflow = '';
+        currentEditingExpenseId = null;
+      }
+
+      if (btnAddNewExpenseEl) btnAddNewExpenseEl.addEventListener('click', () => openExpenseModal());
+      if (btnCancelExpenseModalEl) btnCancelExpenseModalEl.addEventListener('click', closeExpenseModal);
+      if (expenseModalOverlayEl) { // Fermer en cliquant sur l'overlay
+          expenseModalOverlayEl.addEventListener('click', (e) => {
+              if (e.target === expenseModalOverlayEl) closeExpenseModal();
+          });
+      }
+      document.addEventListener('keydown', (e) => { // Fermer avec la touche Echap
+          if (e.key === 'Escape' && expenseModalOverlayEl.classList.contains('visible')) {
+              closeExpenseModal();
+          }
+      });
+
+      // --- Gestion du Formulaire ---
+      if (formAddEditExpenseEl) {
+        formAddEditExpenseEl.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!auth.currentUser) {
+            showGlobalToast("Veuillez vous connecter pour ajouter une dépense.", true);
+            return;
+          }
+
+          const expenseData = {
+            date: firebase.firestore.Timestamp.fromDate(new Date(expenseDateInputEl.value + 'T00:00:00')), // Assurer UTC minuit
+            description: expenseDescriptionInputEl.value.trim(),
+            category: expenseCategoryInputEl.value,
+            amount: parseFloat(expenseAmountInputEl.value),
+            notes: expenseNotesInputEl.value.trim()
+          };
+
+          const saveButton = formAddEditExpenseEl.querySelector('button[type="submit"]');
+          saveButton.disabled = true;
+          saveButton.textContent = 'Enregistrement...';
+
+          try {
+            const userExpensesRef = db.collection('users').doc(auth.currentUser.uid).collection('expenses');
+            if (currentEditingExpenseId) {
+              await userExpensesRef.doc(currentEditingExpenseId).update(expenseData);
+              showGlobalToast("Dépense modifiée avec succès !", false);
+            } else {
+              expenseData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+              await userExpensesRef.add(expenseData);
+              showGlobalToast("Dépense ajoutée avec succès !", false);
+            }
+            closeExpenseModal();
+          } catch (error) {
+            console.error("Erreur sauvegarde dépense:", error);
+            showGlobalToast("Erreur: " + error.message, true);
+          } finally {
+            saveButton.disabled = false;
+            saveButton.textContent = 'Enregistrer';
+          }
+        });
+      }
+      
+      // --- Logique de filtrage par date (similaire à la page des ventes) ---
+      function formatDateForDisplayExpenses(date) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+
+      function updateSelectedDateDisplayExpenses(date) {
+        const today = new Date();
+        if (date.toDateString() === today.toDateString()) {
+            expensesSelectedDateDisplayEl.textContent = "Aujourd'hui";
+        } else {
+            expensesSelectedDateDisplayEl.textContent = formatDateForDisplayExpenses(date);
+        }
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        expensesDatePickerEl.value = `${year}-${month}-${day}`;
+      }
+      
+      if (expensesDateFilterBtnEl) {
+        expensesDateFilterBtnEl.addEventListener('click', () => {
+          try { expensesDatePickerEl.showPicker(); }
+          catch (error) { expensesDatePickerEl.focus(); expensesDatePickerEl.click(); }
+        });
+      }
+
+      if (expensesDatePickerEl) {
+        expensesDatePickerEl.addEventListener('change', (event) => {
+          const newDate = new Date(event.target.value + 'T00:00:00'); // Pour éviter les pbs de fuseau horaire
+          if (!isNaN(newDate.getTime())) {
+            selectedExpensesDate = newDate;
+            updateSelectedDateDisplayExpenses(selectedExpensesDate);
+            setupExpensesListenerAndRender(selectedExpensesDate);
+          }
+        });
+      }
+
+      // --- Chargement et Affichage des Dépenses ---
+      function showExpenseListLoadingSkeletons() {
+        if (!expensesListContainerEl) return;
+        expensesListContainerEl.innerHTML = Array(3).fill('').map(() => 
+            '<div class="skeleton-expense-card"></div>'
+        ).join('');
+        if(expensesTotalChipEl) expensesTotalChipEl.textContent = 'Chargement...';
+      }
+
+      function renderExpenses(expenses) {
+        if (!expensesListContainerEl) return;
+        expensesListContainerEl.innerHTML = ''; // Vider la liste
+
+        let totalAmountForPeriod = 0;
+
+        if (expenses.length === 0) {
+          expensesListContainerEl.innerHTML = '<p class="no-expenses-message">Aucune dépense pour cette période.</p>';
+        } else {
+          expenses.forEach(expense => {
+            totalAmountForPeriod += expense.amount || 0;
+            const card = document.createElement('div');
+            card.className = 'expense-card';
+            card.dataset.id = expense.id;
+
+            const expenseDate = expense.date.toDate ? expense.date.toDate() : new Date(expense.date);
+            const formattedDate = expenseDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            card.innerHTML = `
+              <header>
+                <div class="info">
+                  <strong title="${expense.description}">${expense.description.length > 30 ? expense.description.substring(0,27)+'...' : expense.description}</strong>
+                  <small>${formattedDate} - ${expense.category || 'N/A'}</small>
+                </div>
+                <span class="amount">${(expense.amount || 0).toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0})}</span>
+              </header>
+              ${expense.notes ? `<p class="details">${expense.notes}</p>` : ''}
+              <div class="actions">
+                <button class="btn-action-icon btn-edit-expense" title="Modifier"><i class="bi bi-pencil-fill"></i></button>
+                <button class="btn-action-icon btn-delete-expense btn-delete-book" title="Supprimer"><i class="bi bi-trash3-fill"></i></button> 
+              </div>
+            `;
+            // Note: réutilisation de .btn-delete-book pour le style rouge sur :active
+
+            card.querySelector('.btn-edit-expense').addEventListener('click', () => openExpenseModal(expense));
+            card.querySelector('.btn-delete-expense').addEventListener('click', () => handleDeleteExpense(expense.id, expense.description));
+            
+            expensesListContainerEl.appendChild(card);
+          });
+        }
+        if(expensesTotalChipEl) expensesTotalChipEl.textContent = `Total: ${totalAmountForPeriod.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0})}`;
+      }
+
+      async function handleDeleteExpense(expenseId, description) {
+        if (!auth.currentUser) return;
+        // AMÉLIORATION: Utiliser une modale de confirmation plus jolie que confirm()
+        if (confirm(`Êtes-vous sûr de vouloir supprimer la dépense : "${description}" ?`)) {
+          try {
+            await db.collection('users').doc(auth.currentUser.uid).collection('expenses').doc(expenseId).delete();
+            showGlobalToast("Dépense supprimée.", false);
+            // Le listener onSnapshot mettra à jour la liste automatiquement
+          } catch (error) {
+            console.error("Erreur suppression dépense:", error);
+            showGlobalToast("Erreur lors de la suppression: " + error.message, true);
+          }
+        }
+      }
+      
+      function getStartOfDayTimestampExpenses(date) {
+        const start = new Date(date);
+        start.setHours(0, 0, 0, 0);
+        return firebase.firestore.Timestamp.fromDate(start);
+      }
+
+      function getEndOfDayTimestampExpenses(date) {
+        const end = new Date(date);
+        end.setHours(23, 59, 59, 999);
+        return firebase.firestore.Timestamp.fromDate(end);
+      }
+
+      function setupExpensesListenerAndRender(filterDate) {
+        if (unsubscribeExpenses) unsubscribeExpenses();
+        if (!auth.currentUser) {
+          if (expensesListContainerEl) expensesListContainerEl.innerHTML = '<p class="no-expenses-message">Veuillez vous connecter.</p>';
+          if (expensesTotalChipEl) expensesTotalChipEl.textContent = 'N/A';
+          return;
+        }
+        showExpenseListLoadingSkeletons();
+
+        const startOfDay = getStartOfDayTimestampExpenses(filterDate);
+        const endOfDay = getEndOfDayTimestampExpenses(filterDate);
+
+        const expensesQuery = db.collection('users').doc(auth.currentUser.uid).collection('expenses')
+          .where('date', '>=', startOfDay)
+          .where('date', '<=', endOfDay)
+          .orderBy('date', 'desc');
+
+        unsubscribeExpenses = expensesQuery.onSnapshot(snapshot => {
+          const userExpenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          renderExpenses(userExpenses);
+        }, error => {
+          console.error("Erreur chargement dépenses:", error);
+          if (expensesListContainerEl) expensesListContainerEl.innerHTML = '<p class="no-expenses-message" style="color:var(--ebay-red);">Erreur de chargement des dépenses.</p>';
+          if (expensesTotalChipEl) expensesTotalChipEl.textContent = 'Erreur';
+        });
+      }
+      
+      function initializeExpensesPage() {
+          selectedExpensesDate = new Date(); // Réinitialiser à aujourd'hui
+          updateSelectedDateDisplayExpenses(selectedExpensesDate);
+          if (auth.currentUser) {
+              setupExpensesListenerAndRender(selectedExpensesDate);
+          } else {
+              cleanupExpensesListener();
+              if (expensesListContainerEl) expensesListContainerEl.innerHTML = '<p class="no-expenses-message">Veuillez vous connecter pour voir les dépenses.</p>';
+              if (expensesTotalChipEl) expensesTotalChipEl.textContent = 'N/A';
+          }
+      }
+
+      function cleanupExpensesListener() {
+        if (unsubscribeExpenses) {
+          unsubscribeExpenses();
+          unsubscribeExpenses = null;
+        }
+      }
+
+      // Exécution à l'affichage de la page
+      const expensesPageObserver = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            if (expensesPage.classList.contains('visible')) {
+              initializeExpensesPage();
+            } else {
+              cleanupExpensesListener();
+            }
+          }
+        }
+      });
+      expensesPageObserver.observe(expensesPage, { attributes: true });
+
+      auth.onAuthStateChanged(user => {
+        if (expensesPage.classList.contains('visible')) { // Si la page est déjà visible lors du changement d'auth
+            initializeExpensesPage();
+        }
+      });
+
+      // Si la page est déjà visible au chargement initial du script (ex: refresh sur #expenses)
+      if (expensesPage.classList.contains('visible')) {
+        initializeExpensesPage();
+      }
+
+    })();
+  </script>
 </main>
 
 <main id="new-supply" class="page">
@@ -3777,11 +4363,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
     <section class="catalog-stats-overview">
       <h3>Aperçu du Catalogue</h3>
       <div class="stats-grid">
-        <div class="stat-card">
-          <i class="bi bi-journal-text stat-icon"></i>
-          <div class="stat-value" id="stat-unique-titles">0</div>
-          <div class="stat-label">Titres Uniques</div>
-        </div>
+
         <div class="stat-card">
           <i class="bi bi-boxes stat-icon"></i>
           <div class="stat-value" id="stat-total-books-stock">0</div>
@@ -3792,15 +4374,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
           <div class="stat-value" id="stat-total-stock-value">XOF 0</div>
           <div class="stat-label">Valeur Stock (CMP)</div>
         </div>
-        <div class="stat-card">
-          <i class="bi bi-graph-up stat-icon"></i> <div class="stat-value" id="stat-avg-selling-price">XOF 0</div>
-          <div class="stat-label">Prix Vente Moyen</div>
-        </div>
-        <div class="stat-card">
-          <i class="bi bi-exclamation-triangle-fill stat-icon low-stock"></i>
-          <div class="stat-value" id="stat-low-stock-items">0</div>
-          <div class="stat-label">Articles à faible stock</div>
-        </div>
+
       </div>
       <button id="btn-download-catalog-pdf" class="btn-primary full-width">
         <i class="bi bi-file-earmark-pdf-fill"></i> Télécharger l'Inventaire (PDF)
@@ -4258,7 +4832,8 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
 
 
 <main id="reports" class="page">
-  <header id="reports-header" style="padding: 1rem;"> <button class="btn-page-back" data-hash="home" aria-label="Retour à l'accueil">
+  <header id="reports-header" style="padding: 1rem;">
+    <button class="btn-page-back" data-hash="home" aria-label="Retour à l'accueil">
       <i class="bi bi-arrow-left"></i>
     </button>
     <h2>Rapports & Analyses</h2>
@@ -4284,9 +4859,22 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
         </div>
         <div class="kpi-card">
           <i class="bi bi-graph-up-arrow kpi-icon profit"></i>
-          <div class="kpi-value profit" id="kpi-total-profit">XOF 0</div>
-          <div class="kpi-label">Profit Brut</div>
+          <div class="kpi-value profit" id="kpi-gross-profit">XOF 0</div>
+          <div class="kpi-label">Marge Brute sur Ventes</div>
         </div>
+
+        <div class="kpi-card">
+          <i class="bi bi-cash-stack kpi-icon" style="color: var(--ebay-red); background-color: rgba(229,50,56,0.08);"></i>
+          <div class="kpi-value" id="kpi-total-operating-expenses" style="color: var(--ebay-red);">XOF 0</div>
+          <div class="kpi-label">Dépenses Opérationnelles</div>
+        </div>
+
+        <div class="kpi-card">
+          <i class="bi bi-piggy-bank-fill kpi-icon profit"></i>
+          <div class="kpi-value profit" id="kpi-net-profit">XOF 0</div>
+          <div class="kpi-label">Profit Net</div>
+        </div>
+
         <div class="kpi-card">
           <i class="bi bi-receipt-cutoff kpi-icon sales-count"></i>
           <div class="kpi-value" id="kpi-total-sales-count">0</div>
@@ -4300,8 +4888,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
         <div class="kpi-card">
           <i class="bi bi-percent kpi-icon profit-margin"></i>
           <div class="kpi-value" id="kpi-avg-profit-margin">0%</div>
-          <div class="kpi-label">Marge Brute Moy.</div>
-        </div>
+          <div class="kpi-label">Marge Brute Moy. (%)</div> </div>
       </div>
     </div>
     <div class="report-type-placeholder" id="reports-data-placeholder" style="display:none;">
@@ -4364,22 +4951,27 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
     const reportsPage = document.getElementById('reports');
     if (!reportsPage) return;
 
+    // Références aux éléments DOM pour les KPIs
     const kpiTotalRevenueEl = document.getElementById('kpi-total-revenue');
     const kpiTotalCogsEl = document.getElementById('kpi-total-cogs');
-    const kpiTotalProfitEl = document.getElementById('kpi-total-profit');
+    const kpiGrossProfitEl = document.getElementById('kpi-gross-profit'); // Ancien kpi-total-profit, maintenant Marge Brute
+    const kpiTotalOperatingExpensesEl = document.getElementById('kpi-total-operating-expenses'); // NOUVEAU
+    const kpiNetProfitEl = document.getElementById('kpi-net-profit'); // NOUVEAU
     const kpiTotalSalesCountEl = document.getElementById('kpi-total-sales-count');
     const kpiTotalItemsSoldEl = document.getElementById('kpi-total-items-sold');
     const kpiAvgProfitMarginEl = document.getElementById('kpi-avg-profit-margin');
-   
+    
+    // Éléments pour les filtres
     const periodSelectorEl = document.getElementById('reports-period-selector');
     const reportTypeSelectorEl = document.getElementById('reports-type-selector');
     const customDateInputsEl = document.getElementById('custom-date-inputs-reports');
     const dateStartInputEl = document.getElementById('reports-date-start');
     const dateEndInputEl = document.getElementById('reports-date-end');
-   
+    
     const reportsDataSummaryEl = document.getElementById('reports-data-summary');
     const reportsDataPlaceholderEl = document.getElementById('reports-data-placeholder');
 
+    // Éléments du tiroir de filtres
     const btnOpenFiltersEl = document.getElementById('btn-open-reports-filters');
     const btnCloseFiltersEl = document.getElementById('btn-close-reports-filters');
     const filterDrawerEl = document.getElementById('report-filter-drawer-content');
@@ -4387,16 +4979,17 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
     const btnApplyDrawerFiltersEl = document.getElementById('btn-apply-drawer-filters');
     const activeFiltersDisplayEl = document.getElementById('active-filters-display');
 
-    let allBooksDataCache = {}; // Pas utilisé dans cette version simplifiée, mais utile pour des rapports plus complexes
     let currentStartDate, currentEndDate;
-    let tempPeriodSettings = {};
+    let tempPeriodSettings = {}; // Pour stocker temporairement les sélections du tiroir
 
     function toggleFilterDrawer(show) {
         if (show) {
+            // Sauvegarder les réglages actuels en cas d'annulation
             tempPeriodSettings.period = periodSelectorEl.value;
             tempPeriodSettings.startDate = dateStartInputEl.value;
             tempPeriodSettings.endDate = dateEndInputEl.value;
             tempPeriodSettings.reportType = reportTypeSelectorEl.value;
+
             filterDrawerEl.classList.add('visible');
             filterOverlayEl.classList.add('visible');
             document.body.style.overflow = 'hidden';
@@ -4409,27 +5002,30 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
 
     if(btnOpenFiltersEl) btnOpenFiltersEl.addEventListener('click', () => toggleFilterDrawer(true));
     if(btnCloseFiltersEl) btnCloseFiltersEl.addEventListener('click', () => {
+        // Restaurer les réglages sauvegardés si l'utilisateur annule
         periodSelectorEl.value = tempPeriodSettings.period || 'last30days';
         dateStartInputEl.value = tempPeriodSettings.startDate || '';
         dateEndInputEl.value = tempPeriodSettings.endDate || '';
         reportTypeSelectorEl.value = tempPeriodSettings.reportType || 'summary';
-        if (periodSelectorEl.value === 'custom') {
-            customDateInputsEl.classList.add('visible');
-        } else {
-            customDateInputsEl.classList.remove('visible');
-        }
+        customDateInputsEl.classList.toggle('visible', periodSelectorEl.value === 'custom');
         toggleFilterDrawer(false);
     });
     if(filterOverlayEl) filterOverlayEl.addEventListener('click', () => {
-        if (btnCloseFiltersEl) btnCloseFiltersEl.click();
+        if (btnCloseFiltersEl) btnCloseFiltersEl.click(); // Simuler un clic sur le bouton fermer
     });
-   
+    
     function showKpiMessage(type, message = "") {
         const kpiElements = [
-            kpiTotalRevenueEl, kpiTotalCogsEl, kpiTotalProfitEl,
+            kpiTotalRevenueEl, kpiTotalCogsEl, kpiGrossProfitEl,
+            kpiTotalOperatingExpensesEl, kpiNetProfitEl, // NOUVEAUX KPIs
             kpiTotalSalesCountEl, kpiTotalItemsSoldEl, kpiAvgProfitMarginEl
         ];
-        const defaultValues = ['XOF 0', 'XOF 0', 'XOF 0', '0', '0', '0%'];
+        // Valeurs par défaut pour les KPIs
+        const defaultValues = [
+            'XOF 0', 'XOF 0', 'XOF 0', /* CA, COGS, Marge Brute */
+            'XOF 0', 'XOF 0', /* Dépenses Op., Profit Net */
+            '0', '0', '0%'    /* Nb Ventes, Art. Vendus, Marge Moy. */
+        ];
 
         if (type === 'loading') {
             kpiElements.forEach(el => { if(el) el.textContent = 'Chargement...'; });
@@ -4438,10 +5034,12 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
             kpiElements.forEach(el => { if(el) el.textContent = errorMsg; });
         } else if (type === 'noData') {
             kpiElements.forEach((el, index) => { if(el) el.textContent = defaultValues[index]; });
-            if (message && kpiTotalRevenueEl) kpiTotalRevenueEl.textContent = message; // Afficher un message spécifique si fourni
+            if (message && kpiTotalRevenueEl) { // Optionnel: Afficher un message spécifique
+                 // Pour l'instant, laisser les KPIs à 0 si pas de données.
+            }
         }
     }
-   
+    
     function setDateRange(updateDisplayOnly = false) {
         const selectedPeriod = periodSelectorEl.value;
         const today = new Date();
@@ -4449,11 +5047,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
         let endDate = new Date(today);
         let displayPeriodText = periodSelectorEl.options[periodSelectorEl.selectedIndex].text;
 
-        if (selectedPeriod === 'custom') {
-            customDateInputsEl.classList.add('visible');
-        } else {
-            customDateInputsEl.classList.remove('visible');
-        }
+        customDateInputsEl.classList.toggle('visible', selectedPeriod === 'custom');
 
         switch (selectedPeriod) {
             case 'today': break;
@@ -4472,16 +5066,16 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
                 const storedStart = dateStartInputEl.value;
                 const storedEnd = dateEndInputEl.value;
                 if (storedStart && storedEnd) {
-                    startDate = new Date(storedStart + 'T00:00:00'); // Assurer l'interprétation locale
-                    endDate = new Date(storedEnd + 'T23:59:59');    // Assurer l'interprétation locale
-                    if (startDate > endDate) { // Si la date de début est après la date de fin
-                        endDate = new Date(startDate); // Mettre la date de fin égale à la date de début
+                    startDate = new Date(storedStart + 'T00:00:00');
+                    endDate = new Date(storedEnd + 'T23:59:59');
+                    if (startDate > endDate) {
+                        endDate = new Date(startDate);
                         endDate.setHours(23,59,59,999);
-                        dateEndInputEl.valueAsDate = endDate; // Mettre à jour l'input
+                        dateEndInputEl.valueAsDate = endDate;
                     }
                     const formatDate = (d) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
                     displayPeriodText = `Du ${formatDate(startDate)} au ${formatDate(endDate)}`;
-                } else { // Valeurs par défaut si les champs custom sont vides
+                } else {
                     dateEndInputEl.valueAsDate = today;
                     const thirtyDaysAgo = new Date(today);
                     thirtyDaysAgo.setDate(today.getDate() - 29);
@@ -4493,7 +5087,7 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
                 break;
         }
 
-        if (selectedPeriod !== 'custom') { // Mettre à jour les inputs de date si pas 'custom'
+        if (selectedPeriod !== 'custom') {
             const yearStart = startDate.getFullYear();
             const monthStart = String(startDate.getMonth() + 1).padStart(2, '0');
             const dayStart = String(startDate.getDate()).padStart(2, '0');
@@ -4504,10 +5098,10 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
             const dayEnd = String(endDate.getDate()).padStart(2, '0');
             dateEndInputEl.value = `${yearEnd}-${monthEnd}-${dayEnd}`;
         }
-       
+        
         startDate.setHours(0, 0, 0, 0);
         endDate.setHours(23, 59, 59, 999);
-       
+        
         currentStartDate = startDate;
         currentEndDate = endDate;
 
@@ -4522,47 +5116,66 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
             return;
         }
         showKpiMessage('loading');
-        // await fetchAllBooksDetails(); // Pas directement utilisé pour les KPIs agrégés pour l'instant
 
         if (!currentStartDate || !currentEndDate) {
             showKpiMessage('error', "Période invalide.");
             return;
         }
-       
+        
         try {
+            // 1. Récupérer les ventes
             const salesQuery = db.collection('users').doc(auth.currentUser.uid).collection('sales')
                 .where('timestamp', '>=', firebase.firestore.Timestamp.fromDate(currentStartDate))
                 .where('timestamp', '<=', firebase.firestore.Timestamp.fromDate(currentEndDate));
-                // Pas besoin de .orderBy('timestamp', 'asc') pour l'agrégation
             const salesSnapshot = await salesQuery.get();
 
             let totalRevenue = 0;
-            let totalCogs = 0; // COGS total pour la période
+            let totalCogs = 0;
             let totalSalesCount = salesSnapshot.size;
             let totalItemsSoldCount = 0;
 
-            if (salesSnapshot.empty) {
-                showKpiMessage('noData', 'Aucune vente sur cette période.');
-                return;
+            if (!salesSnapshot.empty) {
+                salesSnapshot.forEach(doc => {
+                    const sale = doc.data();
+                    totalRevenue += sale.grandTotalAmount || 0;
+                    totalItemsSoldCount += sale.totalItemsSold || 0;
+                    totalCogs += sale.totalCostOfGoodsSold || 0;
+                });
+            }
+            
+            // 2. NOUVEAU : Récupérer les dépenses pour la même période
+            const expensesQuery = db.collection('users').doc(auth.currentUser.uid).collection('expenses')
+                .where('date', '>=', firebase.firestore.Timestamp.fromDate(currentStartDate))
+                .where('date', '<=', firebase.firestore.Timestamp.fromDate(currentEndDate));
+            const expensesSnapshot = await expensesQuery.get();
+
+            let totalOperatingExpenses = 0;
+            if (!expensesSnapshot.empty) {
+                expensesSnapshot.forEach(doc => {
+                    totalOperatingExpenses += doc.data().amount || 0;
+                });
             }
 
-            salesSnapshot.forEach(doc => {
-                const sale = doc.data();
-                totalRevenue += sale.grandTotalAmount || 0;
-                totalItemsSoldCount += sale.totalItemsSold || 0;
-                // Utiliser le totalCostOfGoodsSold stocké dans chaque vente
-                totalCogs += sale.totalCostOfGoodsSold || 0;
-            });
+            // 3. Calculer les KPIs
+            const grossProfit = totalRevenue - totalCogs;
+            const netProfit = grossProfit - totalOperatingExpenses;
+            const avgProfitMargin = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
 
-            const totalProfit = totalRevenue - totalCogs;
-            const avgProfitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
-
+            // 4. Afficher les KPIs
             if(kpiTotalRevenueEl) kpiTotalRevenueEl.textContent = totalRevenue.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
             if(kpiTotalCogsEl) kpiTotalCogsEl.textContent = totalCogs.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
-            if(kpiTotalProfitEl) kpiTotalProfitEl.textContent = totalProfit.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
+            if(kpiGrossProfitEl) kpiGrossProfitEl.textContent = grossProfit.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
+            
+            if(kpiTotalOperatingExpensesEl) kpiTotalOperatingExpensesEl.textContent = totalOperatingExpenses.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
+            if(kpiNetProfitEl) kpiNetProfitEl.textContent = netProfit.toLocaleString('fr-FR', {style:'currency', currency:'XOF', minimumFractionDigits:0});
+
             if(kpiTotalSalesCountEl) kpiTotalSalesCountEl.textContent = totalSalesCount.toLocaleString();
             if(kpiTotalItemsSoldEl) kpiTotalItemsSoldEl.textContent = totalItemsSoldCount.toLocaleString();
             if(kpiAvgProfitMarginEl) kpiAvgProfitMarginEl.textContent = avgProfitMargin.toFixed(1) + '%';
+            
+            if (salesSnapshot.empty && expensesSnapshot.empty) {
+                 showKpiMessage('noData'); // Ceci mettra tous les KPIs à leurs valeurs par défaut (0 ou 0%)
+            }
 
         } catch (error) {
             console.error("Erreur chargement rapport:", error);
@@ -4574,61 +5187,53 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
         setDateRange(true); // Mettre à jour les dates et l'affichage du filtre actif
         const selectedType = reportTypeSelectorEl.value;
         if (selectedType === 'summary') {
-            reportsDataSummaryEl.style.display = 'block'; // ou 'flex' si .kpi-grid l'exige
+            reportsDataSummaryEl.style.display = 'block'; 
             reportsDataPlaceholderEl.style.display = 'none';
             loadReportData();
         } else {
             reportsDataSummaryEl.style.display = 'none';
             reportsDataPlaceholderEl.style.display = 'block';
-             // Vous pouvez ajouter un message spécifique dans le placeholder ici
             reportsDataPlaceholderEl.innerHTML = `<p>Le rapport "${reportTypeSelectorEl.options[reportTypeSelectorEl.selectedIndex].text}" sera bientôt disponible.</p>`;
         }
-        toggleFilterDrawer(false); // Fermer le tiroir
+        toggleFilterDrawer(false);
     }
-   
+    
     if(btnApplyDrawerFiltersEl) btnApplyDrawerFiltersEl.addEventListener('click', applyFiltersAndLoadData);
     if(periodSelectorEl) periodSelectorEl.addEventListener('change', () => setDateRange(false)); // Juste mettre à jour les dates, ne pas charger
-   
-    if(reportTypeSelectorEl) reportTypeSelectorEl.addEventListener('change', () => {
-        // Pas besoin de recharger les données ici, se fera à l'application des filtres
-        const selectedType = reportTypeSelectorEl.value;
-        if (selectedType !== 'summary') {
-            // reportsDataSummaryEl.style.display = 'none'; // Géré par applyFiltersAndLoadData
-            // reportsDataPlaceholderEl.style.display = 'block';
-        } else {
-            // reportsDataSummaryEl.style.display = 'block';
-            // reportsDataPlaceholderEl.style.display = 'none';
-        }
-    });
-
+    
+    // Gestion de l'initialisation de la page
     function initializeReportsPage() {
         if (auth.currentUser) {
-            // setDateRange(true); // Assurer que les dates sont initialisées
-            applyFiltersAndLoadData(); // Charger les données avec les filtres par défaut
+            applyFiltersAndLoadData(); 
         } else {
             showKpiMessage('error', "Non connecté.");
             if(activeFiltersDisplayEl) activeFiltersDisplayEl.textContent = "Non connecté";
         }
     }
-   
-    window.addEventListener('hashchange', () => {
-        if (location.hash === '#reports') {
-            initializeReportsPage();
+    
+    // Observer pour la visibilité de la page
+    const reportsPageObserver = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                if (reportsPage.classList.contains('visible')) {
+                    initializeReportsPage();
+                }
+            }
         }
     });
+    reportsPageObserver.observe(reportsPage, { attributes: true });
 
     auth.onAuthStateChanged(user => {
-        if (location.hash === '#reports') { // Seulement si on est sur la page des rapports
+        if (reportsPage.classList.contains('visible')) { 
             initializeReportsPage();
         }
     });
 
-    // Initialisation si la page est chargée directement sur #reports
-    if (location.hash === '#reports') {
+    // Initialisation si la page est déjà visible au chargement du script
+    if (reportsPage.classList.contains('visible')) {
         initializeReportsPage();
     } else {
-        // Assurer que les dates sont prêtes même si la page n'est pas active initialement
-        setDateRange(false); 
+        setDateRange(false); // Préparer les dates même si non visible
     }
 
   })();
@@ -4900,17 +5505,18 @@ window.addEventListener('appinstalled', () => {
      
       // Pages sans la navigation principale
       const pagesWithoutNav = [
-        'activation',
-        'sell',       // Processus de vente
-        'supply',     // Liste des approvisionnements
-        'new-supply', // Processus d'approvisionnement
-        'select-book',// Sélection de livre
-        'orders',     // Commandes
-        'reports',    // Rapports
-        'cart',       // Panier
-        'stock-list', // Nouvelle page pour la liste du stock
-        'not-found'   // Page 404
-      ]; 
+  'activation',
+  'sell',
+  'supply',
+  'new-supply',
+  'select-book',
+  'orders',
+  'reports',
+  'cart',
+  'stock-list',
+  'not-found',
+  'expenses' // <--- AJOUTER CECI
+];
       if (mainNav) {
         if (pagesWithoutNav.includes(pageIdToShow)) { 
             mainNav.style.display = 'none';
