@@ -5593,192 +5593,180 @@ window.addEventListener('appinstalled', () => {
   deferredInstallPrompt = null; 
 });
 </script>
- <script>
+<script>
 // Main Router and Auth Guard - AMÉLIORÉ ET CORRIGÉ
 ;(function() {
-  const allPages  = document.querySelectorAll('main.page');
-  const mainNav   = document.querySelector('nav');
-  let userActivatedModuleScope = false; // Renommée pour clarifier son scope, utilisée pour des états moins critiques
-  let currentAuthUser = undefined; 
-  // Garder le corps caché initialement. route() le rendra visible ou onAuthStateChanged pour login.html.
-  document.body.style.visibility = 'hidden'; 
+  const allPages  = document.querySelectorAll('main.page');
+  const mainNav   = document.querySelector('nav');
+  let userActivatedModuleScope = false; // Utilisée pour les décisions de routage après l'auth
+  let currentAuthUser = undefined;
+  // Garder le corps caché initialement. route() le rendra visible ou onAuthStateChanged pour login.html.
+  document.body.style.visibility = 'hidden';
 
-  function showOnlyPage(pageIdToShow) {
-    let pageFound = false;
-    allPages.forEach(p => {
-      const isVisible = p.id === pageIdToShow;
-      p.classList.toggle('visible', isVisible);
-      if (isVisible) {
-        pageFound = true;
-      }
-    });
+  function showOnlyPage(pageIdToShow) {
+    let pageFound = false;
+    allPages.forEach(p => {
+      const isVisible = p.id === pageIdToShow;
+      p.classList.toggle('visible', isVisible);
+      if (isVisible) {
+        pageFound = true;
+      }
+    });
 
-    if (!pageFound && pageIdToShow !== 'add-book-modal-trigger') { // Assurez-vous que 'add-book-modal-trigger' n'est pas un ID de page réelle si vous le gardez
-      allPages.forEach(p => p.classList.toggle('visible', p.id === 'not-found'));
-      pageIdToShow = 'not-found';
-    }
+    if (!pageFound && pageIdToShow !== 'add-book-modal-trigger') {
+      allPages.forEach(p => p.classList.toggle('visible', p.id === 'not-found'));
+      pageIdToShow = 'not-found';
+    }
 
-    const pagesWithoutNav = [
-      'activation', 'sell', 'supply', 'new-supply', 'select-book',
-      'orders', 'reports', 'cart', 'stock-list', 'not-found', 'expenses'
-    ];
-    if (mainNav) {
-      if (pagesWithoutNav.includes(pageIdToShow)) {
-        mainNav.style.display = 'none';
-        const activePageElement = document.getElementById(pageIdToShow);
-        if (activePageElement) {
-          activePageElement.style.paddingBottom = 'env(safe-area-inset-bottom)';
-        }
-      } else {
-        mainNav.style.removeProperty('display');
-        const activePageElement = document.getElementById(pageIdToShow);
-        if (activePageElement) {
-           activePageElement.style.paddingBottom = 'calc(56px + env(safe-area-inset-bottom))';
-        }
-      }
-    }
+    const pagesWithoutNav = [
+      'activation', 'sell', 'supply', 'new-supply', 'select-book',
+      'orders', 'reports', 'cart', 'stock-list', 'not-found', 'expenses'
+    ];
+    if (mainNav) {
+      if (pagesWithoutNav.includes(pageIdToShow)) {
+        mainNav.style.display = 'none';
+        const activePageElement = document.getElementById(pageIdToShow);
+        if (activePageElement) {
+          activePageElement.style.paddingBottom = 'env(safe-area-inset-bottom)';
+        }
+      } else {
+        mainNav.style.removeProperty('display');
+        const activePageElement = document.getElementById(pageIdToShow);
+        if (activePageElement) {
+            activePageElement.style.paddingBottom = 'calc(56px + env(safe-area-inset-bottom))';
+        }
+      }
+    }
 
-    document.querySelectorAll('nav [data-hash]').forEach(el =>
-      el.classList.toggle('active', el.dataset.hash === pageIdToShow)
-    );
+    document.querySelectorAll('nav [data-hash]').forEach(el =>
+      el.classList.toggle('active', el.dataset.hash === pageIdToShow)
+    );
 
-    const activePageElement = document.getElementById(pageIdToShow);
-    if (activePageElement) {
-      activePageElement.scrollTop = 0;
-    }
-  }
+    const activePageElement = document.getElementById(pageIdToShow);
+    if (activePageElement) {
+      activePageElement.scrollTop = 0;
+    }
+  }
 
-  async function route() {
-    if (currentAuthUser === undefined) { // État d'auth pas encore déterminé
-      document.body.style.visibility = 'hidden'; 
-      return; 
-    }
+  // MODIFICATION PRINCIPALE : La fonction route() n'appelle plus getIdTokenResult(true)
+  async function route() { // "async" n'est plus strictement nécessaire ici, mais ne fait pas de mal
+    if (currentAuthUser === undefined) { // État d'auth pas encore déterminé
+      document.body.style.visibility = 'hidden';
+      return;
+    }
 
-    // L'état d'auth est connu (connecté ou non), on peut rendre le body visible
-    // si on n'est pas en train de rediriger vers login.html (géré par onAuthStateChanged)
+    // L'état d'auth est connu, on peut rendre le body visible
     if (window.location.pathname.endsWith('login.html')) {
-        // login.html gère sa propre visibilité si besoin, ou est déjà visible.
+      // login.html gère sa propre visibilité
     } else {
-        document.body.style.visibility = 'visible';
+      document.body.style.visibility = 'visible';
     }
 
-    let hashKey = location.hash.slice(1) || 'home';
+    let hashKey = location.hash.slice(1) || 'home';
 
-    if (!currentAuthUser) {
-      // Normalement géré par onAuthStateChanged pour rediriger vers login.html.
-      return;
-    }
-
-    // L'utilisateur EST connecté. Vérifions son statut d'activation à chaque appel à route()
-    // pour les décisions critiques de redirection.
-    let isCurrentUserActivated = false;
-    try {
-        // Forcer le rafraîchissement du token pour obtenir les claims les plus récentes
-        const idTokenResult = await currentAuthUser.getIdTokenResult(true); 
-        isCurrentUserActivated = !!idTokenResult.claims.activated;
-    } catch (error) {
-        console.error("Routeur: Erreur lors du rafraîchissement du token dans route()", error);
-        showGlobalToast("Erreur de session critique. Déconnexion...", true, 4000);
-        auth.signOut(); // Déclenchera onAuthStateChanged pour rediriger vers login
-        return;
+    if (!currentAuthUser) {
+      // Normalement géré par onAuthStateChanged pour rediriger vers login.html.
+      // Si on arrive ici, c'est un état transitoire ou une erreur.
+      // La redirection vers login.html dans onAuthStateChanged devrait prévaloir.
+      return;
     }
 
-    // Si l'utilisateur est connecté MAIS PAS activé ET n'est PAS sur la page d'activation
-    if (!isCurrentUserActivated && hashKey !== 'activation') {
-      if (location.hash !== '#activation') {
-        location.hash = '#activation'; // Déclenchera hashchange -> route() à nouveau
+    // L'utilisateur EST connecté.
+    // Utiliser userActivatedModuleScope qui a été mis à jour par onAuthStateChanged.
+    // Pas besoin de refaire un appel réseau ici.
+
+    if (!userActivatedModuleScope && hashKey !== 'activation') {
+      if (location.hash !== '#activation') {
+        location.hash = '#activation'; // Déclenchera hashchange -> route() à nouveau
         return; // Laisser le nouveau hashchange gérer l'affichage
-      }
-      // Si le hash est déjà #activation (par exemple, après la ligne ci-dessus et le nouveau hashchange)
-      showOnlyPage('activation'); 
-      return; 
-    }
+      }
+      // Si le hash est déjà #activation
+      showOnlyPage('activation');
+      return;
+    }
 
-    // Si l'utilisateur EST activé ET est sur la page d'activation (par exemple, juste après l'activation et le hash a été changé pour #home, puis route est appelée)
-    // OU si l'utilisateur est activé et que le hash est #activation (scénario peu probable mais défensif)
-    if (isCurrentUserActivated && hashKey === 'activation') {
-        if (location.hash !== '#home') { 
-            location.hash = '#home'; // Déclenchera hashchange -> route()
-            return; 
-        }
-        showOnlyPage('home'); 
-        return;
-    }
-    
-    showOnlyPage(hashKey);
-  }
+    if (userActivatedModuleScope && hashKey === 'activation') {
+      // Si l'utilisateur est activé et essaie d'aller sur la page d'activation,
+      // le rediriger vers l'accueil.
+      if (location.hash !== '#home') {
+        location.hash = '#home'; // Déclenchera hashchange -> route()
+        return;
+      }
+      showOnlyPage('home');
+      return;
+    }
 
-  auth.onAuthStateChanged(async user => {
-    currentAuthUser = user; 
-    if (!user) {
-      userActivatedModuleScope = false; 
-      if (!window.location.pathname.endsWith('login.html')) {
-        window.location.replace('login.html');
-      } else {
-        document.body.style.visibility = 'visible'; 
-      }
-      return;
-    }
+    showOnlyPage(hashKey);
+  }
 
-    // Utilisateur connecté.
-    // Mettre à jour userActivatedModuleScope pour une utilisation générale potentielle.
-    // Les décisions critiques dans route() utiliseront un rafraîchissement direct.
-    try {
-      const idTokenResult = await user.getIdTokenResult(true); // Rafraîchir au changement d'état
-      userActivatedModuleScope = !!idTokenResult.claims.activated;
-    } catch (error) {
-      console.error("Routeur: Erreur en récupérant idTokenResult dans onAuthStateChanged:", error);
-      userActivatedModuleScope = false;
-      showGlobalToast("Erreur d'authentification critique. Déconnexion...", true, 4000);
-      setTimeout(() => {
-        auth.signOut().finally(() => { 
-          window.location.replace('login.html');
-        });
-      }, 4000);
-      return; 
-    }
-    
+  auth.onAuthStateChanged(async user => {
+    currentAuthUser = user;
+    if (!user) {
+      userActivatedModuleScope = false;
+      if (!window.location.pathname.endsWith('login.html')) {
+        window.location.replace('login.html');
+      } else {
+        document.body.style.visibility = 'visible'; // login.html peut être rendu visible
+      }
+      return;
+    }
+
+    // Utilisateur connecté. Mettre à jour userActivatedModuleScope.
+    try {
+      // Rafraîchir le token ICI est une bonne pratique pour obtenir les claims à jour
+      // lors d'un changement d'état d'authentification ou au premier chargement.
+      const idTokenResult = await user.getIdTokenResult(true);
+      userActivatedModuleScope = !!idTokenResult.claims.activated;
+    } catch (error) {
+      console.error("Routeur: Erreur en récupérant idTokenResult dans onAuthStateChanged:", error);
+      userActivatedModuleScope = false; // Supposer non activé en cas d'erreur critique
+      showGlobalToast("Erreur d'authentification critique. Déconnexion...", true, 4000);
+      setTimeout(() => {
+        auth.signOut().finally(() => {
+          window.location.replace('login.html');
+        });
+      }, 4000);
+      return;
+    }
+
     // L'état d'authentification (currentAuthUser) est maintenant connu, et userActivatedModuleScope a une valeur.
     // Appelons route() pour gérer l'affichage initial ou la redirection nécessaire.
-    // route() se chargera de rafraîchir à nouveau les claims pour ses décisions critiques si besoin.
-    route(); 
-  });
+    route();
+  });
 
-  window.addEventListener('hashchange', route);
+  window.addEventListener('hashchange', route);
 
-  document.body.addEventListener('click', e => {
-    const dataHashElement = e.target.closest('[data-hash]');
-    if (!dataHashElement) return;
+  document.body.addEventListener('click', e => {
+    const dataHashElement = e.target.closest('[data-hash]');
+    if (!dataHashElement) return;
 
-    if (dataHashElement.classList.contains('nav-link')) {
-      const rect = dataHashElement.getBoundingClientRect();
-      const rippleSize = Math.max(rect.width, rect.height);
-      const rippleSpan = document.createElement('span');
-      rippleSpan.className = 'ripple';
-      rippleSpan.style.width = rippleSpan.style.height = rippleSize + 'px';
-      rippleSpan.style.left = (e.clientX - rect.left - rippleSize/2) + 'px';
-      rippleSpan.style.top  = (e.clientY - rect.top  - rippleSize/2) + 'px';
+    if (dataHashElement.classList.contains('nav-link')) {
+      const rect = dataHashElement.getBoundingClientRect();
+      const rippleSize = Math.max(rect.width, rect.height);
+      const rippleSpan = document.createElement('span');
+      rippleSpan.className = 'ripple';
+      rippleSpan.style.width = rippleSpan.style.height = rippleSize + 'px';
+      rippleSpan.style.left = (e.clientX - rect.left - rippleSize/2) + 'px';
+      rippleSpan.style.top  = (e.clientY - rect.top  - rippleSize/2) + 'px';
 
-      const existingRipple = dataHashElement.querySelector('.ripple');
-      if (existingRipple) existingRipple.remove();
+      const existingRipple = dataHashElement.querySelector('.ripple');
+      if (existingRipple) existingRipple.remove();
 
-      dataHashElement.appendChild(rippleSpan);
-      rippleSpan.addEventListener('animationend', () => rippleSpan.remove(), {once: true});
-    }
+      dataHashElement.appendChild(rippleSpan);
+      rippleSpan.addEventListener('animationend', () => rippleSpan.remove(), {once: true});
+    }
 
-    if (dataHashElement.tagName !== 'A' || !dataHashElement.getAttribute('href')?.startsWith('#')) {
-        if (location.hash !== '#' + dataHashElement.dataset.hash) {
-            location.hash = dataHashElement.dataset.hash;
-        } else {
-            route(); // Si on clique sur le lien de la page active, réexécuter la logique de la route
-        }
-    }
-    // Si c'est un lien <a> avec href="#...", la navigation par défaut se produit et hashchange est déclenché.
-  });
+    if (dataHashElement.tagName !== 'A' || !dataHashElement.getAttribute('href')?.startsWith('#')) {
+        if (location.hash !== '#' + dataHashElement.dataset.hash) {
+            location.hash = dataHashElement.dataset.hash;
+        } else {
+            route(); // Si on clique sur le lien de la page active, réexécuter la logique de la route
+        }
+    }
+    // Si c'est un lien <a> avec href="#...", la navigation par défaut se produit et hashchange est déclenché.
+  });
 
-  // L'appel initial à route() est maintenant géré plus robustement à la fin de onAuthStateChanged.
-  // Si currentAuthUser est encore undefined (script exécuté avant le premier onAuthStateChanged), 
-  // route() retournera tôt et attendra onAuthStateChanged.
+  // L'appel initial à route() est maintenant géré à la fin de onAuthStateChanged.
 })();
 </script>
 </body>
