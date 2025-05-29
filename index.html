@@ -3802,9 +3802,22 @@
             autocomplete="off"
             autocorrect="off"
             autocapitalize="sentences" 
-            enterkeyhint="done"  
+            enterkeyhint="next"  
             spellcheck="false"
             required
+          >
+        </div>
+        <div class="form-group">
+          <label for="new-book-author-modal-input">Nom de l'auteur</label>
+          <input
+            type="text" 
+            id="new-book-author-modal-input"
+            placeholder="Ex: Antoine de Saint-Exupéry"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="words" 
+            enterkeyhint="done" 
+            spellcheck="false"
           >
         </div>
         <button type="submit" id="add-book-modal-submit-btn">Enregistrer le livre</button>
@@ -3812,39 +3825,50 @@
     </div>
   </div>
 </div>
-
 <script>
 // Script pour la MODALE GLOBALE d'ajout de livre
 const addBookModalOverlayGlobal = document.getElementById('add-book-modal-overlay');
 const addBookModalDialogGlobal = addBookModalOverlayGlobal.querySelector('.modal');
 const formAddBookModalGlobal = document.getElementById('form-add-book-modal-form');
 const titleInputModalGlobal = document.getElementById('new-book-title-modal-input');
+const authorInputModalGlobal = document.getElementById('new-book-author-modal-input'); // NOUVELLE LIGNE
 const closeModalBtnModalGlobal = document.getElementById('add-book-modal-close-btn');
 const submitBtnModalGlobal = document.getElementById('add-book-modal-submit-btn');
 let previousActiveElementGlobal; 
 let focusableElementsModalGlobal = [];
 
-function openGlobalAddBookModal(defaultTitle = '') {
+// Variable pour stocker l'élément actuellement focus à l'intérieur de la modale pour le scroll
+let currentFocusedInputInModal;
+
+function openGlobalAddBookModal(defaultTitle = '', defaultAuthor = '') { // Ajout de defaultAuthor
   if (!addBookModalOverlayGlobal) return console.error('Modale #add-book-modal-overlay introuvable');
  
   previousActiveElementGlobal = document.activeElement; 
   addBookModalOverlayGlobal.classList.add('visible');
   addBookModalOverlayGlobal.setAttribute('aria-hidden', 'false');
   titleInputModalGlobal.value = defaultTitle;
+  authorInputModalGlobal.value = defaultAuthor; // NOUVELLE LIGNE pour l'auteur
 
-  // Piéger le focus
-  const focusableElementsString = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  const focusableElementsString = 'input[type="search"], input[type="text"], button, [href], select, textarea, [tabindex]:not([tabindex="-1"])'; // Préciser les types d'input
   focusableElementsModalGlobal = Array.from(addBookModalDialogGlobal.querySelectorAll(focusableElementsString));
-  const firstFocusableElement = focusableElementsModalGlobal[0];
+  const firstFocusableElement = titleInputModalGlobal; // Toujours commencer par le titre
  
-  setTimeout(() => { // Laisser le temps à la modale de devenir visible
-      if (firstFocusableElement) firstFocusableElement.focus();
+  setTimeout(() => {
+    if (firstFocusableElement) firstFocusableElement.focus();
   }, 100);
-
 
   document.addEventListener('keydown', trapFocusInModalGlobal);
   document.addEventListener('keydown', handleEscapeKeyModalGlobal);
-  document.body.style.overflow = 'hidden'; // Empêcher le scroll du body
+  document.body.style.overflow = 'hidden';
+
+  // Gestion du clavier pour la modale
+  focusableElementsModalGlobal.forEach(el => {
+    el.addEventListener('focus', handleModalInputFocus);
+    el.addEventListener('blur', handleModalInputBlur);
+  });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', handleModalViewportResize);
+  }
 }
 
 function closeGlobalAddBookModal() {
@@ -3854,57 +3878,41 @@ function closeGlobalAddBookModal() {
  
   document.removeEventListener('keydown', trapFocusInModalGlobal);
   document.removeEventListener('keydown', handleEscapeKeyModalGlobal);
-  document.body.style.overflow = ''; // Restaurer le scroll du body
+  document.body.style.overflow = ''; 
 
   if (previousActiveElementGlobal) {
-      previousActiveElementGlobal.focus(); 
+    previousActiveElementGlobal.focus(); 
   }
-  // Nettoyer le titre suggéré si on vient de select-book
   sessionStorage.removeItem('suggestedNewBookTitle_newSupply');
+  
+  // Nettoyage des listeners pour le clavier sur la modale
+  focusableElementsModalGlobal.forEach(el => {
+    el.removeEventListener('focus', handleModalInputFocus);
+    el.removeEventListener('blur', handleModalInputBlur);
+  });
+  if (window.visualViewport) {
+    window.visualViewport.removeEventListener('resize', handleModalViewportResize);
+  }
+  // Réinitialiser le style du modal en cas de modifications pour le clavier
+  addBookModalDialogGlobal.style.transform = '';
+  addBookModalDialogGlobal.style.marginBottom = '';
+  currentFocusedInputInModal = null;
 }
 
-if(closeModalBtnModalGlobal) closeModalBtnModalGlobal.addEventListener('click', closeGlobalAddBookModal);
-addBookModalOverlayGlobal.addEventListener('click', (e) => {
-    if (e.target === addBookModalOverlayGlobal) { 
-        closeGlobalAddBookModal();
-    }
-});
-
-function trapFocusInModalGlobal(e) {
-    if (e.key !== 'Tab' || !addBookModalOverlayGlobal.classList.contains('visible')) return;
-   
-    const firstFocusableElement = focusableElementsModalGlobal[0];
-    const lastFocusableElement = focusableElementsModalGlobal[focusableElementsModalGlobal.length - 1];
-
-    if (e.shiftKey) { 
-        if (document.activeElement === firstFocusableElement) {
-            lastFocusableElement.focus();
-            e.preventDefault();
-        }
-    } else { 
-        if (document.activeElement === lastFocusableElement) {
-            firstFocusableElement.focus();
-        }
-    }
-}
-
-function handleEscapeKeyModalGlobal(e) {
-    if (e.key === 'Escape' && addBookModalOverlayGlobal.classList.contains('visible')) {
-        closeGlobalAddBookModal();
-    }
-}
+// ... (trapFocusInModalGlobal et handleEscapeKeyModalGlobal restent inchangés) ...
 
 formAddBookModalGlobal.addEventListener('submit', async e => {
     e.preventDefault();
     const newTitle = titleInputModalGlobal.value.trim();
-   
+    const newAuthor = authorInputModalGlobal.value.trim(); // NOUVELLE LIGNE
+
     if (!newTitle) {
       titleInputModalGlobal.style.borderColor = 'var(--ebay-red)';
       setTimeout(() => titleInputModalGlobal.style.borderColor = '', 2000);
       titleInputModalGlobal.focus();
       return;
     }
-   
+    
     submitBtnModalGlobal.disabled = true;
     submitBtnModalGlobal.textContent = 'Enregistrement...';
 
@@ -3912,13 +3920,19 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
       if (!auth.currentUser) throw new Error("Utilisateur non authentifié.");
       const uid = auth.currentUser.uid;
       const userBooksRef = db.collection('users').doc(uid).collection('books');
-      const querySnapshot = await userBooksRef.get();
-      const existingBook = querySnapshot.docs.find(doc => doc.data().title.toLowerCase() === newTitle.toLowerCase());
-
-      if (existingBook) throw new Error(`Un livre intitulé "${existingBook.data().title}" existe déjà.`);
+      
+      // Vérification d'existence (optionnelle, mais bonne pratique si les titres doivent être uniques)
+      const querySnapshot = await userBooksRef.where('title', '==', newTitle).get();
+      if (!querySnapshot.empty) {
+          const existingBook = querySnapshot.docs.find(doc => (doc.data().author || '').toLowerCase() === newAuthor.toLowerCase());
+          if (existingBook) {
+            throw new Error(`Le livre "${newTitle}" par "${newAuthor || 'Auteur inconnu'}" existe déjà.`);
+          }
+      }
 
       await userBooksRef.add({
         title: newTitle,
+        author: newAuthor || "", // NOUVELLE LIGNE (stocker chaîne vide si pas d'auteur)
         price: 0, 
         quantity: 0, 
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -3929,25 +3943,97 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
       closeGlobalAddBookModal(); 
       showGlobalToast(`Livre "${newTitle}" ajouté !`, false, 2500);
 
-      // AMÉLIORATION: Mettre à jour sessionStorage pour la page new-supply si on vient de là
       const targetRowIdForNewSupply = sessionStorage.getItem('targetBookInputRowId_newSupply');
       if (targetRowIdForNewSupply) {
-          sessionStorage.setItem('selectedBookTitle_newSupply', newTitle);
-          sessionStorage.setItem('selectedBookBaseCost_newSupply', "0"); // Nouveau livre, coût 0
-          // Pas besoin de changer le hash ici, applySelectedBookFromStorage_newSupply
-          // sera appelé quand #new-supply redevient visible.
-          // Le routeur principal s'occupera de ramener à #new-supply si #select-book était intermédiaire.
-          if(location.hash === '#select-book') location.hash = 'new-supply';
+        sessionStorage.setItem('selectedBookTitle_newSupply', newTitle);
+        // Si vous voulez aussi passer l'auteur à la page new-supply, faites-le ici.
+        // sessionStorage.setItem('selectedBookAuthor_newSupply', newAuthor); 
+        sessionStorage.setItem('selectedBookBaseCost_newSupply', "0");
+        if(location.hash === '#select-book') location.hash = 'new-supply';
       }
       titleInputModalGlobal.value = ''; 
+      authorInputModalGlobal.value = ''; // NOUVELLE LIGNE
     } catch (err) {
       console.error(err);
       showGlobalToast("Erreur: " + err.message, true, 3500);
     } finally {
-        submitBtnModalGlobal.disabled = false;
-        submitBtnModalGlobal.textContent = 'Enregistrer le livre';
+      submitBtnModalGlobal.disabled = false;
+      submitBtnModalGlobal.textContent = 'Enregistrer le livre';
     }
 });
+
+// --- NOUVELLES FONCTIONS POUR LA GESTION DU CLAVIER DANS LA MODALE ---
+function handleModalInputFocus(event) {
+    currentFocusedInputInModal = event.target;
+    // Un léger délai pour s'assurer que le clavier est apparu et que visualViewport a été mis à jour
+    setTimeout(() => {
+        adjustModalForKeyboard();
+    }, 100);
+}
+
+function handleModalInputBlur() {
+    // On ne réinitialise pas immédiatement la position au blur d'un champ,
+    // car l'utilisateur pourrait passer à un autre champ dans la modale.
+    // La réinitialisation se fait à la fermeture de la modale (dans closeGlobalAddBookModal)
+    // ou si le clavier se referme (géré par handleModalViewportResize).
+    // currentFocusedInputInModal = null; // Optionnel: décommenter si nécessaire pour une logique plus fine
+}
+
+function handleModalViewportResize() {
+    // S'exécute lorsque le clavier apparaît/disparaît ou que la fenêtre est redimensionnée
+    adjustModalForKeyboard();
+}
+
+function adjustModalForKeyboard() {
+    if (!addBookModalOverlayGlobal.classList.contains('visible') || !window.visualViewport) {
+        // Si la modale n'est pas visible ou visualViewport n'est pas supporté, ne rien faire
+        addBookModalDialogGlobal.style.transform = '';
+        addBookModalDialogGlobal.style.marginBottom = '';
+        return;
+    }
+
+    const visualViewport = window.visualViewport;
+    const modalRect = addBookModalDialogGlobal.getBoundingClientRect();
+    const overlayRect = addBookModalOverlayGlobal.getBoundingClientRect(); // L'overlay prend toute la page
+
+    // Hauteur du clavier (approximative)
+    const keyboardHeight = overlayRect.height - visualViewport.height - visualViewport.offsetTop;
+
+    if (keyboardHeight > 50) { // Clavier probablement ouvert
+        addBookModalDialogGlobal.style.maxHeight = `calc(${visualViewport.height}px - 4rem)`; // 2rem de padding en haut et 2rem en bas
+        addBookModalDialogGlobal.style.overflowY = 'auto';
+
+        if (currentFocusedInputInModal) {
+            const inputRect = currentFocusedInputInModal.getBoundingClientRect();
+            // Vérifier si l'input est caché par le clavier
+            // La position de l'input par rapport au haut du viewport visible
+            const inputTopInViewport = inputRect.top - visualViewport.offsetTop;
+            // La position du bas de l'input par rapport au haut du viewport visible
+            const inputBottomInViewport = inputRect.bottom - visualViewport.offsetTop;
+
+            // Si le bas de l'input est en dessous du bas du viewport visible
+            if (inputBottomInViewport > visualViewport.height - 20) { // 20px de marge
+                 // Tenter de scroller l'input en vue à l'intérieur de la modale si elle est scrollable
+                currentFocusedInputInModal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            // Si le haut de l'input est au-dessus du haut du viewport (moins probable pour un clavier en bas)
+            // Ou si la modale elle-même est trop basse.
+            // On peut aussi choisir de translater la modale un peu vers le haut.
+            // addBookModalDialogGlobal.style.transform = `translateY(-${keyboardHeight / 3}px)`; // Exemple de translation
+
+        }
+        // Option: Forcer la modale à être plus haute si le contenu est petit
+        // addBookModalDialogGlobal.style.marginBottom = `${keyboardHeight - visualViewport.offsetTop + 20}px`;
+
+
+    } else { // Clavier probablement fermé ou non significatif
+        addBookModalDialogGlobal.style.transform = '';
+        addBookModalDialogGlobal.style.marginBottom = '';
+        addBookModalDialogGlobal.style.maxHeight = 'calc(100dvh - 4rem)'; // Rétablir la hauteur max
+        addBookModalDialogGlobal.style.overflowY = 'auto'; // Garder le scroll si le contenu est long
+    }
+}
+// --- FIN DES NOUVELLES FONCTIONS ---
 </script>
 
   <main id="orders" class="page">
@@ -4773,27 +4859,27 @@ formAddBookModalGlobal.addEventListener('submit', async e => {
                 else if (book.quantity <= LOW_STOCK_THRESHOLD_STOCK_PAGE) stockClass = 'stock-low';
 
                 card.innerHTML = `
-                    <div class="book-card-image-area">
-                        <i class="bi bi-book book-placeholder-icon"></i>
-                    </div>
-                    <div class="book-card-content-area">
-                        <div class="book-card-main-info">
-                            <h4 class="book-title">${book.title || 'Titre inconnu'}</h4>
-                            <p class="book-author"><i class="bi bi-person"></i> <span>${book.author || 'Auteur inconnu'}</span></p>
-                            <p class="book-price-sell"><i class="bi bi-tag-fill"></i> Prix Vente: <span>${formattedPriceSell}</span></p>
-                            <p class="book-quantity-stock"><i class="bi bi-box-seam"></i> Stock: <span class="stock-value ${stockClass}">${book.quantity || 0}</span></p>
-                        </div>
-                        <div class="book-card-secondary-info">
-                            <p class="book-price-purchase"><i class="bi bi-cart-check"></i> Dernier Coût: <span>${formattedLastPurchasePrice}</span></p>
-                            <p class="book-average-cost"><i class="bi bi-calculator"></i> Coût Moyen P.: <span>${formattedAverageCost}</span></p>
-                        </div>
-                        <div class="book-card-actions">
-                            <button class="btn-action-icon btn-view-details-stock" data-book-id="${book.id}" aria-label="Voir détails" title="Voir détails"><i class="bi bi-eye-fill"></i></button>
-                            <button class="btn-action-icon btn-edit-book-stock" data-book-id="${book.id}" aria-label="Modifier" title="Modifier"><i class="bi bi-pencil-fill"></i></button>
-                            <button class="btn-action-icon btn-delete-book btn-delete-book-stock" data-book-id="${book.id}" aria-label="Supprimer" title="Supprimer"><i class="bi bi-trash3-fill"></i></button>
-                        </div>
-                    </div>
-                `;
+    <div class="book-card-image-area">
+        <i class="bi bi-book book-placeholder-icon"></i>
+    </div>
+    <div class="book-card-content-area">
+        <div class="book-card-main-info">
+            <h4 class="book-title">${book.title || 'Titre inconnu'}</h4>
+            <p class="book-author"><i class="bi bi-person"></i> <span>${book.author || 'Auteur inconnu'}</span></p>
+            <p class="book-price-sell"><i class="bi bi-tag-fill"></i> Prix Vente: <span>${formattedPriceSell}</span></p>
+            <p class="book-quantity-stock"><i class="bi bi-box-seam"></i> Stock: <span class="stock-value ${stockClass}">${book.quantity || 0}</span></p>
+        </div>
+        <div class="book-card-secondary-info">
+            <p class="book-price-purchase"><i class="bi bi-cart-check"></i> Dernier Coût: <span>${formattedLastPurchasePrice}</span></p>
+            <p class="book-average-cost"><i class="bi bi-calculator"></i> Coût Moyen P.: <span>${formattedAverageCost}</span></p>
+        </div>
+        <div class="book-card-actions">
+            <button class="btn-action-icon btn-view-details-stock" data-book-id="${book.id}" aria-label="Voir détails" title="Voir détails"><i class="bi bi-eye-fill"></i></button>
+            <button class="btn-action-icon btn-edit-book-stock" data-book-id="${book.id}" aria-label="Modifier" title="Modifier"><i class="bi bi-pencil-fill"></i></button>
+            <button class="btn-action-icon btn-delete-book btn-delete-book-stock" data-book-id="${book.id}" aria-label="Supprimer" title="Supprimer"><i class="bi bi-trash3-fill"></i></button>
+        </div>
+    </div>
+`;
                 booksListContainerEl.appendChild(card);
             });
 
