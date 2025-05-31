@@ -6405,242 +6405,201 @@
       </script>
     </main>
 
-    <main id="catalog" class="page">
-      <header id="catalog-main-header">
-        <h2>Catalogue</h2>
-      </header>
-      <div class="catalog-content-wrapper">
-        <section class="catalog-stats-overview">
-          <h3>Aperçu du Catalogue</h3>
-          <div class="stats-grid">
-            <div class="stat-card">
-              <i class="bi bi-boxes stat-icon"></i>
-              <div class="stat-value" id="stat-total-books-stock">0</div>
-              <div class="stat-label">Livres en Stock</div>
+
+
+        <main id="catalog" class="page">
+            <header id="catalog-main-header">
+                <h2>Catalogue</h2>
+            </header>
+            <div class="catalog-content-wrapper">
+                <section class="catalog-stats-overview">
+                    <h3>Aperçu du Catalogue</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="bi bi-boxes stat-icon"></i>
+                            <div class="stat-value" id="stat-total-books-stock">0</div>
+                            <div class="stat-label">Livres en Stock</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="bi bi-cash-stack stat-icon value"></i>
+                            <div class="stat-value" id="stat-total-stock-value">XOF 0</div>
+                            <div class="stat-label">Valeur Stock (CMP)</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="bi bi-tag-fill stat-icon" style="color: var(--ebay-blue); background-color: rgba(0, 100, 210, 0.08);"></i>
+                            <div class="stat-value" id="stat-avg-selling-price">XOF 0</div>
+                            <div class="stat-label">Prix Vente Moyen (Indic.)</div>
+                        </div>
+                    </div>
+                    <button id="btn-download-catalog-pdf" class="btn-primary full-width">
+                        <i class="bi bi-file-earmark-pdf-fill"></i> Télécharger l'Inventaire (PDF)
+                    </button>
+                </section>
+
+                <section class="catalog-actions-section">
+                    <h3>Gestion du Stock</h3>
+                    <button id="btn-view-stock-list" class="btn-primary full-width" data-hash="stock-list">
+                        <i class="bi bi-list-ul"></i> Consulter et Rechercher le Stock
+                    </button>
+                </section>
             </div>
-            <div class="stat-card">
-              <i class="bi bi-cash-stack stat-icon value"></i>
-              <div class="stat-value" id="stat-total-stock-value">XOF 0</div>
-              <div class="stat-label">Valeur Stock (CMP)</div>
-            </div>
-          </div>
-          <button id="btn-download-catalog-pdf" class="btn-primary full-width">
-            <i class="bi bi-file-earmark-pdf-fill"></i> Télécharger l'Inventaire
-            (PDF)
-          </button>
-        </section>
 
-        <section class="catalog-actions-section">
-          <h3>Gestion du Stock</h3>
-          <button
-            id="btn-view-stock-list"
-            class="btn-primary full-width"
-            data-hash="stock-list"
-          >
-            <i class="bi bi-list-ul"></i> Consulter et Rechercher le Stock
-          </button>
-        </section>
-      </div>
+            <script>
+            // Catalog Page Script (Dashboard View) - MODIFIED
+            (function () {
+                const catalogPageEl = document.getElementById("catalog");
+                if (!catalogPageEl) return;
 
-      <script>
-        // Catalog Page Script (Dashboard View)
-        (function () {
-          const catalogPageEl = document.getElementById("catalog");
-          if (!catalogPageEl) return;
+                // Stats elements
+                const statTotalBooksStockEl = catalogPageEl.querySelector("#stat-total-books-stock");
+                const statTotalStockValueEl = catalogPageEl.querySelector("#stat-total-stock-value");
+                // NOUVEL ÉLÉMENT RÉFÉRENCÉ
+                const statAvgSellingPriceEl = catalogPageEl.querySelector("#stat-avg-selling-price"); 
 
-          // Stats elements
-          const statUniqueTitlesEl = catalogPageEl.querySelector(
-            "#stat-unique-titles"
-          );
-          const statTotalBooksStockEl = catalogPageEl.querySelector(
-            "#stat-total-books-stock"
-          );
-          const statTotalStockValueEl = catalogPageEl.querySelector(
-            "#stat-total-stock-value"
-          );
-          const statAvgSellingPriceEl = catalogPageEl.querySelector(
-            "#stat-avg-selling-price"
-          );
-          const statLowStockItemsEl = catalogPageEl.querySelector(
-            "#stat-low-stock-items"
-          );
-          const btnDownloadPdfEl = catalogPageEl.querySelector(
-            "#btn-download-catalog-pdf"
-          );
+                const btnDownloadPdfEl = catalogPageEl.querySelector("#btn-download-catalog-pdf");
 
-          let allBooksCacheForStats = [];
-          let unsubscribeCatalogStats = null;
-          const LOW_STOCK_THRESHOLD = 5;
+                let allBooksCacheForStats = [];
+                let unsubscribeCatalogStats = null;
+                // const LOW_STOCK_THRESHOLD = 5; // Plus nécessaire ici si la stat n'est pas affichée
 
-          auth.onAuthStateChanged((user) => {
-            if (user) {
-              if (catalogPageEl.classList.contains("visible")) {
-                setupCatalogStatsListener();
-              }
-            } else {
-              cleanupCatalogStatsListener();
-              if (catalogPageEl.classList.contains("visible")) {
-                resetStats();
-              }
-            }
-          });
-
-          window.addEventListener("hashchange", () => {
-            if (location.hash === "#catalog") {
-              if (auth.currentUser) setupCatalogStatsListener();
-              else resetStats();
-            } else {
-              cleanupCatalogStatsListener();
-            }
-          });
-
-          if (location.hash === "#catalog") {
-            if (auth.currentUser) setupCatalogStatsListener();
-            else resetStats();
-          }
-
-          if (btnDownloadPdfEl) {
-            btnDownloadPdfEl.addEventListener("click", () => {
-              showGlobalToast(
-                "Fonctionnalité de téléchargement PDF en cours de développement.",
-                false,
-                2500
-              );
-            });
-          }
-
-          function setupCatalogStatsListener() {
-            if (unsubscribeCatalogStats) unsubscribeCatalogStats();
-            if (!auth.currentUser) return;
-
-            const userBooksRef = db
-              .collection("users")
-              .doc(auth.currentUser.uid)
-              .collection("books");
-
-            // Mettre les stats en mode chargement
-            if (statUniqueTitlesEl) statUniqueTitlesEl.textContent = "...";
-            if (statTotalBooksStockEl)
-              statTotalBooksStockEl.textContent = "...";
-            if (statTotalStockValueEl)
-              statTotalStockValueEl.textContent = "...";
-            if (statAvgSellingPriceEl)
-              statAvgSellingPriceEl.textContent = "...";
-            if (statLowStockItemsEl) statLowStockItemsEl.textContent = "...";
-
-            unsubscribeCatalogStats = userBooksRef.onSnapshot(
-              (snapshot) => {
-                allBooksCacheForStats = snapshot.docs.map((doc) => ({
-                  id: doc.id,
-                  ...doc.data(),
-                }));
-                updateCatalogStatsDisplay();
-              },
-              (err) => {
-                console.error("Erreur Firestore catalog/stats:", err);
-                resetStats();
-                if (statUniqueTitlesEl)
-                  statUniqueTitlesEl.textContent = "Erreur";
-              }
-            );
-          }
-
-          function cleanupCatalogStatsListener() {
-            if (unsubscribeCatalogStats) {
-              unsubscribeCatalogStats();
-              unsubscribeCatalogStats = null;
-            }
-            allBooksCacheForStats = [];
-            // Ne pas effacer les stats ici, elles pourraient être utiles si l'utilisateur revient rapidement
-          }
-
-          function resetStats() {
-            if (statUniqueTitlesEl) statUniqueTitlesEl.textContent = "0";
-            if (statTotalBooksStockEl) statTotalBooksStockEl.textContent = "0";
-            if (statTotalStockValueEl)
-              statTotalStockValueEl.textContent = "XOF 0";
-            if (statAvgSellingPriceEl)
-              statAvgSellingPriceEl.textContent = "XOF 0";
-            if (statLowStockItemsEl) statLowStockItemsEl.textContent = "0";
-          }
-
-          function updateCatalogStatsDisplay() {
-            if (!allBooksCacheForStats.length && !auth.currentUser) {
-              // S'assurer que l'utilisateur est connecté avant de remettre à zéro
-              resetStats();
-              return;
-            }
-            if (!allBooksCacheForStats.length && auth.currentUser) {
-              // Utilisateur connecté mais pas de livres
-              if (statUniqueTitlesEl) statUniqueTitlesEl.textContent = "0";
-              if (statTotalBooksStockEl)
-                statTotalBooksStockEl.textContent = "0";
-              if (statTotalStockValueEl)
-                statTotalStockValueEl.textContent = "XOF 0";
-              if (statAvgSellingPriceEl)
-                statAvgSellingPriceEl.textContent = "XOF 0";
-              if (statLowStockItemsEl) statLowStockItemsEl.textContent = "0";
-              return;
-            }
-
-            const uniqueTitles = allBooksCacheForStats.length;
-            const totalBooksInStock = allBooksCacheForStats.reduce(
-              (sum, book) => sum + (book.quantity || 0),
-              0
-            );
-            const totalStockValue = allBooksCacheForStats.reduce(
-              (sum, book) => {
-                const cost =
-                  book.averageCost !== undefined
-                    ? book.averageCost
-                    : book.lastPurchasePrice || 0;
-                return sum + cost * (book.quantity || 0);
-              },
-              0
-            );
-
-            let totalSellingPriceSum = 0;
-            let booksWithPriceCount = 0;
-            allBooksCacheForStats.forEach((book) => {
-              if (typeof book.price === "number" && book.quantity > 0) {
-                totalSellingPriceSum += book.price * book.quantity;
-                booksWithPriceCount += book.quantity;
-              }
-            });
-            const avgSellingPrice =
-              booksWithPriceCount > 0
-                ? totalSellingPriceSum / booksWithPriceCount
-                : 0;
-            const lowStockItems = allBooksCacheForStats.filter(
-              (book) =>
-                book.quantity > 0 && book.quantity <= LOW_STOCK_THRESHOLD
-            ).length;
-
-            if (statUniqueTitlesEl)
-              statUniqueTitlesEl.textContent = uniqueTitles.toLocaleString();
-            if (statTotalBooksStockEl)
-              statTotalBooksStockEl.textContent =
-                totalBooksInStock.toLocaleString();
-            if (statTotalStockValueEl)
-              statTotalStockValueEl.textContent =
-                totalStockValue.toLocaleString("fr-FR", {
-                  style: "currency",
-                  currency: "XOF",
-                  minimumFractionDigits: 0,
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        if (catalogPageEl.classList.contains("visible")) {
+                            setupCatalogStatsListener();
+                        }
+                    } else {
+                        cleanupCatalogStatsListener();
+                        if (catalogPageEl.classList.contains("visible")) {
+                            resetStats();
+                        }
+                    }
                 });
-            if (statAvgSellingPriceEl)
-              statAvgSellingPriceEl.textContent =
-                avgSellingPrice.toLocaleString("fr-FR", {
-                  style: "currency",
-                  currency: "XOF",
-                  minimumFractionDigits: 0,
+
+                // Observer pour la visibilité de la page
+                const catalogPageObserver = new MutationObserver((mutationsList) => {
+                    for (const mutation of mutationsList) {
+                        if (mutation.type === "attributes" && mutation.attributeName === "class") {
+                            if (catalogPageEl.classList.contains("visible")) {
+                                if (auth.currentUser) setupCatalogStatsListener();
+                                else resetStats();
+                            } else {
+                                cleanupCatalogStatsListener();
+                            }
+                        }
+                    }
                 });
-            if (statLowStockItemsEl)
-              statLowStockItemsEl.textContent = lowStockItems.toLocaleString();
-          }
-        })();
-      </script>
-    </main>
+                catalogPageObserver.observe(catalogPageEl, { attributes: true });
+
+
+                if (catalogPageEl.classList.contains("visible")) { // Chargement initial
+                    if (auth.currentUser) setupCatalogStatsListener();
+                    else resetStats();
+                }
+
+
+                if (btnDownloadPdfEl) {
+                    btnDownloadPdfEl.addEventListener("click", () => {
+                        showGlobalToast(
+                            "Fonctionnalité de téléchargement PDF en cours de développement.",
+                            false,
+                            2500
+                        );
+                    });
+                }
+
+                function setupCatalogStatsListener() {
+                    if (unsubscribeCatalogStats) unsubscribeCatalogStats();
+                    if (!auth.currentUser) return;
+
+                    const userBooksRef = db
+                        .collection("users")
+                        .doc(auth.currentUser.uid)
+                        .collection("books");
+
+                    // Mettre les stats en mode chargement
+                    if (statTotalBooksStockEl) statTotalBooksStockEl.textContent = "...";
+                    if (statTotalStockValueEl) statTotalStockValueEl.textContent = "...";
+                    if (statAvgSellingPriceEl) statAvgSellingPriceEl.textContent = "..."; // NOUVEAU
+
+                    unsubscribeCatalogStats = userBooksRef.onSnapshot(
+                        (snapshot) => {
+                            allBooksCacheForStats = snapshot.docs.map((doc) => ({
+                                id: doc.id,
+                                ...doc.data(),
+                            }));
+                            updateCatalogStatsDisplay();
+                        },
+                        (err) => {
+                            console.error("Erreur Firestore catalog/stats:", err);
+                            resetStats(); // Remettre à zéro en cas d'erreur
+                            if (statTotalBooksStockEl) statTotalBooksStockEl.textContent = "Erreur"; // Indiquer une erreur
+                        }
+                    );
+                }
+
+                function cleanupCatalogStatsListener() {
+                    if (unsubscribeCatalogStats) {
+                        unsubscribeCatalogStats();
+                        unsubscribeCatalogStats = null;
+                    }
+                    // Ne pas vider allBooksCacheForStats ici pour un rechargement plus rapide si l'utilisateur revient
+                }
+
+                function resetStats() {
+                    if (statTotalBooksStockEl) statTotalBooksStockEl.textContent = "0";
+                    if (statTotalStockValueEl) statTotalStockValueEl.textContent = "XOF 0";
+                    if (statAvgSellingPriceEl) statAvgSellingPriceEl.textContent = "XOF 0"; // NOUVEAU
+                }
+
+                function updateCatalogStatsDisplay() {
+                    if (!auth.currentUser) { // Si l'utilisateur s'est déconnecté pendant que le listener était actif
+                        resetStats();
+                        return;
+                    }
+                    if (!allBooksCacheForStats.length) {
+                        resetStats(); // Met les valeurs à 0 si le cache est vide (ex: aucun livre)
+                        return;
+                    }
+
+                    const totalBooksInStock = allBooksCacheForStats.reduce(
+                        (sum, book) => sum + (book.quantity || 0),0
+                    );
+                    const totalStockValue = allBooksCacheForStats.reduce(
+                        (sum, book) => {
+                            const cost = book.averageCost !== undefined ? book.averageCost : (book.lastPurchasePrice || 0);
+                            return sum + cost * (book.quantity || 0);
+                        },0
+                    );
+
+                    // NOUVEAU CALCUL : Prix de Vente Moyen Indicatif Pondéré par la quantité en stock
+                    let totalWeightedSellingPriceSum = 0;
+                    let totalQuantityForAvgPrice = 0;
+                    allBooksCacheForStats.forEach((book) => {
+                        // On ne considère que les livres en stock et ayant un prix de vente défini
+                        if (typeof book.price === "number" && book.price > 0 && book.quantity > 0) {
+                            totalWeightedSellingPriceSum += book.price * book.quantity;
+                            totalQuantityForAvgPrice += book.quantity;
+                        }
+                    });
+                    const avgSellingPrice = totalQuantityForAvgPrice > 0 ? totalWeightedSellingPriceSum / totalQuantityForAvgPrice : 0;
+
+
+                    if (statTotalBooksStockEl) statTotalBooksStockEl.textContent = totalBooksInStock.toLocaleString();
+                    if (statTotalStockValueEl) {
+                        statTotalStockValueEl.textContent = totalStockValue.toLocaleString("fr-FR", {
+                            style: "currency", currency: "XOF", minimumFractionDigits: 0,
+                        });
+                    }
+                    // NOUVEL AFFICHAGE
+                    if (statAvgSellingPriceEl) {
+                         statAvgSellingPriceEl.textContent = avgSellingPrice.toLocaleString("fr-FR", {
+                            style: "currency", currency: "XOF", minimumFractionDigits: 0,
+                        });
+                    }
+                }
+            })();
+            </script>
+        </main>
 
     <main id="stock-list" class="page">
       <header id="stock-list-header">
